@@ -1,3 +1,5 @@
+package org.rascat.gcl.converter;
+
 import org.apache.flink.api.common.functions.MapFunction;
 import org.apache.flink.api.common.typeinfo.TypeHint;
 import org.apache.flink.api.java.DataSet;
