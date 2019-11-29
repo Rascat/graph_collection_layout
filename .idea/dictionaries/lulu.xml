@@ -4,6 +4,7 @@
       <w>flink</w>
       <w>gradoop</w>
       <w>ldbc</w>
+      <w>subgraph</w>
     </words>
   </dictionary>
 </component>
