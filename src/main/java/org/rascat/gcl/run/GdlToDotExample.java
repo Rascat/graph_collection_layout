@@ -3,10 +3,12 @@ package org.rascat.gcl.run;
 import org.apache.flink.api.java.ExecutionEnvironment;
 import org.gradoop.flink.io.api.DataSink;
 import org.gradoop.flink.io.impl.dot.DOTDataSink;
+import org.gradoop.flink.model.impl.epgm.GraphCollection;
 import org.gradoop.flink.model.impl.epgm.LogicalGraph;
 import org.gradoop.flink.util.FlinkAsciiGraphLoader;
 import org.gradoop.flink.util.GradoopFlinkConfig;
 import org.jetbrains.annotations.NotNull;
+import org.rascat.gcl.layout.RandomGraphCollectionLayout;
 import org.rascat.gcl.util.Printer;
 
 import java.util.Objects;
@@ -33,8 +35,13 @@ public class GdlToDotExample {
         Printer.printGraphInfo(g4, "g4");
         Printer.printGraphInfo(g5, "g5");
 
-        DataSink sink = new DOTDataSink(pathToOutput, true, DOTDataSink.DotFormat.SIMPLE);
-        loader.getGraphCollection().writeTo(sink, true);
+        GraphCollection collection = loader.getGraphCollection();
+
+        RandomGraphCollectionLayout layout = new RandomGraphCollectionLayout(100, 100, cfg);
+        collection = layout.execute(collection);
+
+        DataSink sink = new DOTDataSink(pathToOutput, true, DOTDataSink.DotFormat.HTML);
+        collection.writeTo(sink, true);
 
         env.execute();
     }
