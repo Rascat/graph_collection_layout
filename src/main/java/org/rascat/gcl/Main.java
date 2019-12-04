@@ -1,6 +1,8 @@
 package org.rascat.gcl;
 
+import org.apache.flink.api.common.functions.FilterFunction;
 import org.apache.flink.api.java.ExecutionEnvironment;
+import org.gradoop.common.model.impl.pojo.EPGMVertex;
 import org.gradoop.flink.io.api.DataSink;
 import org.gradoop.flink.io.impl.csv.CSVDataSink;
 import org.gradoop.flink.io.impl.csv.CSVDataSource;
@@ -10,6 +12,7 @@ import org.gradoop.flink.model.impl.functions.bool.True;
 import org.gradoop.flink.model.impl.functions.epgm.LabelIsIn;
 import org.gradoop.flink.model.impl.operators.sampling.RandomVertexEdgeSampling;
 import org.gradoop.flink.model.impl.operators.sampling.SamplingAlgorithm;
+import org.gradoop.flink.model.impl.operators.subgraph.Subgraph;
 import org.gradoop.flink.util.GradoopFlinkConfig;
 import org.jetbrains.annotations.NotNull;
 
@@ -32,14 +35,15 @@ public class Main {
         System.out.println("[IG] Graph heads: " + graph.getGraphHead().collect());
 
 //        LogicalGraph resultGraph = createSampleGraph(graph, 0.2f);
-        LogicalGraph resultGraph = createSubgraph(graph);
+//        LogicalGraph resultGraph = createSubgraph(graph);
+        LogicalGraph resultGraph = graph;
 
         System.out.println("[OG] Amount edges: " + resultGraph.getEdges().count());
         System.out.println("[OG] Amount vertices: " + resultGraph.getVertices().count());
         System.out.println("[OG] Graph heads: " + resultGraph.getGraphHead().collect());
 
-        DataSink sink = new CSVDataSink(pathToOutput, cfg);
-//        DataSink sink = new DOTDataSink(pathToOutput + "/ldbc.dot", true, DOTDataSink.DotFormat.HTML);
+//        DataSink sink = new CSVDataSink(pathToOutput, cfg);
+        DataSink sink = new DOTDataSink(pathToOutput, true, DOTDataSink.DotFormat.HTML);
         resultGraph.writeTo(sink, true);
 
         env.execute();
@@ -51,8 +55,11 @@ public class Main {
     }
 
     private static LogicalGraph createSubgraph(LogicalGraph graph) {
-        return graph.subgraph(
-                new LabelIsIn<>("City", "University", "Company", "Person"),
-                new True<>());
+        return graph.vertexInducedSubgraph(new FilterFunction<EPGMVertex>() {
+            @Override
+            public boolean filter(EPGMVertex epgmVertex) throws Exception {
+                return epgmVertex.getLabel().equals("person");
+            }
+        });
     }
 }
