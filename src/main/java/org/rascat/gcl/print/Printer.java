@@ -2,55 +2,46 @@ package org.rascat.gcl.print;
 
 import org.gradoop.common.model.impl.pojo.EPGMVertex;
 import org.gradoop.flink.model.impl.epgm.GraphCollection;
-import org.rascat.gcl.print.shapes.VertexShape;
 
 import javax.imageio.ImageIO;
 import java.awt.*;
 import java.awt.geom.Ellipse2D;
-import java.awt.geom.Line2D;
-import java.awt.geom.Point2D;
 import java.awt.image.BufferedImage;
 import java.io.File;
-import java.io.IOException;
 
 public class Printer {
-    public void printGraphCollection(GraphCollection collection) throws Exception {
-        BufferedImage image = new BufferedImage(1000, 1000, BufferedImage.TYPE_INT_ARGB);
-        Graphics2D gfx = image.createGraphics();
-        gfx.setColor(Color.RED);
 
-        for (EPGMVertex vertex : collection.getVertices().collect()) {
-            gfx.fillOval(vertex.getPropertyValue("X").getInt() * 10, vertex.getPropertyValue("Y").getInt() * 10, 30, 30);
-        }
+    private int imageHeight;
+    private int imageWidth;
+    private String out;
 
-        File file = new File("out/file.png");
-        ImageIO.write(image, "png", file);
+    private String DEFAULT_IMG_FORMAT = "png";
+    private int DEFAULT_RADIUS = 15;
+
+    public Printer(int imageHeight, int imageWidth, String out) {
+        this.imageHeight = imageHeight;
+        this.imageWidth = imageWidth;
+        this.out = out;
     }
 
-    private static void printGraphCollection() throws IOException {
-        int layoutWidth = 100;
-        int layoutHeight = 100;
-
-        BufferedImage image = new BufferedImage(layoutWidth * 10, layoutHeight * 10, BufferedImage.TYPE_INT_ARGB);
+    public void printGraphCollection(GraphCollection collection) throws Exception {
+        BufferedImage image = new BufferedImage(this.imageWidth, this.imageHeight, BufferedImage.TYPE_INT_ARGB);
         Graphics2D gfx = image.createGraphics();
         gfx.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
         gfx.setColor(Color.RED);
 
-        gfx.setStroke(new BasicStroke(10));
-        gfx.drawLine(0,0,image.getWidth(),image.getHeight());
-        Point2D p1 = new Point(5,6);
-        Point2D p2 = new Point(46, 87);
-        Point2D p3 = new Point(80, 10);
-        Point2D p4 = new Point(33, 69);
+        for (EPGMVertex vertex : collection.getVertices().collect()) {
+            int x = vertex.getPropertyValue("X").getInt();
+            int y = vertex.getPropertyValue("Y").getInt();
+            gfx.fill(this.createCircle(x, y, DEFAULT_RADIUS));
 
-        gfx.fillOval(5 * 10,6 * 10,30,30);
-        gfx.fillOval(46  * 10, 87 * 10,30,30);
+        }
 
-        File file = new File("out/file.png");
-        ImageIO.write(image, "png", file);
+        File file = new File(out);
+        ImageIO.write(image, DEFAULT_IMG_FORMAT, file);
     }
 
-    public static void main(String[] args) throws IOException {
-        printGraphCollection();
+    private Ellipse2D createCircle(double x, double y, double r) {
+        return new Ellipse2D.Double(x - r, y - r, 2 * r, 2 * r);
     }
 }
