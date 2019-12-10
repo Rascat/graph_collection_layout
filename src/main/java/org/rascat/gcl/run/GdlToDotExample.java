@@ -9,7 +9,7 @@ import org.gradoop.flink.util.FlinkAsciiGraphLoader;
 import org.gradoop.flink.util.GradoopFlinkConfig;
 import org.jetbrains.annotations.NotNull;
 import org.rascat.gcl.layout.RandomGraphCollectionLayout;
-import org.rascat.gcl.print.Printer;
+import org.rascat.gcl.print.Render;
 import org.rascat.gcl.util.Logger;
 
 import java.util.Objects;
@@ -19,7 +19,7 @@ public class GdlToDotExample {
         String pathToGdl = Objects.requireNonNull(args[0]);
         String pathToOutput = Objects.requireNonNull(args[1]);
 
-        ExecutionEnvironment env = ExecutionEnvironment.getExecutionEnvironment();
+        ExecutionEnvironment env = ExecutionEnvironment.createLocalEnvironment();
         GradoopFlinkConfig cfg = GradoopFlinkConfig.createConfig(env);
 
         FlinkAsciiGraphLoader loader = new FlinkAsciiGraphLoader(cfg);
@@ -41,12 +41,12 @@ public class GdlToDotExample {
         RandomGraphCollectionLayout layout = new RandomGraphCollectionLayout(1000, 1000);
         collection = layout.execute(collection);
 
-        DataSink sink = new DOTDataSink(pathToOutput, true, DOTDataSink.DotFormat.HTML);
+//        Render render = new Render(1000, 1000, "out/draw.png");
+//        render.renderGraphCollection(collection);
+
+        DataSink sink = new Render(1000,1000, "out/image.png");
         collection.writeTo(sink, true);
 
         env.execute();
-
-        Printer printer = new Printer(1000, 1000, "out/draw.png");
-        printer.printGraphCollection(collection);
     }
 }
