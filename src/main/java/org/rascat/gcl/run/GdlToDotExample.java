@@ -38,7 +38,7 @@ public class GdlToDotExample {
 
         GraphCollection collection = loader.getGraphCollection();
 
-        RandomGraphCollectionLayout layout = new RandomGraphCollectionLayout(100, 100);
+        RandomGraphCollectionLayout layout = new RandomGraphCollectionLayout(1000, 1000);
         collection = layout.execute(collection);
 
         DataSink sink = new DOTDataSink(pathToOutput, true, DOTDataSink.DotFormat.HTML);
@@ -46,7 +46,7 @@ public class GdlToDotExample {
 
         env.execute();
 
-        Printer printer = new Printer();
+        Printer printer = new Printer(1000, 1000, "out/draw.png");
         printer.printGraphCollection(collection);
     }
 }
