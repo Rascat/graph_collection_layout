@@ -1,0 +1,4 @@
+out/*
+.idea/*
+.git/*
+target/*
