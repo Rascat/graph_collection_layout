@@ -2,6 +2,7 @@ package org.rascat.gcl.print;
 
 import org.apache.flink.api.common.functions.JoinFunction;
 import org.apache.flink.api.java.DataSet;
+import org.apache.flink.api.java.ExecutionEnvironment;
 import org.apache.flink.api.java.io.LocalCollectionOutputFormat;
 import org.gradoop.common.model.impl.pojo.EPGMEdge;
 import org.gradoop.common.model.impl.pojo.EPGMVertex;
@@ -19,10 +20,12 @@ import java.awt.geom.Line2D;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
+import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
-public class Render implements DataSink {
+public class Render {
 
     private int imageHeight;
     private int imageWidth;
@@ -30,6 +33,10 @@ public class Render implements DataSink {
 
     private String DEFAULT_IMG_FORMAT = "png";
     private int DEFAULT_RADIUS = 15;
+    private float DEFAULT_STROKE_WIDTH = 2F;
+
+    private Color VERTEX_COLOR = Color.RED;
+    private Color EDGE_COLOR = Color.BLACK;
 
     public Render(int imageHeight, int imageWidth, String out) {
         this.imageHeight = imageHeight;
@@ -37,41 +44,47 @@ public class Render implements DataSink {
         this.out = out;
     }
 
-    public void renderGraphCollection(GraphCollection collection) throws Exception {
+    public void renderGraphCollection(GraphCollection collection, ExecutionEnvironment env) throws Exception {
         BufferedImage image = new BufferedImage(this.imageWidth, this.imageHeight, BufferedImage.TYPE_INT_ARGB);
         Graphics2D gfx = image.createGraphics();
         gfx.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-        gfx.setColor(Color.RED);
+
         DataSet<EPGMEdge> preparedEdges = this.prepareEdges(collection.getVertices(), collection.getEdges());
 
         List<EPGMVertex> vertices = new ArrayList<>();
         collection.getVertices().output(new LocalCollectionOutputFormat<>(vertices));
-
-        for (EPGMVertex vertex : vertices) {
-            int x = vertex.getPropertyValue("X").getInt();
-            int y = vertex.getPropertyValue("Y").getInt();
-            System.out.println(String.format("vx: %d, vy: %d", x, y));
-            gfx.fill(this.createCircle(x, y, DEFAULT_RADIUS));
-        }
-
         List<EPGMEdge> edges = new ArrayList<>();
         preparedEdges.output(new LocalCollectionOutputFormat<>(edges));
 
-        gfx.setStroke(new BasicStroke(1));
-        gfx.setColor(Color.BLACK);
+        env.execute();
+
+        drawEdges(edges, gfx);
+        drawVertices(vertices, gfx);
+
+        File file = new File(out);
+        ImageIO.write(image, DEFAULT_IMG_FORMAT, file);
+    }
+
+    private void drawEdges(Collection<EPGMEdge> edges, Graphics2D gfx) {
+        gfx.setStroke(new BasicStroke(DEFAULT_STROKE_WIDTH));
+        gfx.setColor(EDGE_COLOR);
         for (EPGMEdge edge : edges) {
             int sourceX = edge.getPropertyValue("source_x").getInt();
             int sourceY = edge.getPropertyValue("source_y").getInt();
             int targetX = edge.getPropertyValue("target_x").getInt();
             int targetY = edge.getPropertyValue("target_y").getInt();
 
-            System.out.println(String.format("sx: %d, sy: %d, tx: %d, ty: %d", sourceX, sourceY, targetX, targetY));
-
             gfx.draw(new Line2D.Double(sourceX, sourceY, targetX, targetY));
         }
+    }
 
-        File file = new File(out);
-        ImageIO.write(image, DEFAULT_IMG_FORMAT, file);
+    private void drawVertices(Collection<EPGMVertex> vertices, Graphics2D gfx) {
+        gfx.setColor(VERTEX_COLOR);
+        for (EPGMVertex vertex : vertices) {
+            int x = vertex.getPropertyValue("X").getInt();
+            int y = vertex.getPropertyValue("Y").getInt();
+            gfx.fill(this.createCircle(x, y, DEFAULT_RADIUS));
+        }
     }
 
     private Ellipse2D createCircle(double x, double y, double r) {
@@ -103,33 +116,5 @@ public class Render implements DataSink {
               }
           });
         return edges;
-    }
-
-    @Override
-    public void write(LogicalGraph logicalGraph) throws IOException {
-        throw new UnsupportedOperationException("Plotting is not supported for GraphCollections");
-    }
-
-    @Override
-    public void write(GraphCollection graphCollection) throws IOException {
-        try {
-            renderGraphCollection(graphCollection);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
-
-    @Override
-    public void write(LogicalGraph logicalGraph, boolean b) throws IOException {
-        throw new UnsupportedOperationException("Plotting is not supported for GraphCollections");
-    }
-
-    @Override
-    public void write(GraphCollection graphCollection, boolean b) throws IOException {
-        try {
-            renderGraphCollection(graphCollection);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
     }
 }
