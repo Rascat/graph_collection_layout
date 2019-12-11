@@ -41,12 +41,7 @@ public class GdlToDotExample {
         RandomGraphCollectionLayout layout = new RandomGraphCollectionLayout(1000, 1000);
         collection = layout.execute(collection);
 
-//        Render render = new Render(1000, 1000, "out/draw.png");
-//        render.renderGraphCollection(collection);
-
-        DataSink sink = new Render(1000,1000, "out/image.png");
-        collection.writeTo(sink, true);
-
-        env.execute();
+        Render render = new Render(1000, 1000, pathToOutput);
+        render.renderGraphCollection(collection, env);
     }
 }
