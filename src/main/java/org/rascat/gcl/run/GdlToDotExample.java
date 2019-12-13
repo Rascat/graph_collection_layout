@@ -24,17 +24,6 @@ public class GdlToDotExample {
 
         FlinkAsciiGraphLoader loader = new FlinkAsciiGraphLoader(cfg);
         loader.initDatabaseFromFile(pathToGdl);
-        LogicalGraph g1 = loader.getLogicalGraphByVariable("g1");
-        LogicalGraph g2 = loader.getLogicalGraphByVariable("g2");
-        LogicalGraph g3 = loader.getLogicalGraphByVariable("g3");
-        LogicalGraph g4 = loader.getLogicalGraphByVariable("g4");
-        LogicalGraph g5 = loader.getLogicalGraphByVariable("g5");
-
-        Logger.printGraphInfo(g1, "g1");
-        Logger.printGraphInfo(g2, "g2");
-        Logger.printGraphInfo(g3, "g3");
-        Logger.printGraphInfo(g4, "g4");
-        Logger.printGraphInfo(g5, "g5");
 
         GraphCollection collection = loader.getGraphCollection();
 
