@@ -24,35 +24,6 @@ public class RandomGraphCollectionLayout {
 
         DataSet<EPGMVertex> mappedVertices = vertices.map(new RandomPlacement(this.width, this.height));
 
-//        DataSet<EPGMEdge> mappedEdges = this.prepareEdges(mappedVertices, edges);
-
         return collection.getFactory().fromDataSets(graphHeads, mappedVertices, edges);
     }
-
-//    /**
-//     * Prepare the given edges for drawing. Assign them start- and end-coordinates from their
-//     * vertices.
-//     *
-//     * @param vertices The vertices to take the edge-coordinates from
-//     * @param edges    The raw edges
-//     * @return The prepared edges
-//     */
-//    private DataSet<EPGMEdge> prepareEdges(DataSet<EPGMVertex> vertices, DataSet<EPGMEdge> edges) {
-//        edges = edges.join(vertices).where("sourceId").equalTo("id")
-//          .with(new JoinFunction<EPGMEdge, EPGMVertex, EPGMEdge>() {
-//              public EPGMEdge join(EPGMEdge first, EPGMVertex second) throws Exception {
-//                  first.setProperty("source_x", second.getPropertyValue("X"));
-//                  first.setProperty("source_y", second.getPropertyValue("Y"));
-//                  return first;
-//              }
-//          }).join(vertices).where("targetId").equalTo("id")
-//          .with(new JoinFunction<EPGMEdge, EPGMVertex, EPGMEdge>() {
-//              public EPGMEdge join(EPGMEdge first, EPGMVertex second) throws Exception {
-//                  first.setProperty("target_x", second.getPropertyValue("X"));
-//                  first.setProperty("target_y", second.getPropertyValue("Y"));
-//                  return first;
-//              }
-//          });
-//        return edges;
-//    }
 }
