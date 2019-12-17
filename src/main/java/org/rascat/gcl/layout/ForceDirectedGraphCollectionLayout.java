@@ -1,15 +1,17 @@
 package org.rascat.gcl.layout;
 
 import org.apache.flink.api.java.DataSet;
+import org.apache.flink.core.fs.FileSystem;
 import org.gradoop.common.model.api.entities.GraphHead;
 import org.gradoop.common.model.impl.pojo.EPGMEdge;
 import org.gradoop.common.model.impl.pojo.EPGMGraphHead;
 import org.gradoop.common.model.impl.pojo.EPGMVertex;
 import org.gradoop.flink.model.impl.epgm.GraphCollection;
-import org.rascat.gcl.functions.ComputeRepulsiveForces;
-import org.rascat.gcl.functions.RandomPlacement;
-import org.rascat.gcl.functions.SumForces;
+import org.rascat.gcl.functions.*;
 import org.rascat.gcl.model.Force;
+
+import static org.rascat.gcl.functions.TransferPosition.Position.SOURCE;
+import static org.rascat.gcl.functions.TransferPosition.Position.TARGET;
 
 public class ForceDirectedGraphCollectionLayout {
 
@@ -35,13 +37,20 @@ public class ForceDirectedGraphCollectionLayout {
 
         vertices = vertices.map(new RandomPlacement(width, height));
 
-        DataSet<Force> displacements =
+        DataSet<Force> repulsiveForces =
           vertices.cross(vertices).with(new ComputeRepulsiveForces(k));
+        DataSet<Force> repulsiveForcesById = repulsiveForces.groupBy("f0").reduce(new SumForces());
 
-        DataSet<Force> displacementByVertex = displacements.groupBy("f0").reduce(new SumForces());
+        DataSet<EPGMEdge> positionedEdges = edges.join(vertices)
+          .where("sourceId").equalTo("id").with(new TransferPosition(SOURCE))
+          .join(vertices)
+          .where("targetId").equalTo("id").with(new TransferPosition(TARGET));
 
-        displacements.writeAsText("out/displacements");
-        displacementByVertex.writeAsText("out/dispByVertex");
+        DataSet<Force> attractingForces = positionedEdges.map(new ComputeAttractingForces(k));
+
+        repulsiveForces.writeAsText("out/displacements", FileSystem.WriteMode.OVERWRITE);
+        repulsiveForcesById.writeAsText("out/dispByVertex", FileSystem.WriteMode.OVERWRITE);
+        attractingForces.writeAsText("out/attractingForces", FileSystem.WriteMode.OVERWRITE);
 
         return collection.getFactory().fromDataSets(graphHeads, vertices, edges);
     }
