@@ -15,8 +15,8 @@ public class ComputeRepulsiveForces implements CrossFunction<EPGMVertex, EPGMVer
 
   @Override
   public Force cross(EPGMVertex v, EPGMVertex u) throws Exception {
-    Vector2D vPos = new Vector2D(v.getPropertyValue("X").getInt(), v.getPropertyValue("Y").getInt());
-    Vector2D uPos = new Vector2D(u.getPropertyValue("X").getInt(), u.getPropertyValue("Y").getInt());
+    Vector2D vPos = new Vector2D(v.getPropertyValue("X").getDouble(), v.getPropertyValue("Y").getDouble());
+    Vector2D uPos = new Vector2D(u.getPropertyValue("X").getDouble(), u.getPropertyValue("Y").getDouble());
     Vector2D delta = vPos.subtract(uPos);
 
     if (v.getId().equals(u.getId())) {

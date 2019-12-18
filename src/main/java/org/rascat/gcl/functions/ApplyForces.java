@@ -19,8 +19,8 @@ public class ApplyForces implements JoinFunction<EPGMVertex, Force, EPGMVertex> 
 
     @Override
     public EPGMVertex join(EPGMVertex vertex, Force force) throws Exception {
-        int x = vertex.getPropertyValue("X").getInt();
-        int y = vertex.getPropertyValue("Y").getInt();
+        double x = vertex.getPropertyValue("X").getDouble();
+        double y = vertex.getPropertyValue("Y").getDouble();
 
         Vector2D vPos = new Vector2D(x, y);
         Vector2D vDisp = force.getVector();
