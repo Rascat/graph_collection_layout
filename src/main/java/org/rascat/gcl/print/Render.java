@@ -69,10 +69,10 @@ public class Render {
         gfx.setStroke(new BasicStroke(DEFAULT_STROKE_WIDTH));
         gfx.setColor(EDGE_COLOR);
         for (EPGMEdge edge : edges) {
-            int sourceX = edge.getPropertyValue("source_x").getInt();
-            int sourceY = edge.getPropertyValue("source_y").getInt();
-            int targetX = edge.getPropertyValue("target_x").getInt();
-            int targetY = edge.getPropertyValue("target_y").getInt();
+            double sourceX = edge.getPropertyValue("source_x").getDouble();
+            double sourceY = edge.getPropertyValue("source_y").getDouble();
+            double targetX = edge.getPropertyValue("target_x").getDouble();
+            double targetY = edge.getPropertyValue("target_y").getDouble();
 
             gfx.draw(new Line2D.Double(sourceX, sourceY, targetX, targetY));
         }
@@ -81,8 +81,8 @@ public class Render {
     private void drawVertices(Collection<EPGMVertex> vertices, Graphics2D gfx) {
         gfx.setColor(VERTEX_COLOR);
         for (EPGMVertex vertex : vertices) {
-            int x = vertex.getPropertyValue("X").getInt();
-            int y = vertex.getPropertyValue("Y").getInt();
+            double x = vertex.getPropertyValue("X").getDouble();
+            double y = vertex.getPropertyValue("Y").getDouble();
             gfx.fill(this.createCircle(x, y, DEFAULT_RADIUS));
         }
     }

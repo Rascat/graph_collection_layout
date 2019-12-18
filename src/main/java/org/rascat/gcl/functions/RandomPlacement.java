@@ -8,18 +8,18 @@ import java.util.concurrent.ThreadLocalRandom;
 
 public class RandomPlacement implements MapFunction<EPGMVertex, EPGMVertex> {
 
-    private Integer limitX;
-    private Integer limitY;
+    private double limitX;
+    private double limitY;
 
-    public RandomPlacement(Integer limitX, Integer limitY) {
+    public RandomPlacement(double limitX, double limitY) {
         this.limitX = limitX;
         this.limitY = limitY;
     }
 
     @Override
     public EPGMVertex map(EPGMVertex vertex) throws Exception {
-        Integer x = ThreadLocalRandom.current().nextInt(this.limitX);
-        Integer y = ThreadLocalRandom.current().nextInt(this.limitY);
+        double x = ThreadLocalRandom.current().nextDouble(this.limitX);
+        double y = ThreadLocalRandom.current().nextDouble(this.limitY);
         vertex.setProperty(Property.create("X", x));
         vertex.setProperty(Property.create("Y", y));
         return vertex;
