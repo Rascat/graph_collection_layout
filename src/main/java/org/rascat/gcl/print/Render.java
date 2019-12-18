@@ -9,6 +9,7 @@ import org.gradoop.common.model.impl.pojo.EPGMVertex;
 import org.gradoop.flink.io.api.DataSink;
 import org.gradoop.flink.model.impl.epgm.GraphCollection;
 import org.gradoop.flink.model.impl.epgm.LogicalGraph;
+import org.rascat.gcl.functions.TransferPosition;
 
 import javax.imageio.ImageIO;
 import java.awt.BasicStroke;
@@ -101,20 +102,9 @@ public class Render {
      */
     private DataSet<EPGMEdge> prepareEdges(DataSet<EPGMVertex> vertices, DataSet<EPGMEdge> edges) {
         edges = edges.join(vertices).where("sourceId").equalTo("id")
-          .with(new JoinFunction<EPGMEdge, EPGMVertex, EPGMEdge>() {
-              public EPGMEdge join(EPGMEdge first, EPGMVertex second) throws Exception {
-                  first.setProperty("source_x", second.getPropertyValue("X"));
-                  first.setProperty("source_y", second.getPropertyValue("Y"));
-                  return first;
-              }
-          }).join(vertices).where("targetId").equalTo("id")
-          .with(new JoinFunction<EPGMEdge, EPGMVertex, EPGMEdge>() {
-              public EPGMEdge join(EPGMEdge first, EPGMVertex second) throws Exception {
-                  first.setProperty("target_x", second.getPropertyValue("X"));
-                  first.setProperty("target_y", second.getPropertyValue("Y"));
-                  return first;
-              }
-          });
+          .with(new TransferPosition(TransferPosition.Position.SOURCE)
+          ).join(vertices).where("targetId").equalTo("id")
+          .with(new TransferPosition(TransferPosition.Position.TARGET));
         return edges;
     }
 }
