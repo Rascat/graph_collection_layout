@@ -24,8 +24,9 @@ public class GdlToDotExample {
 
         GraphCollection collection = loader.getGraphCollection();
 
-        RandomGraphCollectionLayout layout = new RandomGraphCollectionLayout(1000, 1000);
-//        ForceDirectedGraphCollectionLayout layout = new ForceDirectedGraphCollectionLayout(1000, 1000);
+//        RandomGraphCollectionLayout layout = new RandomGraphCollectionLayout(1000, 1000);
+        ForceDirectedGraphCollectionLayout layout = new ForceDirectedGraphCollectionLayout(1000, 1000);
+        layout.setIterations(10);
 
         collection = layout.execute(collection);
 

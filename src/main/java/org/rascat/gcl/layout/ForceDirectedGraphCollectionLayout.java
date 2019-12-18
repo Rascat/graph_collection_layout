@@ -1,8 +1,8 @@
 package org.rascat.gcl.layout;
 
 import org.apache.flink.api.java.DataSet;
+import org.apache.flink.api.java.operators.IterativeDataSet;
 import org.apache.flink.core.fs.FileSystem;
-import org.gradoop.common.model.api.entities.GraphHead;
 import org.gradoop.common.model.impl.pojo.EPGMEdge;
 import org.gradoop.common.model.impl.pojo.EPGMGraphHead;
 import org.gradoop.common.model.impl.pojo.EPGMVertex;
@@ -25,6 +25,10 @@ public class ForceDirectedGraphCollectionLayout {
         this.width = width;
     }
 
+    public void setIterations(int i) {
+        this.iterations = i;
+    }
+
     public GraphCollection execute(GraphCollection collection) {
         return execute(collection, 20);
     }
@@ -37,29 +41,43 @@ public class ForceDirectedGraphCollectionLayout {
 
         vertices = vertices.map(new RandomPlacement(width, height));
 
-        DataSet<Force> repulsiveForces =
-          vertices.cross(vertices).with(new ComputeRepulsiveForces(k));
-        DataSet<Force> repulsiveForcesById = repulsiveForces.groupBy("f0").reduce(new SumForces());
+        IterativeDataSet<EPGMVertex> loop = vertices.iterate(iterations);
 
-        DataSet<EPGMEdge> positionedEdges = edges.join(vertices)
-          .where("sourceId").equalTo("id").with(new TransferPosition(SOURCE))
-          .join(vertices)
-          .where("targetId").equalTo("id").with(new TransferPosition(TARGET));
+        DataSet<Force> repulsiveForcesLoop = loop.cross(loop)
+                .with(new ComputeRepulsiveForces(k))
+                .groupBy("f0")
+                .reduce(new SumForces());
 
-        DataSet<Force> attractingForces = positionedEdges.map(new ComputeAttractingForces(k));
-        DataSet<Force> attractingForcesById = attractingForces.groupBy("f0").reduce(new SubtractForces());
+        DataSet<EPGMEdge> positionedEdgesLoop = edges.join(loop)
+                .where("sourceId").equalTo("id").with(new TransferPosition(SOURCE))
+                .join(vertices)
+                .where("targetId").equalTo("id").with(new TransferPosition(TARGET));
 
-        DataSet<Force> resultingForces = repulsiveForcesById.union(attractingForces).groupBy("f0").reduce(new SubtractForces());
+        DataSet<Force> attractingForcesLoop = positionedEdgesLoop
+                .map(new ComputeAttractingForces(k))
+                .groupBy("f0")
+                .reduce(new SubtractForces());
 
-        vertices = vertices.join(resultingForces).where("id").equalTo("f0").with(new ApplyForces(width / 10, width, height));
+        DataSet<Force> resultingForcesLoop = repulsiveForcesLoop.union(attractingForcesLoop).groupBy("f0").reduce(new SubtractForces());
+        DataSet<EPGMVertex> pVertices = loop.closeWith(loop.join(resultingForcesLoop).where("id").equalTo("f0").with(new ApplyForces(width / 10, width, height)));
 
-        repulsiveForces.writeAsText("out/displacements", FileSystem.WriteMode.OVERWRITE);
-        repulsiveForcesById.writeAsText("out/dispByVertex", FileSystem.WriteMode.OVERWRITE);
-        attractingForces.writeAsText("out/attractingForces", FileSystem.WriteMode.OVERWRITE);
-        attractingForcesById.writeAsText("out/attrForcesById", FileSystem.WriteMode.OVERWRITE);
-        resultingForces.writeAsText("out/resultingForces", FileSystem.WriteMode.OVERWRITE);
+//        DataSet<Force> repulsiveForces =
+//          vertices.cross(vertices).with(new ComputeRepulsiveForces(k));
+//        DataSet<Force> repulsiveForcesById = repulsiveForces.groupBy("f0").reduce(new SumForces());
+//
+//        DataSet<EPGMEdge> positionedEdges = edges.join(vertices)
+//          .where("sourceId").equalTo("id").with(new TransferPosition(SOURCE))
+//          .join(vertices)
+//          .where("targetId").equalTo("id").with(new TransferPosition(TARGET));
+//
+//        DataSet<Force> attractingForces = positionedEdges.map(new ComputeAttractingForces(k));
+//        DataSet<Force> attractingForcesById = attractingForces.groupBy("f0").reduce(new SubtractForces());
+//
+//        DataSet<Force> resultingForces = repulsiveForcesById.union(attractingForcesById).groupBy("f0").reduce(new SubtractForces());
+//
+//        vertices = vertices.join(resultingForces).where("id").equalTo("f0").with(new ApplyForces(width / 10, width, height));
 
-        return collection.getFactory().fromDataSets(graphHeads, vertices, edges);
+        return collection.getFactory().fromDataSets(graphHeads, pVertices, edges);
     }
 
     private int area() {
