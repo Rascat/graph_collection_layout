@@ -35,6 +35,7 @@ public class ApplyForces implements JoinFunction<EPGMVertex, Force, EPGMVertex> 
         vertex.setProperty("X", vPosX);
         vertex.setProperty("Y", vPosY);
 
+        System.out.println(String.format("[%s]: (%.0f, %.0f)-->(%.0f, %.0f)", vertex.getId().toString().substring(vertex.getId().toString().length() - 4), x, y, vPosX, vPosY));
         return vertex;
     }
 }
