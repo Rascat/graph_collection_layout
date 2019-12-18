@@ -25,12 +25,10 @@ public class ComputeRepulsiveForces implements CrossFunction<EPGMVertex, EPGMVer
 
     Vector2D displacement = delta.scalarMultiply(1 / delta.getNorm()).scalarMultiply(f(delta.getNorm()));
 
-    Force force = new Force(v.getId(), displacement);
-    System.out.println(force);
-    return force;
+    return new Force(v.getId(), displacement);
   }
 
   private double f(double norm) {
-    return Math.pow(k, 2) / norm;
+    return k * k / norm;
   }
 }
