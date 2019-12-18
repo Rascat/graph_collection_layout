@@ -47,10 +47,17 @@ public class ForceDirectedGraphCollectionLayout {
           .where("targetId").equalTo("id").with(new TransferPosition(TARGET));
 
         DataSet<Force> attractingForces = positionedEdges.map(new ComputeAttractingForces(k));
+        DataSet<Force> attractingForcesById = attractingForces.groupBy("f0").reduce(new SubtractForces());
+
+        DataSet<Force> resultingForces = repulsiveForcesById.union(attractingForces).groupBy("f0").reduce(new SubtractForces());
+
+        vertices = vertices.join(resultingForces).where("id").equalTo("f0").with(new ApplyForces(width / 10, width, height));
 
         repulsiveForces.writeAsText("out/displacements", FileSystem.WriteMode.OVERWRITE);
         repulsiveForcesById.writeAsText("out/dispByVertex", FileSystem.WriteMode.OVERWRITE);
         attractingForces.writeAsText("out/attractingForces", FileSystem.WriteMode.OVERWRITE);
+        attractingForcesById.writeAsText("out/attrForcesById", FileSystem.WriteMode.OVERWRITE);
+        resultingForces.writeAsText("out/resultingForces", FileSystem.WriteMode.OVERWRITE);
 
         return collection.getFactory().fromDataSets(graphHeads, vertices, edges);
     }
