@@ -1,4 +1,7 @@
 package org.rascat.gcl.functions;
 
-public interface CoolingSchedule {
+import java.io.Serializable;
+
+public interface CoolingSchedule extends Serializable {
+  double computeTemperature(int currentIteration);
 }
