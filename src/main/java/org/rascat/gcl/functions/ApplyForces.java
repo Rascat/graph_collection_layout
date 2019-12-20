@@ -2,14 +2,19 @@ package org.rascat.gcl.functions;
 
 import org.apache.commons.math3.geometry.euclidean.twod.Vector2D;
 import org.apache.flink.api.common.functions.JoinFunction;
+import org.apache.flink.api.common.functions.RichJoinFunction;
 import org.gradoop.common.model.impl.pojo.EPGMVertex;
 import org.rascat.gcl.model.Force;
 
-public class ApplyForces implements JoinFunction<EPGMVertex, Force, EPGMVertex> {
+public class ApplyForces extends RichJoinFunction<EPGMVertex, Force, EPGMVertex> {
 
     private double t;
     private int width;
     private int height;
+
+    public ApplyForces(int width, int height) {
+        this((double) width / 10, width, height);
+    }
 
     public ApplyForces(double t, int width, int height) {
         this.t = t;
@@ -37,5 +42,9 @@ public class ApplyForces implements JoinFunction<EPGMVertex, Force, EPGMVertex> 
 
         System.out.println(String.format("[%s]: (%.0f, %.0f)-->(%.0f, %.0f)", vertex.getId().toString().substring(vertex.getId().toString().length() - 4), x, y, vPosX, vPosY));
         return vertex;
+    }
+
+    private void cool() {
+
     }
 }
