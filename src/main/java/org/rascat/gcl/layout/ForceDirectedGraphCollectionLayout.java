@@ -13,7 +13,7 @@ import org.rascat.gcl.model.Force;
 import static org.rascat.gcl.functions.TransferPosition.Position.SOURCE;
 import static org.rascat.gcl.functions.TransferPosition.Position.TARGET;
 
-public class ForceDirectedGraphCollectionLayout {
+public class ForceDirectedGraphCollectionLayout extends AbstractGraphCollectionLayout {
 
     private int width;
     private int height;
@@ -58,24 +58,14 @@ public class ForceDirectedGraphCollectionLayout {
                 .groupBy("f0")
                 .reduce(new SubtractForces());
 
-        DataSet<Force> resultingForcesLoop = repulsiveForcesLoop.union(attractingForcesLoop).groupBy("f0").reduce(new SubtractForces());
-        DataSet<EPGMVertex> pVertices = loop.closeWith(loop.join(resultingForcesLoop).where("id").equalTo("f0").with(new ApplyForces(width / 10, width, height)));
+        DataSet<Force> resultingForcesLoop = repulsiveForcesLoop.union(attractingForcesLoop)
+          .groupBy("f0")
+          .reduce(new SubtractForces());
 
-//        DataSet<Force> repulsiveForces =
-//          vertices.cross(vertices).with(new ComputeRepulsiveForces(k));
-//        DataSet<Force> repulsiveForcesById = repulsiveForces.groupBy("f0").reduce(new SumForces());
-//
-//        DataSet<EPGMEdge> positionedEdges = edges.join(vertices)
-//          .where("sourceId").equalTo("id").with(new TransferPosition(SOURCE))
-//          .join(vertices)
-//          .where("targetId").equalTo("id").with(new TransferPosition(TARGET));
-//
-//        DataSet<Force> attractingForces = positionedEdges.map(new ComputeAttractingForces(k));
-//        DataSet<Force> attractingForcesById = attractingForces.groupBy("f0").reduce(new SubtractForces());
-//
-//        DataSet<Force> resultingForces = repulsiveForcesById.union(attractingForcesById).groupBy("f0").reduce(new SubtractForces());
-//
-//        vertices = vertices.join(resultingForces).where("id").equalTo("f0").with(new ApplyForces(width / 10, width, height));
+        DataSet<EPGMVertex> pVertices = loop.closeWith(
+          loop.join(resultingForcesLoop)
+            .where("id").equalTo("f0")
+            .with(new ApplyForces(1, width, height)));
 
         return collection.getFactory().fromDataSets(graphHeads, pVertices, edges);
     }

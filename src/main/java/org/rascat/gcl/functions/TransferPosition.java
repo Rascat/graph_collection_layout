@@ -4,6 +4,8 @@ import org.apache.flink.api.common.functions.JoinFunction;
 import org.gradoop.common.model.impl.pojo.EPGMEdge;
 import org.gradoop.common.model.impl.pojo.EPGMVertex;
 
+import static org.rascat.gcl.layout.AbstractGraphCollectionLayout.*;
+
 public class TransferPosition implements JoinFunction<EPGMEdge, EPGMVertex, EPGMEdge> {
 
   private Position position;
@@ -13,9 +15,9 @@ public class TransferPosition implements JoinFunction<EPGMEdge, EPGMVertex, EPGM
   }
 
   @Override
-  public EPGMEdge join(EPGMEdge edge, EPGMVertex vertex) throws Exception {
-    edge.setProperty(position.getKeyX(), vertex.getPropertyValue("X"));
-    edge.setProperty(position.getKeyY(), vertex.getPropertyValue("Y"));
+  public EPGMEdge join(EPGMEdge edge, EPGMVertex vertex) {
+    edge.setProperty(position.getKeyX(), vertex.getPropertyValue(KEY_X_COORD));
+    edge.setProperty(position.getKeyY(), vertex.getPropertyValue(KEY_Y_COORD));
     return edge;
   }
 

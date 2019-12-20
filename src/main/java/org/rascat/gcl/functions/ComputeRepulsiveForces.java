@@ -5,6 +5,8 @@ import org.apache.flink.api.common.functions.CrossFunction;
 import org.gradoop.common.model.impl.pojo.EPGMVertex;
 import org.rascat.gcl.model.Force;
 
+import static org.rascat.gcl.layout.AbstractGraphCollectionLayout.*;
+
 public class ComputeRepulsiveForces implements CrossFunction<EPGMVertex, EPGMVertex, Force> {
 
   private double k;
@@ -15,8 +17,8 @@ public class ComputeRepulsiveForces implements CrossFunction<EPGMVertex, EPGMVer
 
   @Override
   public Force cross(EPGMVertex v, EPGMVertex u) throws Exception {
-    Vector2D vPos = new Vector2D(v.getPropertyValue("X").getDouble(), v.getPropertyValue("Y").getDouble());
-    Vector2D uPos = new Vector2D(u.getPropertyValue("X").getDouble(), u.getPropertyValue("Y").getDouble());
+    Vector2D vPos = new Vector2D(v.getPropertyValue(KEY_X_COORD).getDouble(), v.getPropertyValue(KEY_Y_COORD).getDouble());
+    Vector2D uPos = new Vector2D(u.getPropertyValue(KEY_X_COORD).getDouble(), u.getPropertyValue(KEY_Y_COORD).getDouble());
     Vector2D delta = vPos.subtract(uPos);
 
     if (v.getId().equals(u.getId())) {
