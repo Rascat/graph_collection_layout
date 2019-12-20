@@ -2,7 +2,6 @@ package org.rascat.gcl.layout;
 
 import org.apache.flink.api.java.DataSet;
 import org.apache.flink.api.java.operators.IterativeDataSet;
-import org.apache.flink.core.fs.FileSystem;
 import org.gradoop.common.model.impl.pojo.EPGMEdge;
 import org.gradoop.common.model.impl.pojo.EPGMGraphHead;
 import org.gradoop.common.model.impl.pojo.EPGMVertex;
@@ -62,10 +61,11 @@ public class ForceDirectedGraphCollectionLayout extends AbstractGraphCollectionL
           .groupBy("f0")
           .reduce(new SubtractForces());
 
+        CoolingSchedule schedule = new LinearSimulatedAnnealing((double) width / 10);
         DataSet<EPGMVertex> pVertices = loop.closeWith(
           loop.join(resultingForcesLoop)
             .where("id").equalTo("f0")
-            .with(new ApplyForces(1, width, height)));
+            .with(new ApplyForces(width, height, schedule)));
 
         return collection.getFactory().fromDataSets(graphHeads, pVertices, edges);
     }
