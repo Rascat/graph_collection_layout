@@ -16,7 +16,7 @@ public class ComputeAttractingForces implements MapFunction<EPGMEdge, Force> {
   }
 
   @Override
-  public Force map(EPGMEdge edge) throws Exception {
+  public Force map(EPGMEdge edge) {
     checkEdge(edge);
 
     Vector2D vPos = new Vector2D(edge.getPropertyValue(SOURCE.getKeyX()).getDouble(), edge.getPropertyValue(SOURCE.getKeyY()).getDouble());

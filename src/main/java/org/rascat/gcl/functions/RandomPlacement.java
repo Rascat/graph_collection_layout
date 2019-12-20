@@ -3,7 +3,6 @@ package org.rascat.gcl.functions;
 import org.apache.flink.api.common.functions.MapFunction;
 import org.gradoop.common.model.impl.pojo.EPGMVertex;
 import org.gradoop.common.model.impl.properties.Property;
-import org.rascat.gcl.layout.AbstractGraphCollectionLayout;
 
 import java.util.concurrent.ThreadLocalRandom;
 
@@ -20,7 +19,7 @@ public class RandomPlacement implements MapFunction<EPGMVertex, EPGMVertex> {
     }
 
     @Override
-    public EPGMVertex map(EPGMVertex vertex) throws Exception {
+    public EPGMVertex map(EPGMVertex vertex) {
         double x = ThreadLocalRandom.current().nextDouble(this.limitX);
         double y = ThreadLocalRandom.current().nextDouble(this.limitY);
         vertex.setProperty(Property.create(KEY_X_COORD, x));

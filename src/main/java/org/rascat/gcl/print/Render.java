@@ -1,15 +1,13 @@
 package org.rascat.gcl.print;
 
-import org.apache.flink.api.common.functions.JoinFunction;
 import org.apache.flink.api.java.DataSet;
 import org.apache.flink.api.java.ExecutionEnvironment;
 import org.apache.flink.api.java.io.LocalCollectionOutputFormat;
 import org.gradoop.common.model.impl.pojo.EPGMEdge;
 import org.gradoop.common.model.impl.pojo.EPGMVertex;
-import org.gradoop.flink.io.api.DataSink;
 import org.gradoop.flink.model.impl.epgm.GraphCollection;
-import org.gradoop.flink.model.impl.epgm.LogicalGraph;
 import org.rascat.gcl.functions.TransferPosition;
+import org.rascat.gcl.layout.AbstractGraphCollectionLayout;
 
 import javax.imageio.ImageIO;
 import java.awt.BasicStroke;
@@ -20,11 +18,13 @@ import java.awt.geom.Ellipse2D;
 import java.awt.geom.Line2D;
 import java.awt.image.BufferedImage;
 import java.io.File;
-import java.io.IOException;
-import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+
+import static org.rascat.gcl.functions.TransferPosition.Position.SOURCE;
+import static org.rascat.gcl.functions.TransferPosition.Position.TARGET;
+import static org.rascat.gcl.layout.AbstractGraphCollectionLayout.*;
 
 public class Render {
 
@@ -70,10 +70,10 @@ public class Render {
         gfx.setStroke(new BasicStroke(DEFAULT_STROKE_WIDTH));
         gfx.setColor(EDGE_COLOR);
         for (EPGMEdge edge : edges) {
-            double sourceX = edge.getPropertyValue("source_x").getDouble();
-            double sourceY = edge.getPropertyValue("source_y").getDouble();
-            double targetX = edge.getPropertyValue("target_x").getDouble();
-            double targetY = edge.getPropertyValue("target_y").getDouble();
+            double sourceX = edge.getPropertyValue(SOURCE.getKeyX()).getDouble();
+            double sourceY = edge.getPropertyValue(SOURCE.getKeyY()).getDouble();
+            double targetX = edge.getPropertyValue(TARGET.getKeyX()).getDouble();
+            double targetY = edge.getPropertyValue(TARGET.getKeyY()).getDouble();
 
             gfx.draw(new Line2D.Double(sourceX, sourceY, targetX, targetY));
         }
@@ -82,8 +82,8 @@ public class Render {
     private void drawVertices(Collection<EPGMVertex> vertices, Graphics2D gfx) {
         gfx.setColor(VERTEX_COLOR);
         for (EPGMVertex vertex : vertices) {
-            double x = vertex.getPropertyValue("X").getDouble();
-            double y = vertex.getPropertyValue("Y").getDouble();
+            double x = vertex.getPropertyValue(KEY_X_COORD).getDouble();
+            double y = vertex.getPropertyValue(KEY_Y_COORD).getDouble();
             gfx.fill(this.createCircle(x, y, DEFAULT_RADIUS));
         }
     }
@@ -102,7 +102,7 @@ public class Render {
      */
     private DataSet<EPGMEdge> prepareEdges(DataSet<EPGMVertex> vertices, DataSet<EPGMEdge> edges) {
         edges = edges.join(vertices).where("sourceId").equalTo("id")
-          .with(new TransferPosition(TransferPosition.Position.SOURCE)
+          .with(new TransferPosition(SOURCE)
           ).join(vertices).where("targetId").equalTo("id")
           .with(new TransferPosition(TransferPosition.Position.TARGET));
         return edges;

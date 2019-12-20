@@ -5,7 +5,7 @@ import org.rascat.gcl.model.Force;
 
 public class SubtractForces implements ReduceFunction<Force> {
     @Override
-    public Force reduce(Force force, Force t1) throws Exception {
+    public Force reduce(Force force, Force t1) {
         return new Force(force.getId(), force.getVector().subtract(t1.getVector()));
     }
 }

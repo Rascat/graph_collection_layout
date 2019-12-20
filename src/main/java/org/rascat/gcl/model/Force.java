@@ -6,8 +6,8 @@ import org.gradoop.common.model.impl.id.GradoopId;
 
 public class Force extends Tuple2<GradoopId, Vector2D> {
 
-  public Force(GradoopId value0, Vector2D value1) {
-    super(value0, value1);
+  public Force(GradoopId id, Vector2D vector) {
+    super(id, vector);
   }
 
   public Force() {

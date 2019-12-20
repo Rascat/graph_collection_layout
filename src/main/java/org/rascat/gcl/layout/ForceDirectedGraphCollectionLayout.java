@@ -7,6 +7,8 @@ import org.gradoop.common.model.impl.pojo.EPGMGraphHead;
 import org.gradoop.common.model.impl.pojo.EPGMVertex;
 import org.gradoop.flink.model.impl.epgm.GraphCollection;
 import org.rascat.gcl.functions.*;
+import org.rascat.gcl.functions.cooling.CoolingSchedule;
+import org.rascat.gcl.functions.cooling.LinearSimulatedAnnealing;
 import org.rascat.gcl.model.Force;
 
 import static org.rascat.gcl.functions.TransferPosition.Position.SOURCE;
