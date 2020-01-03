@@ -11,10 +11,11 @@ import org.rascat.gcl.print.Render;
 
 import java.util.Objects;
 
-public class GdlToDotExample {
+public class Workbench {
     public static void main(@NotNull String[] args) throws Exception {
         String pathToGdl = Objects.requireNonNull(args[0]);
         String pathToOutput = Objects.requireNonNull(args[1]);
+        int numIterations = Objects.requireNonNull(Integer.valueOf(args[2]));
 
         ExecutionEnvironment env = ExecutionEnvironment.createLocalEnvironment();
         GradoopFlinkConfig cfg = GradoopFlinkConfig.createConfig(env);
@@ -26,7 +27,7 @@ public class GdlToDotExample {
 
 //        RandomGraphCollectionLayout layout = new RandomGraphCollectionLayout(1000, 1000);
         ForceDirectedGraphCollectionLayout layout = new ForceDirectedGraphCollectionLayout(1000, 1000);
-        layout.setIterations(10);
+        layout.setIterations(numIterations);
 
         collection = layout.execute(collection);
 
