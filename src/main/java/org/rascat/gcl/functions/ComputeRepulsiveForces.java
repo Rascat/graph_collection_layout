@@ -3,6 +3,7 @@ package org.rascat.gcl.functions;
 import org.apache.commons.math3.geometry.euclidean.twod.Vector2D;
 import org.apache.flink.api.common.functions.CrossFunction;
 import org.gradoop.common.model.impl.pojo.EPGMVertex;
+import org.rascat.gcl.functions.forces.RepulsionFunction;
 import org.rascat.gcl.model.Force;
 
 import static org.rascat.gcl.layout.AbstractGraphCollectionLayout.*;
@@ -10,9 +11,11 @@ import static org.rascat.gcl.layout.AbstractGraphCollectionLayout.*;
 public class ComputeRepulsiveForces implements CrossFunction<EPGMVertex, EPGMVertex, Force> {
 
   private double k;
+  private RepulsionFunction function;
 
-  public ComputeRepulsiveForces(double k) {
+  public ComputeRepulsiveForces(double k, RepulsionFunction function) {
     this.k = k;
+    this.function = function;
   }
 
   @Override
@@ -22,15 +25,11 @@ public class ComputeRepulsiveForces implements CrossFunction<EPGMVertex, EPGMVer
     Vector2D delta = vPos.subtract(uPos);
 
     if (v.getId().equals(u.getId())) {
-      return new Force(v.getId(), new Vector2D(0,0));
+      return new Force(v.getId(), new Vector2D(0, 0));
     }
 
-    Vector2D displacement = delta.scalarMultiply(1 / delta.getNorm()).scalarMultiply(f(delta.getNorm()));
+    Vector2D displacement = delta.scalarMultiply(1 / delta.getNorm()).scalarMultiply(function.repulsion(delta.getNorm(), k));
 
     return new Force(v.getId(), displacement);
-  }
-
-  private double f(double norm) {
-    return k * k / norm;
   }
 }

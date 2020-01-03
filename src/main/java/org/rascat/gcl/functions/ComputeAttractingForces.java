@@ -3,6 +3,7 @@ package org.rascat.gcl.functions;
 import org.apache.commons.math3.geometry.euclidean.twod.Vector2D;
 import org.apache.flink.api.common.functions.MapFunction;
 import org.gradoop.common.model.impl.pojo.EPGMEdge;
+import org.rascat.gcl.functions.forces.AttractionFunction;
 import org.rascat.gcl.model.Force;
 
 import static org.rascat.gcl.functions.TransferPosition.Position.*;
@@ -10,9 +11,11 @@ import static org.rascat.gcl.functions.TransferPosition.Position.*;
 public class ComputeAttractingForces implements MapFunction<EPGMEdge, Force> {
 
   private double k;
+  private AttractionFunction function;
 
-  public ComputeAttractingForces(double k) {
+  public ComputeAttractingForces(double k, AttractionFunction function) {
     this.k = k;
+    this.function = function;
   }
 
   @Override
@@ -23,13 +26,9 @@ public class ComputeAttractingForces implements MapFunction<EPGMEdge, Force> {
     Vector2D uPos = new Vector2D(edge.getPropertyValue(TARGET.getKeyX()).getDouble(), edge.getPropertyValue(TARGET.getKeyY()).getDouble());
     Vector2D delta = vPos.subtract(uPos);
 
-    Vector2D result = delta.scalarMultiply(1 / delta.getNorm()).scalarMultiply(f(delta.getNorm()));
+    Vector2D result = delta.scalarMultiply(1 / delta.getNorm()).scalarMultiply(function.attraction(delta.getNorm(), k));
 
     return new Force(edge.getSourceId(), result);
-  }
-
-  private double f(double norm) {
-    return norm * norm / k;
   }
 
   private static void checkEdge(EPGMEdge edge) {

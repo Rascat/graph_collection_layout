@@ -9,6 +9,8 @@ import org.gradoop.flink.model.impl.epgm.GraphCollection;
 import org.rascat.gcl.functions.*;
 import org.rascat.gcl.functions.cooling.CoolingSchedule;
 import org.rascat.gcl.functions.cooling.LinearSimulatedAnnealing;
+import org.rascat.gcl.functions.forces.StandardAttractingForce;
+import org.rascat.gcl.functions.forces.StandardRepulsionFunction;
 import org.rascat.gcl.model.Force;
 
 import static org.rascat.gcl.functions.TransferPosition.Position.SOURCE;
@@ -45,7 +47,7 @@ public class ForceDirectedGraphCollectionLayout extends AbstractGraphCollectionL
         IterativeDataSet<EPGMVertex> loop = vertices.iterate(iterations);
 
         DataSet<Force> repulsiveForcesLoop = loop.cross(loop)
-                .with(new ComputeRepulsiveForces(k))
+                .with(new ComputeRepulsiveForces(k, new StandardRepulsionFunction()))
                 .groupBy("f0")
                 .reduce(new SumForces());
 
@@ -55,7 +57,7 @@ public class ForceDirectedGraphCollectionLayout extends AbstractGraphCollectionL
                 .where("targetId").equalTo("id").with(new TransferPosition(TARGET));
 
         DataSet<Force> attractingForcesLoop = positionedEdgesLoop
-                .map(new ComputeAttractingForces(k))
+                .map(new ComputeAttractingForces(k, new StandardAttractingForce()))
                 .groupBy("f0")
                 .reduce(new SubtractForces());
 
