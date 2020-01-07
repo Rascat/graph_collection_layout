@@ -1,5 +1,6 @@
 package org.rascat.gcl.layout;
 
+import org.apache.commons.math3.geometry.euclidean.twod.Vector2D;
 import org.apache.flink.api.java.DataSet;
 import org.apache.flink.api.java.operators.IterativeDataSet;
 import org.gradoop.common.model.impl.pojo.EPGMEdge;
@@ -22,6 +23,7 @@ public class ForceDirectedGraphCollectionLayout extends AbstractGraphCollectionL
     private int height;
     private double k;
     private int iterations = 1;
+    private boolean isIntermediaryLayout = false;
 
     public ForceDirectedGraphCollectionLayout(int width, int height) {
         this.height = height;
@@ -30,6 +32,10 @@ public class ForceDirectedGraphCollectionLayout extends AbstractGraphCollectionL
 
     public void setIterations(int i) {
         this.iterations = i;
+    }
+
+    public void setIsIntermediaryLayout(boolean isIntermediaryLayout) {
+        this.isIntermediaryLayout = isIntermediaryLayout;
     }
 
     public GraphCollection execute(GraphCollection collection) {
@@ -42,39 +48,71 @@ public class ForceDirectedGraphCollectionLayout extends AbstractGraphCollectionL
         DataSet<EPGMVertex> vertices = collection.getVertices();
         DataSet<EPGMGraphHead> graphHeads = collection.getGraphHeads();
 
-        vertices = vertices.map(new RandomPlacement(width, height));
+        if(!isIntermediaryLayout) {
+            vertices = vertices.map(new RandomPlacement(width, height));
+        } else {
+            // make sure int values get cast to double
+            vertices = vertices.map( vertex -> {
+                vertex.setProperty(KEY_X_COORD, (double) vertex.getPropertyValue(KEY_X_COORD).getInt());
+                vertex.setProperty(KEY_Y_COORD, (double) vertex.getPropertyValue(KEY_Y_COORD).getInt());
+                return vertex;
+            });
+        }
 
         IterativeDataSet<EPGMVertex> loop = vertices.iterate(iterations);
 
-        DataSet<Force> repulsiveForcesLoop = loop.cross(loop)
-                .with(new ComputeRepulsiveForces(k, new StandardRepulsionFunction()))
-                .groupBy("f0")
-                .reduce(new SumForces());
+        DataSet<Force> repulsiveForces = repulsiveForces(loop);
+//        DataSet<Force> repulsiveForcesLoop = loop.cross(loop)
+//                .with(new ComputeRepulsiveForces(k, new StandardRepulsionFunction()))
+//                .groupBy("f0")
+//                .reduce(new SumForces());
 
-        DataSet<EPGMEdge> positionedEdgesLoop = edges.join(loop)
-                .where("sourceId").equalTo("id").with(new TransferPosition(SOURCE))
-                .join(vertices)
-                .where("targetId").equalTo("id").with(new TransferPosition(TARGET));
+        DataSet<Force> attractiveForces = attractiveForces(loop, edges);
+//        DataSet<EPGMEdge> positionedEdgesLoop = edges.join(loop)
+//                .where("sourceId").equalTo("id").with(new TransferPosition(SOURCE))
+//                .join(vertices)
+//                .where("targetId").equalTo("id").with(new TransferPosition(TARGET));
+//
+//        DataSet<Force> attractingForcesLoop = positionedEdgesLoop
+//                .map(new ComputeAttractingForces(k, new StandardAttractingForce()))
+//                .groupBy("f0")
+//                .reduce(new SubtractForces());
 
-        DataSet<Force> attractingForcesLoop = positionedEdgesLoop
-                .map(new ComputeAttractingForces(k, new StandardAttractingForce()))
-                .groupBy("f0")
-                .reduce(new SubtractForces());
+        DataSet<Force> forces = repulsiveForces.union(attractiveForces)
+                .groupBy(Force.ID_POSITION)
+                .reduce((firstForce, secondForce) -> {
+                    firstForce.setVector(firstForce.getVector().add(secondForce.getVector()));
+                    return firstForce;
+                });
 
-        DataSet<Force> resultingForcesLoop = repulsiveForcesLoop.union(attractingForcesLoop)
-          .groupBy("f0")
-          .reduce(new SubtractForces());
+//        DataSet<Force> resultingForcesLoop = repulsiveForcesLoop.union(attractingForcesLoop)
+//                .groupBy(Force.ID_POSITION)
+//                .reduce(new SubtractForces());
 
         CoolingSchedule schedule = new LinearSimulatedAnnealing((double) width / 10);
         DataSet<EPGMVertex> pVertices = loop.closeWith(
-          loop.join(resultingForcesLoop)
-            .where("id").equalTo("f0")
-            .with(new ApplyForces(width, height, schedule)));
+                loop.join(forces)
+                        .where("id").equalTo("f0")
+                        .with(new ApplyForces(width, height, schedule)));
 
         return collection.getFactory().fromDataSets(graphHeads, pVertices, edges);
     }
 
     private int area() {
         return this.height * this.width;
+    }
+
+    private DataSet<Force> repulsiveForces(DataSet<EPGMVertex> vertices) {
+        return vertices.cross(vertices).with(new ComputeRepulsiveForces(k, new StandardRepulsionFunction()));
+    }
+
+    private DataSet<Force> attractiveForces(DataSet<EPGMVertex> vertices, DataSet<EPGMEdge> edges) {
+        // first we need to add the position of the source/target vertex to the respective edge
+        DataSet<EPGMEdge> positionedEdges = edges.join(vertices)
+                .where("sourceId").equalTo("id").with(new TransferPosition(SOURCE))
+                .join(vertices)
+                .where("targetId").equalTo("id").with(new TransferPosition(TARGET));
+
+        return positionedEdges.map(new ComputeAttractingForces(k, new StandardAttractingForce()));
     }
 }
