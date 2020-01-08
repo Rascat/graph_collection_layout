@@ -35,7 +35,7 @@ public class ApplyForces extends RichJoinFunction<EPGMVertex, Force, EPGMVertex>
 
 
         double temperature = schedule.computeTemperature(getIterationRuntimeContext().getSuperstepNumber());
-        vPos = vPos.add(vDisp.scalarMultiply(1 / vDisp.getNorm()).scalarMultiply(Math.min(vDisp.getNorm(), temperature)));
+        vPos = vPos.add(vDisp.normalize().scalarMultiply(Math.min(vDisp.getNorm(), temperature)));
         double vPosX = vPos.getX();
         double vPosY = vPos.getY();
 
