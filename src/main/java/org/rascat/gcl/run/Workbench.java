@@ -7,8 +7,7 @@ import org.gradoop.flink.util.FlinkAsciiGraphLoader;
 import org.gradoop.flink.util.GradoopFlinkConfig;
 import org.jetbrains.annotations.NotNull;
 import org.rascat.gcl.layout.ForceDirectedGraphCollectionLayout;
-import org.rascat.gcl.layout.RandomGraphCollectionLayout;
-import org.rascat.gcl.print.Render;
+import org.rascat.gcl.io.Render;
 
 
 public class Workbench {

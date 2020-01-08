@@ -1,5 +1,6 @@
 package org.rascat.gcl.functions;
 
+import org.apache.commons.math3.exception.MathArithmeticException;
 import org.apache.commons.math3.geometry.euclidean.twod.Vector2D;
 import org.apache.flink.api.common.functions.MapFunction;
 import org.gradoop.common.model.impl.pojo.EPGMEdge;
@@ -26,7 +27,13 @@ public class ComputeAttractingForces implements MapFunction<EPGMEdge, Force> {
     Vector2D uPos = new Vector2D(edge.getPropertyValue(TARGET.getKeyX()).getDouble(), edge.getPropertyValue(TARGET.getKeyY()).getDouble());
     Vector2D delta = vPos.subtract(uPos);
 
-    Vector2D result = delta.normalize().scalarMultiply(function.attraction(delta.getNorm(), k) * -1);
+    Vector2D result;
+    try {
+      result = delta.normalize().scalarMultiply(function.attraction(delta.getNorm(), k) * -1);
+    } catch (MathArithmeticException e) {
+      // we probably tried to normalize a zero vector
+      result = new Vector2D(0, 0);
+    }
 
     return new Force(edge.getSourceId(), result);
   }

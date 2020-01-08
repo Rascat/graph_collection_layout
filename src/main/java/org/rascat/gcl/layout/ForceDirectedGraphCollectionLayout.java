@@ -10,7 +10,7 @@ import org.rascat.gcl.functions.*;
 import org.rascat.gcl.functions.cooling.CoolingSchedule;
 import org.rascat.gcl.functions.cooling.ExponentialSimulatedAnnealing;
 import org.rascat.gcl.functions.forces.StandardAttractingForce;
-import org.rascat.gcl.functions.forces.StandardRepulsionFunction;
+import org.rascat.gcl.functions.forces.StandardRepulsingForce;
 import org.rascat.gcl.model.Force;
 
 import static org.rascat.gcl.functions.TransferPosition.Position.SOURCE;
@@ -85,7 +85,7 @@ public class ForceDirectedGraphCollectionLayout extends AbstractGraphCollectionL
     }
 
     private DataSet<Force> repulsiveForces(DataSet<EPGMVertex> vertices) {
-        return vertices.cross(vertices).with(new ComputeRepulsiveForces(k, new StandardRepulsionFunction()));
+        return vertices.cross(vertices).with(new ComputeRepulsiveForces(k, new StandardRepulsingForce()));
     }
 
     private DataSet<Force> attractiveForces(DataSet<EPGMVertex> vertices, DataSet<EPGMEdge> edges) {

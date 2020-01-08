@@ -1,4 +1,4 @@
-package org.rascat.gcl.print;
+package org.rascat.gcl.io;
 
 import org.apache.flink.api.java.DataSet;
 import org.apache.flink.api.java.ExecutionEnvironment;
@@ -7,7 +7,6 @@ import org.gradoop.common.model.impl.pojo.EPGMEdge;
 import org.gradoop.common.model.impl.pojo.EPGMVertex;
 import org.gradoop.flink.model.impl.epgm.GraphCollection;
 import org.rascat.gcl.functions.TransferPosition;
-import org.rascat.gcl.layout.AbstractGraphCollectionLayout;
 
 import javax.imageio.ImageIO;
 import java.awt.BasicStroke;

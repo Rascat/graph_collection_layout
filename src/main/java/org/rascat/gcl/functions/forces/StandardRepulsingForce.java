@@ -1,6 +1,6 @@
 package org.rascat.gcl.functions.forces;
 
-public class StandardRepulsionFunction implements RepulsionFunction{
+public class StandardRepulsingForce implements RepulsionFunction{
 
     @Override
     public double repulsion(double distance, double optimalDistance) {
