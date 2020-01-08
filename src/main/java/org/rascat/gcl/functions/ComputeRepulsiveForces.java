@@ -1,5 +1,6 @@
 package org.rascat.gcl.functions;
 
+import org.apache.commons.math3.exception.MathArithmeticException;
 import org.apache.commons.math3.geometry.euclidean.twod.Vector2D;
 import org.apache.flink.api.common.functions.CrossFunction;
 import org.gradoop.common.model.impl.pojo.EPGMVertex;
@@ -28,7 +29,13 @@ public class ComputeRepulsiveForces implements CrossFunction<EPGMVertex, EPGMVer
       return new Force(v.getId(), new Vector2D(0, 0));
     }
 
-    Vector2D displacement = delta.normalize().scalarMultiply(function.repulsion(delta.getNorm(), k));
+    Vector2D displacement;
+    try {
+      displacement = delta.normalize().scalarMultiply(function.repulsion(delta.getNorm(), k));
+    } catch (MathArithmeticException e) {
+      // we probably tried to normalize a vector with length 0, so we return a zero vector
+      displacement = new Vector2D(0,0);
+    }
 
     return new Force(v.getId(), displacement);
   }
