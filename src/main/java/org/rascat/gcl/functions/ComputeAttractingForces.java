@@ -26,7 +26,7 @@ public class ComputeAttractingForces implements MapFunction<EPGMEdge, Force> {
     Vector2D uPos = new Vector2D(edge.getPropertyValue(TARGET.getKeyX()).getDouble(), edge.getPropertyValue(TARGET.getKeyY()).getDouble());
     Vector2D delta = vPos.subtract(uPos);
 
-    Vector2D result = delta.normalize().scalarMultiply(function.attraction(delta.getNorm(), k));
+    Vector2D result = delta.normalize().scalarMultiply(function.attraction(delta.getNorm(), k) * -1);
 
     return new Force(edge.getSourceId(), result);
   }
