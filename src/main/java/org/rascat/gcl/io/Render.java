@@ -7,6 +7,7 @@ import org.gradoop.common.model.impl.pojo.EPGMEdge;
 import org.gradoop.common.model.impl.pojo.EPGMVertex;
 import org.gradoop.flink.model.impl.epgm.GraphCollection;
 import org.rascat.gcl.functions.TransferPosition;
+import org.rascat.gcl.functions.VertexType;
 
 import javax.imageio.ImageIO;
 import java.awt.BasicStroke;
@@ -21,8 +22,8 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
-import static org.rascat.gcl.functions.TransferPosition.Position.SOURCE;
-import static org.rascat.gcl.functions.TransferPosition.Position.TARGET;
+import static org.rascat.gcl.functions.VertexType.TAIL;
+import static org.rascat.gcl.functions.VertexType.HEAD;
 import static org.rascat.gcl.layout.AbstractGraphCollectionLayout.*;
 
 public class Render {
@@ -69,10 +70,10 @@ public class Render {
         gfx.setStroke(new BasicStroke(DEFAULT_STROKE_WIDTH));
         gfx.setColor(EDGE_COLOR);
         for (EPGMEdge edge : edges) {
-            double sourceX = edge.getPropertyValue(SOURCE.getKeyX()).getDouble();
-            double sourceY = edge.getPropertyValue(SOURCE.getKeyY()).getDouble();
-            double targetX = edge.getPropertyValue(TARGET.getKeyX()).getDouble();
-            double targetY = edge.getPropertyValue(TARGET.getKeyY()).getDouble();
+            double sourceX = edge.getPropertyValue(TAIL.getKeyX()).getDouble();
+            double sourceY = edge.getPropertyValue(TAIL.getKeyY()).getDouble();
+            double targetX = edge.getPropertyValue(HEAD.getKeyX()).getDouble();
+            double targetY = edge.getPropertyValue(HEAD.getKeyY()).getDouble();
 
             gfx.draw(new Line2D.Double(sourceX, sourceY, targetX, targetY));
         }
@@ -101,9 +102,9 @@ public class Render {
      */
     private DataSet<EPGMEdge> prepareEdges(DataSet<EPGMVertex> vertices, DataSet<EPGMEdge> edges) {
         edges = edges.join(vertices).where("sourceId").equalTo("id")
-          .with(new TransferPosition(SOURCE)
+          .with(new TransferPosition(TAIL)
           ).join(vertices).where("targetId").equalTo("id")
-          .with(new TransferPosition(TransferPosition.Position.TARGET));
+          .with(new TransferPosition(VertexType.HEAD));
         return edges;
     }
 }

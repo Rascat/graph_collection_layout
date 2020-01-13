@@ -11,10 +11,11 @@ import org.rascat.gcl.functions.cooling.CoolingSchedule;
 import org.rascat.gcl.functions.cooling.ExponentialSimulatedAnnealing;
 import org.rascat.gcl.functions.forces.StandardAttractingForce;
 import org.rascat.gcl.functions.forces.StandardRepulsingForce;
+import org.rascat.gcl.functions.forces.WeightedAttractingForce;
 import org.rascat.gcl.model.Force;
 
-import static org.rascat.gcl.functions.TransferPosition.Position.SOURCE;
-import static org.rascat.gcl.functions.TransferPosition.Position.TARGET;
+import static org.rascat.gcl.functions.VertexType.TAIL;
+import static org.rascat.gcl.functions.VertexType.HEAD;
 
 public class ForceDirectedGraphCollectionLayout extends AbstractGraphCollectionLayout {
 
@@ -62,7 +63,7 @@ public class ForceDirectedGraphCollectionLayout extends AbstractGraphCollectionL
 
         DataSet<Force> repulsiveForces = repulsiveForces(loop);
 
-        DataSet<Force> attractiveForces = attractiveForces(loop, edges);
+        DataSet<Force> attractiveForces = weightedAttractiveForces(loop, edges);
 
         DataSet<Force> forces = repulsiveForces.union(attractiveForces)
                 .groupBy(Force.ID_POSITION)
@@ -90,11 +91,22 @@ public class ForceDirectedGraphCollectionLayout extends AbstractGraphCollectionL
 
     private DataSet<Force> attractiveForces(DataSet<EPGMVertex> vertices, DataSet<EPGMEdge> edges) {
         // first we need to add the position of the source/target vertex to the respective edge
-        DataSet<EPGMEdge> positionedEdges = edges.join(vertices)
-                .where("sourceId").equalTo("id").with(new TransferPosition(SOURCE))
-                .join(vertices)
-                .where("targetId").equalTo("id").with(new TransferPosition(TARGET));
+        DataSet<EPGMEdge> positionedEdges = edges
+                .join(vertices).where("sourceId").equalTo("id").with(new TransferPosition(TAIL))
+                .join(vertices).where("targetId").equalTo("id").with(new TransferPosition(HEAD));
 
         return positionedEdges.map(new ComputeAttractingForces(k, new StandardAttractingForce()));
+    }
+
+    private DataSet<Force> weightedAttractiveForces(DataSet<EPGMVertex> vertices, DataSet<EPGMEdge> edges) {
+        DataSet<EPGMEdge> positionedEdges = edges
+                .join(vertices).where("sourceId").equalTo("id").with(new TransferPosition(TAIL))
+                .join(vertices).where("targetId").equalTo("id").with(new TransferPosition(HEAD));
+
+        positionedEdges = positionedEdges
+                .join(vertices).where("sourceId").equalTo("id").with(new TransferGraphIds(TAIL))
+                .join(vertices).where("targetId").equalTo("id").with(new TransferGraphIds(HEAD));
+
+        return positionedEdges.map(new ComputeWeightedAttractingForces(k, new WeightedAttractingForce()));
     }
 }
