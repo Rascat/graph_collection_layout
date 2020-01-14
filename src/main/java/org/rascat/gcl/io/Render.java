@@ -10,10 +10,7 @@ import org.rascat.gcl.functions.TransferPosition;
 import org.rascat.gcl.functions.VertexType;
 
 import javax.imageio.ImageIO;
-import java.awt.BasicStroke;
-import java.awt.Color;
-import java.awt.Graphics2D;
-import java.awt.RenderingHints;
+import java.awt.*;
 import java.awt.geom.Ellipse2D;
 import java.awt.geom.Line2D;
 import java.awt.image.BufferedImage;
@@ -80,11 +77,16 @@ public class Render {
     }
 
     private void drawVertices(Collection<EPGMVertex> vertices, Graphics2D gfx) {
-        gfx.setColor(VERTEX_COLOR);
+
         for (EPGMVertex vertex : vertices) {
+            gfx.setColor(VERTEX_COLOR);
             double x = vertex.getPropertyValue(KEY_X_COORD).getDouble();
             double y = vertex.getPropertyValue(KEY_Y_COORD).getDouble();
             gfx.fill(this.createCircle(x, y, DEFAULT_RADIUS));
+
+            String label = vertex.getLabel().equals("") ? "X" : vertex.getLabel();
+            gfx.setColor(Color.BLACK);
+            gfx.drawString(label,(float) x, (float) y + 10);
         }
     }
 
