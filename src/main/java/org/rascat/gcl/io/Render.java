@@ -86,7 +86,7 @@ public class Render {
 
             String label = vertex.getLabel().equals("") ? "X" : vertex.getLabel();
             gfx.setColor(Color.BLACK);
-            gfx.drawString(label,(float) x, (float) y + 10);
+            gfx.drawString(label,(float) (x - label.length() * 4), (float) y + 5);
         }
     }
 
