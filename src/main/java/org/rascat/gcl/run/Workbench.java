@@ -1,11 +1,14 @@
 package org.rascat.gcl.run;
 
+import org.apache.flink.api.java.DataSet;
 import org.apache.flink.api.java.ExecutionEnvironment;
-import org.apache.commons.cli.*;
+import org.gradoop.common.model.impl.pojo.EPGMVertex;
+import org.gradoop.flink.io.impl.dot.DOTDataSink;
 import org.gradoop.flink.model.impl.epgm.GraphCollection;
 import org.gradoop.flink.util.FlinkAsciiGraphLoader;
 import org.gradoop.flink.util.GradoopFlinkConfig;
 import org.jetbrains.annotations.NotNull;
+import org.rascat.gcl.functions.SetGephiPosValue;
 import org.rascat.gcl.layout.ForceDirectedGraphCollectionLayout;
 import org.rascat.gcl.io.Render;
 
@@ -31,8 +34,13 @@ public class Workbench {
 
         collection = layout.execute(collection, params.vertices(20));
 
+        DataSet<EPGMVertex> positionedVertices = collection.getVertices().map(new SetGephiPosValue());
+
+        collection = collection.getFactory().fromDataSets(collection.getGraphHeads(), positionedVertices, collection.getEdges());
+        DOTDataSink sink = new DOTDataSink("out/result.dot", true, DOTDataSink.DotFormat.SIMPLE);
+        collection.writeTo(sink, true);
+
         Render render = new Render(height, width, params.outputPath());
         render.renderGraphCollection(collection, env);
     }
-
 }
