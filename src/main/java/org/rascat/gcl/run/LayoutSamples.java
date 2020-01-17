@@ -29,8 +29,8 @@ public class LayoutSamples {
     GraphCollection collection = loader.getGraphCollection();
 
     FRLayouter frLayout = new FRLayouter(iterations, vertices);
-    CombiLayouter combiLayout = new CombiLayouter(iterations, vertices, .5D);
-    FusingFRLayouter fusingLayout = new FusingFRLayouter(iterations, vertices, 0.7D, FusingFRLayouter.OutputFormat.EXTRACTED);
+    CombiLayouter combiLayout = new CombiLayouter(iterations, vertices, params.quality(.5D));
+    FusingFRLayouter fusingLayout = new FusingFRLayouter(iterations, vertices, params.threshold(.5D), FusingFRLayouter.OutputFormat.EXTRACTED);
     CentroidFRLayouter centroidFRLayout = new CentroidFRLayouter(iterations, vertices);
 
     GraphCollection frCollection = frLayout.execute(collection);
