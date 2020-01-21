@@ -17,7 +17,6 @@ public class SquareIdSelector implements KeySelector<EPGMVertex, Integer> {
   @Override
   public Integer getKey(EPGMVertex value) {
     int squareId = value.getPropertyValue(SquareIdMapper.KEY_SQUARE_ID).getInt();
-    System.out.println(String.format("selected %d for %s", squareId, value.getLabel()));
     int squareX = squareId >> HALF_INTEGER_SIZE;
     int squareY = squareId & 0xFFFF;
 
