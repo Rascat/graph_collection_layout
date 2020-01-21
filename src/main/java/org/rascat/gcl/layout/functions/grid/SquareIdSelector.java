@@ -1,10 +1,10 @@
-package org.rascat.gcl.functions.grid;
+package org.rascat.gcl.layout.functions.grid;
 
 import org.apache.flink.api.java.functions.KeySelector;
 import org.gradoop.common.model.impl.pojo.EPGMVertex;
 
-import static org.rascat.gcl.functions.grid.NeighborType.*;
-import static org.rascat.gcl.functions.grid.SquareIdMapper.HALF_INTEGER_SIZE;
+import static org.rascat.gcl.layout.functions.grid.NeighborType.*;
+import static org.rascat.gcl.layout.functions.grid.SquareIdMapper.HALF_INTEGER_SIZE;
 
 public class SquareIdSelector implements KeySelector<EPGMVertex, Integer> {
 

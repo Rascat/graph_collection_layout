@@ -1,10 +1,10 @@
-package org.rascat.gcl.functions;
+package org.rascat.gcl.layout.functions.forces;
 
 import org.apache.commons.math3.geometry.euclidean.twod.Vector2D;
 import org.apache.flink.api.common.functions.RichJoinFunction;
 import org.gradoop.common.model.impl.pojo.EPGMVertex;
-import org.rascat.gcl.functions.cooling.CoolingSchedule;
-import org.rascat.gcl.model.Force;
+import org.rascat.gcl.layout.functions.cooling.CoolingSchedule;
+import org.rascat.gcl.layout.model.Force;
 
 import static org.rascat.gcl.layout.AbstractGraphCollectionLayout.*;
 

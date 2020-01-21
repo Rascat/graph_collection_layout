@@ -7,19 +7,19 @@ import org.gradoop.common.model.impl.pojo.EPGMEdge;
 import org.gradoop.common.model.impl.pojo.EPGMGraphHead;
 import org.gradoop.common.model.impl.pojo.EPGMVertex;
 import org.gradoop.flink.model.impl.epgm.GraphCollection;
-import org.rascat.gcl.functions.*;
-import org.rascat.gcl.functions.cooling.CoolingSchedule;
-import org.rascat.gcl.functions.cooling.ExponentialSimulatedAnnealing;
-import org.rascat.gcl.functions.forces.StandardAttractingForce;
-import org.rascat.gcl.functions.forces.StandardRepulsingForce;
-import org.rascat.gcl.functions.forces.WeightedAttractingForce;
-import org.rascat.gcl.functions.grid.NeighborType;
-import org.rascat.gcl.functions.grid.SquareIdMapper;
-import org.rascat.gcl.functions.grid.SquareIdSelector;
-import org.rascat.gcl.model.Force;
+import org.rascat.gcl.layout.functions.cooling.CoolingSchedule;
+import org.rascat.gcl.layout.functions.cooling.ExponentialSimulatedAnnealing;
+import org.rascat.gcl.layout.functions.forces.*;
+import org.rascat.gcl.layout.functions.grid.NeighborType;
+import org.rascat.gcl.layout.functions.grid.SquareIdMapper;
+import org.rascat.gcl.layout.functions.grid.SquareIdSelector;
+import org.rascat.gcl.layout.functions.prepare.RandomPlacement;
+import org.rascat.gcl.layout.functions.prepare.TransferGraphIds;
+import org.rascat.gcl.layout.functions.prepare.TransferPosition;
+import org.rascat.gcl.layout.model.Force;
 
-import static org.rascat.gcl.functions.VertexType.TAIL;
-import static org.rascat.gcl.functions.VertexType.HEAD;
+import static org.rascat.gcl.layout.model.VertexType.TAIL;
+import static org.rascat.gcl.layout.model.VertexType.HEAD;
 
 public class ForceDirectedGraphCollectionLayout extends AbstractGraphCollectionLayout {
 

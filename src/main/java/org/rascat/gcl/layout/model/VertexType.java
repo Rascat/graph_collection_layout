@@ -1,4 +1,4 @@
-package org.rascat.gcl.functions;
+package org.rascat.gcl.layout.model;
 
 public enum VertexType {
   TAIL("tail_x", "tail_y", "tail_ids"),

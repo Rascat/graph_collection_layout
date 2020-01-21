@@ -1,4 +1,4 @@
-package org.rascat.gcl.model;
+package org.rascat.gcl.layout.model;
 
 import org.apache.commons.math3.geometry.euclidean.twod.Vector2D;
 import org.apache.flink.api.java.tuple.Tuple2;

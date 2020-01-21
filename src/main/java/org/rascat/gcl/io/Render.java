@@ -6,8 +6,8 @@ import org.apache.flink.api.java.io.LocalCollectionOutputFormat;
 import org.gradoop.common.model.impl.pojo.EPGMEdge;
 import org.gradoop.common.model.impl.pojo.EPGMVertex;
 import org.gradoop.flink.model.impl.epgm.GraphCollection;
-import org.rascat.gcl.functions.TransferPosition;
-import org.rascat.gcl.functions.VertexType;
+import org.rascat.gcl.layout.functions.prepare.TransferPosition;
+import org.rascat.gcl.layout.model.VertexType;
 
 import javax.imageio.ImageIO;
 import java.awt.*;
@@ -19,8 +19,8 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
-import static org.rascat.gcl.functions.VertexType.TAIL;
-import static org.rascat.gcl.functions.VertexType.HEAD;
+import static org.rascat.gcl.layout.model.VertexType.TAIL;
+import static org.rascat.gcl.layout.model.VertexType.HEAD;
 import static org.rascat.gcl.layout.AbstractGraphCollectionLayout.*;
 
 public class Render {

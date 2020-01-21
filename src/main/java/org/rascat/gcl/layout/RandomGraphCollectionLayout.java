@@ -5,7 +5,7 @@ import org.gradoop.common.model.impl.pojo.EPGMEdge;
 import org.gradoop.common.model.impl.pojo.EPGMGraphHead;
 import org.gradoop.common.model.impl.pojo.EPGMVertex;
 import org.gradoop.flink.model.impl.epgm.GraphCollection;
-import org.rascat.gcl.functions.RandomPlacement;
+import org.rascat.gcl.layout.functions.prepare.RandomPlacement;
 
 public class RandomGraphCollectionLayout extends AbstractGraphCollectionLayout {
     private int width;

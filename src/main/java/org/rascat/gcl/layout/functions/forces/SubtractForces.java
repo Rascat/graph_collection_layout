@@ -1,7 +1,7 @@
-package org.rascat.gcl.functions;
+package org.rascat.gcl.layout.functions.forces;
 
 import org.apache.flink.api.common.functions.ReduceFunction;
-import org.rascat.gcl.model.Force;
+import org.rascat.gcl.layout.model.Force;
 
 public class SubtractForces implements ReduceFunction<Force> {
     @Override

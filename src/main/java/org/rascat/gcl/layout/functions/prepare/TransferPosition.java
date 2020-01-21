@@ -1,8 +1,9 @@
-package org.rascat.gcl.functions;
+package org.rascat.gcl.layout.functions.prepare;
 
 import org.apache.flink.api.common.functions.JoinFunction;
 import org.gradoop.common.model.impl.pojo.EPGMEdge;
 import org.gradoop.common.model.impl.pojo.EPGMVertex;
+import org.rascat.gcl.layout.model.VertexType;
 
 import static org.rascat.gcl.layout.AbstractGraphCollectionLayout.*;
 

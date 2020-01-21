@@ -1,4 +1,4 @@
-package org.rascat.gcl.functions;
+package org.rascat.gcl.layout.functions.prepare;
 
 import org.apache.flink.api.common.functions.MapFunction;
 import org.gradoop.common.model.impl.pojo.EPGMVertex;

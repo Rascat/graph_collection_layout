@@ -1,4 +1,4 @@
-package org.rascat.gcl.functions;
+package org.rascat.gcl.layout.functions.forces;
 
 import org.apache.commons.math3.exception.MathArithmeticException;
 import org.apache.commons.math3.geometry.euclidean.twod.Vector2D;
@@ -6,12 +6,11 @@ import org.apache.flink.api.common.functions.MapFunction;
 import org.gradoop.common.model.impl.id.GradoopIdSet;
 import org.gradoop.common.model.impl.pojo.EPGMEdge;
 import org.gradoop.common.model.impl.properties.PropertyValue;
-import org.rascat.gcl.functions.forces.WeightedAttractingForce;
-import org.rascat.gcl.model.Force;
+import org.rascat.gcl.layout.model.Force;
 
 import java.util.List;
 
-import static org.rascat.gcl.functions.VertexType.*;
+import static org.rascat.gcl.layout.model.VertexType.*;
 
 public class ComputeWeightedAttractingForces implements MapFunction<EPGMEdge, Force> {
 

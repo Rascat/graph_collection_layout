@@ -1,12 +1,12 @@
-package org.rascat.gcl.functions;
+package org.rascat.gcl.layout.functions.forces;
 
 import org.apache.commons.math3.exception.MathArithmeticException;
 import org.apache.commons.math3.geometry.euclidean.twod.Vector2D;
 import org.apache.flink.api.common.functions.CrossFunction;
 import org.apache.flink.api.common.functions.JoinFunction;
 import org.gradoop.common.model.impl.pojo.EPGMVertex;
-import org.rascat.gcl.functions.forces.RepulsionFunction;
-import org.rascat.gcl.model.Force;
+import org.rascat.gcl.layout.functions.forces.RepulsionFunction;
+import org.rascat.gcl.layout.model.Force;
 
 import static org.rascat.gcl.layout.AbstractGraphCollectionLayout.*;
 

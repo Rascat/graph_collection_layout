@@ -1,10 +1,10 @@
-package org.rascat.gcl.functions;
+package org.rascat.gcl.layout.functions.prepare;
 
 import org.apache.flink.api.common.functions.MapFunction;
 import org.gradoop.common.model.impl.pojo.EPGMVertex;
 import org.rascat.gcl.layout.AbstractGraphCollectionLayout;
 
-public class SetGephiPosValue implements MapFunction<EPGMVertex, EPGMVertex> {
+public class SetPosProperty implements MapFunction<EPGMVertex, EPGMVertex> {
   @Override
   public EPGMVertex map(EPGMVertex value) throws Exception {
     double x = value.getPropertyValue(AbstractGraphCollectionLayout.KEY_X_COORD).getDouble();

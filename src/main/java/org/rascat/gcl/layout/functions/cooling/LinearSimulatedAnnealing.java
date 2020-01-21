@@ -1,4 +1,4 @@
-package org.rascat.gcl.functions.cooling;
+package org.rascat.gcl.layout.functions.cooling;
 
 public class LinearSimulatedAnnealing implements CoolingSchedule {
 
