@@ -1,6 +1,7 @@
 package org.rascat.gcl.layout;
 
 import org.apache.flink.api.java.DataSet;
+import org.apache.flink.api.java.functions.KeySelector;
 import org.apache.flink.api.java.operators.IterativeDataSet;
 import org.gradoop.common.model.impl.pojo.EPGMEdge;
 import org.gradoop.common.model.impl.pojo.EPGMGraphHead;
@@ -12,6 +13,9 @@ import org.rascat.gcl.functions.cooling.ExponentialSimulatedAnnealing;
 import org.rascat.gcl.functions.forces.StandardAttractingForce;
 import org.rascat.gcl.functions.forces.StandardRepulsingForce;
 import org.rascat.gcl.functions.forces.WeightedAttractingForce;
+import org.rascat.gcl.functions.grid.NeighborType;
+import org.rascat.gcl.functions.grid.SquareIdMapper;
+import org.rascat.gcl.functions.grid.SquareIdSelector;
 import org.rascat.gcl.model.Force;
 
 import static org.rascat.gcl.functions.VertexType.TAIL;
@@ -61,7 +65,7 @@ public class ForceDirectedGraphCollectionLayout extends AbstractGraphCollectionL
 
         IterativeDataSet<EPGMVertex> loop = vertices.iterate(iterations);
 
-        DataSet<Force> repulsiveForces = repulsiveForces(loop);
+        DataSet<Force> repulsiveForces = gridRepulsiveForces(loop);
 
         DataSet<Force> attractiveForces = weightedAttractiveForces(loop, edges);
 
@@ -85,8 +89,46 @@ public class ForceDirectedGraphCollectionLayout extends AbstractGraphCollectionL
         return this.height * this.width;
     }
 
-    private DataSet<Force> repulsiveForces(DataSet<EPGMVertex> vertices) {
+    private DataSet<Force> naiveRepulsiveForces(DataSet<EPGMVertex> vertices) {
         return vertices.cross(vertices).with(new ComputeRepulsiveForces(k, new StandardRepulsingForce()));
+    }
+
+    private DataSet<Force> gridRepulsiveForces(DataSet<EPGMVertex> vertices) {
+        vertices = vertices.map(new SquareIdMapper((int) k * 2));
+
+        KeySelector<EPGMVertex, Integer> selfSelector = new SquareIdSelector(NeighborType.SELF);
+        KeySelector<EPGMVertex, Integer> upSelector = new SquareIdSelector(NeighborType.UP);
+        KeySelector<EPGMVertex, Integer> upRightSelector = new SquareIdSelector(NeighborType.UPRIGHT);
+        KeySelector<EPGMVertex, Integer> upLeftSelector = new SquareIdSelector(NeighborType.UPLEFT);
+        KeySelector<EPGMVertex, Integer> leftSelector = new SquareIdSelector(NeighborType.LEFT);
+
+        ComputeRepulsiveForces repulsionFunction = new ComputeRepulsiveForces(k, new StandardRepulsingForce());
+
+        DataSet<Force> directNeighbors = vertices.join(vertices)
+          .where(selfSelector).equalTo(selfSelector)
+          .with(repulsionFunction);
+
+        DataSet<Force> upNeighbors = vertices.join(vertices)
+          .where(upSelector).equalTo(selfSelector)
+          .with(repulsionFunction);
+
+        DataSet<Force> upRightNeighbors = vertices.join(vertices)
+          .where(upRightSelector).equalTo(selfSelector)
+          .with(repulsionFunction);
+
+        DataSet<Force> upLeftNeighbors = vertices.join(vertices)
+          .where(upLeftSelector).equalTo(selfSelector)
+          .with(repulsionFunction);
+
+        DataSet<Force> leftNeighbors = vertices.join(vertices)
+          .where(leftSelector).equalTo(selfSelector)
+          .with(repulsionFunction);
+
+        return directNeighbors
+          .union(upNeighbors)
+          .union(upRightNeighbors)
+          .union(upLeftNeighbors)
+          .union(leftNeighbors);
     }
 
     private DataSet<Force> attractiveForces(DataSet<EPGMVertex> vertices, DataSet<EPGMEdge> edges) {
