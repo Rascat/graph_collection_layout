@@ -2,7 +2,9 @@
   <dictionary name="lucas">
     <words>
       <w>combi</w>
+      <w>downleft</w>
       <w>gephi</w>
+      <w>upleft</w>
     </words>
   </dictionary>
 </component>
