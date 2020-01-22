@@ -10,10 +10,10 @@ import static org.rascat.gcl.layout.AbstractGraphCollectionLayout.*;
 
 public class RandomPlacement implements MapFunction<EPGMVertex, EPGMVertex> {
 
-    private double limitX;
-    private double limitY;
+    private int limitX;
+    private int limitY;
 
-    public RandomPlacement(double limitX, double limitY) {
+    public RandomPlacement(int limitX, int limitY) {
         this.limitX = limitX;
         this.limitY = limitY;
     }
