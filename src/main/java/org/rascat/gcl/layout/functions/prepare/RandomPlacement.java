@@ -4,6 +4,7 @@ import org.apache.flink.api.common.functions.MapFunction;
 import org.gradoop.common.model.impl.pojo.EPGMVertex;
 import org.gradoop.common.model.impl.properties.Property;
 
+import java.util.StringJoiner;
 import java.util.concurrent.ThreadLocalRandom;
 
 import static org.rascat.gcl.layout.AbstractGraphCollectionLayout.*;
@@ -25,5 +26,13 @@ public class RandomPlacement implements MapFunction<EPGMVertex, EPGMVertex> {
         vertex.setProperty(Property.create(KEY_X_COORD, x));
         vertex.setProperty(Property.create(KEY_Y_COORD, y));
         return vertex;
+    }
+
+    @Override
+    public String toString() {
+        return new StringJoiner(", ", RandomPlacement.class.getSimpleName() + "[", "]")
+          .add("limitX=" + limitX)
+          .add("limitY=" + limitY)
+          .toString();
     }
 }

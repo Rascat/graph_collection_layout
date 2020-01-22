@@ -100,8 +100,8 @@ public class ForceDirectedGraphCollectionLayout extends AbstractGraphCollectionL
       .add("iterations=" + iterations)
       .add("isIntermediaryLayout=" + isIntermediaryLayout)
       .add("initialLayout=" + initialLayout)
-      .add("repulsiveForces=" + repulsiveForces)
-      .add("attractiveForces=" + attractiveForces)
+      .add("repulsiveForces=" + repulsiveForces.getClass().getSimpleName())
+      .add("attractiveForces=" + attractiveForces.getClass().getSimpleName())
       .toString();
   }
 
