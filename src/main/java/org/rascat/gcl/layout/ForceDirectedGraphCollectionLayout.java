@@ -1,154 +1,174 @@
 package org.rascat.gcl.layout;
 
+import org.apache.flink.api.common.functions.MapFunction;
 import org.apache.flink.api.java.DataSet;
-import org.apache.flink.api.java.functions.KeySelector;
 import org.apache.flink.api.java.operators.IterativeDataSet;
 import org.gradoop.common.model.impl.pojo.EPGMEdge;
 import org.gradoop.common.model.impl.pojo.EPGMGraphHead;
 import org.gradoop.common.model.impl.pojo.EPGMVertex;
 import org.gradoop.flink.model.impl.epgm.GraphCollection;
+import org.rascat.gcl.layout.api.AttractiveForces;
 import org.rascat.gcl.layout.api.CoolingSchedule;
+import org.rascat.gcl.layout.api.RepulsiveForces;
 import org.rascat.gcl.layout.functions.cooling.ExponentialSimulatedAnnealing;
 import org.rascat.gcl.layout.functions.forces.*;
-import org.rascat.gcl.layout.functions.grid.NeighborType;
-import org.rascat.gcl.layout.functions.grid.SquareIdMapper;
-import org.rascat.gcl.layout.functions.grid.SquareIdSelector;
+
 import org.rascat.gcl.layout.functions.prepare.RandomPlacement;
-import org.rascat.gcl.layout.functions.prepare.TransferGraphIds;
-import org.rascat.gcl.layout.functions.prepare.TransferPosition;
+
 import org.rascat.gcl.layout.model.Force;
 
-import static org.rascat.gcl.layout.model.VertexType.TAIL;
-import static org.rascat.gcl.layout.model.VertexType.HEAD;
+import java.util.StringJoiner;
 
 public class ForceDirectedGraphCollectionLayout extends AbstractGraphCollectionLayout {
 
-    private int width;
-    private int height;
-    private double k;
+  private final int width;
+  private final int height;
+  private final double k;
+  private final int iterations;
+  private final boolean isIntermediaryLayout;
+  private final MapFunction<EPGMVertex, EPGMVertex> initialLayout;
+  private final RepulsiveForces repulsiveForces;
+  private final AttractiveForces attractiveForces;
+
+  public ForceDirectedGraphCollectionLayout(Builder builder) {
+    this.width = builder.width;
+    this.height = builder.height;
+    this.k = builder.k;
+    this.iterations = builder.iterations;
+    this.isIntermediaryLayout = builder.isIntermediary;
+    this.initialLayout = builder.initialLayout;
+    this.repulsiveForces = builder.repulsiveForces;
+    this.attractiveForces = builder.attractiveForces;
+  }
+
+  public GraphCollection execute(GraphCollection collection) {
+    DataSet<EPGMEdge> edges = collection.getEdges();
+    DataSet<EPGMVertex> vertices = collection.getVertices();
+    DataSet<EPGMGraphHead> graphHeads = collection.getGraphHeads();
+
+    if (!isIntermediaryLayout) {
+      vertices = vertices.map(initialLayout);
+    } else {
+      // make sure int values get cast to double
+      vertices = vertices.map(vertex -> {
+        vertex.setProperty(KEY_X_COORD, (double) vertex.getPropertyValue(KEY_X_COORD).getInt());
+        vertex.setProperty(KEY_Y_COORD, (double) vertex.getPropertyValue(KEY_Y_COORD).getInt());
+        return vertex;
+      });
+    }
+
+    IterativeDataSet<EPGMVertex> loop = vertices.iterate(iterations);
+
+    DataSet<Force> repulsiveForces = computeRepulsiveForces(loop);
+
+    DataSet<Force> attractiveForces = computeAttractiveForces(loop, edges);
+
+    DataSet<Force> forces = repulsiveForces.union(attractiveForces)
+      .groupBy(Force.ID_POSITION)
+      .reduce((firstForce, secondForce) -> {
+        firstForce.setVector(firstForce.getVector().add(secondForce.getVector()));
+        return firstForce;
+      });
+
+    CoolingSchedule schedule = new ExponentialSimulatedAnnealing(this.width, this.height, this.k, this.iterations);
+    DataSet<EPGMVertex> pVertices = loop.closeWith(
+      loop.join(forces)
+        .where("id").equalTo("f0")
+        .with(new ApplyForces(width, height, schedule)));
+
+    return collection.getFactory().fromDataSets(graphHeads, pVertices, edges);
+  }
+
+  private int area() {
+    return this.height * this.width;
+  }
+
+  private DataSet<Force> computeAttractiveForces(DataSet<EPGMVertex> vertices, DataSet<EPGMEdge> edges) {
+    return this.attractiveForces.compute(vertices, edges, this.k);
+  }
+
+  private DataSet<Force> computeRepulsiveForces(DataSet<EPGMVertex> vertices) {
+    return this.repulsiveForces.compute(vertices, this.k);
+  }
+
+  @Override
+  public String toString() {
+    return new StringJoiner(", ", ForceDirectedGraphCollectionLayout.class.getSimpleName() + "[", "]")
+      .add("width=" + width)
+      .add("height=" + height)
+      .add("k=" + k)
+      .add("iterations=" + iterations)
+      .add("isIntermediaryLayout=" + isIntermediaryLayout)
+      .add("initialLayout=" + initialLayout)
+      .add("repulsiveForces=" + repulsiveForces)
+      .add("attractiveForces=" + attractiveForces)
+      .toString();
+  }
+
+  public static class Builder {
+
+    // required
+    private final int width;
+    private final int height;
+    private final int vertices;
+
+    // optional
+    private double k = -1;
     private int iterations = 1;
-    private boolean isIntermediaryLayout = false;
+    private boolean isIntermediary = false;
+    private MapFunction<EPGMVertex, EPGMVertex> initialLayout; // we initialize this during build()
+    private RepulsiveForces repulsiveForces = new NaiveRepulsiveForces();
+    private AttractiveForces attractiveForces = new StandardAttractiveForces();
 
-    public ForceDirectedGraphCollectionLayout(int width, int height) {
-        this.height = height;
-        this.width = width;
+    public Builder(int width, int height, int vertices) {
+      this.width = width;
+      this.height = height;
+      this.vertices = vertices;
     }
 
-    public void setIterations(int i) {
-        this.iterations = i;
+    public Builder k(double k) {
+      if (k <= 0) {
+        throw new IllegalArgumentException("K needs to be > 0.");
+      }
+
+      this.k = k;
+      return this;
     }
 
-    public void setIsIntermediaryLayout(boolean isIntermediaryLayout) {
-        this.isIntermediaryLayout = isIntermediaryLayout;
+    public Builder iterations(int iterations) {
+      this.iterations = iterations;
+      return this;
     }
 
-    public GraphCollection execute(GraphCollection collection) {
-        return execute(collection, 20);
+    public Builder isIntermediary(boolean isIntermediary) {
+      this.isIntermediary = isIntermediary;
+      return this;
     }
 
-    public GraphCollection execute(GraphCollection collection, int vertexCount) {
-        this.k = Math.sqrt((double) area() / vertexCount);
-        DataSet<EPGMEdge> edges = collection.getEdges();
-        DataSet<EPGMVertex> vertices = collection.getVertices();
-        DataSet<EPGMGraphHead> graphHeads = collection.getGraphHeads();
-
-        if(!isIntermediaryLayout) {
-            vertices = vertices.map(new RandomPlacement(width, height));
-        } else {
-            // make sure int values get cast to double
-            vertices = vertices.map( vertex -> {
-                vertex.setProperty(KEY_X_COORD, (double) vertex.getPropertyValue(KEY_X_COORD).getInt());
-                vertex.setProperty(KEY_Y_COORD, (double) vertex.getPropertyValue(KEY_Y_COORD).getInt());
-                return vertex;
-            });
-        }
-
-        IterativeDataSet<EPGMVertex> loop = vertices.iterate(iterations);
-
-        DataSet<Force> repulsiveForces = gridRepulsiveForces(loop);
-
-        DataSet<Force> attractiveForces = weightedAttractiveForces(loop, edges);
-
-        DataSet<Force> forces = repulsiveForces.union(attractiveForces)
-                .groupBy(Force.ID_POSITION)
-                .reduce((firstForce, secondForce) -> {
-                    firstForce.setVector(firstForce.getVector().add(secondForce.getVector()));
-                    return firstForce;
-                });
-
-        CoolingSchedule schedule = new ExponentialSimulatedAnnealing(this.width, this.height, this.k, this.iterations);
-        DataSet<EPGMVertex> pVertices = loop.closeWith(
-                loop.join(forces)
-                        .where("id").equalTo("f0")
-                        .with(new ApplyForces(width, height, schedule)));
-
-        return collection.getFactory().fromDataSets(graphHeads, pVertices, edges);
+    public Builder initialLayout(MapFunction<EPGMVertex, EPGMVertex> function) {
+      this.initialLayout = function;
+      return this;
     }
 
-    private int area() {
-        return this.height * this.width;
+    public Builder repulsiveForces(RepulsiveForces repulsiveForces) {
+      this.repulsiveForces = repulsiveForces;
+      return this;
     }
 
-    private DataSet<Force> naiveRepulsiveForces(DataSet<EPGMVertex> vertices) {
-        return vertices.cross(vertices).with(new ComputeRepulsiveForces(k, new StandardRepulsingForce()));
+    public Builder attractiveForces(AttractiveForces attractiveForces) {
+      this.attractiveForces = attractiveForces;
+      return this;
     }
 
-    private DataSet<Force> gridRepulsiveForces(DataSet<EPGMVertex> vertices) {
-        vertices = vertices.map(new SquareIdMapper((int) k * 2));
+    public ForceDirectedGraphCollectionLayout build() {
+      if (this.initialLayout == null) {
+        this.initialLayout = new RandomPlacement(this.width, this.height);
+      }
+      if (k == -1) {
+        k = Math.sqrt((width * height) / (double) vertices);
+      }
 
-        KeySelector<EPGMVertex, Integer> selfSelector = new SquareIdSelector(NeighborType.SELF);
-        KeySelector<EPGMVertex, Integer> upSelector = new SquareIdSelector(NeighborType.UP);
-        KeySelector<EPGMVertex, Integer> upRightSelector = new SquareIdSelector(NeighborType.UPRIGHT);
-        KeySelector<EPGMVertex, Integer> upLeftSelector = new SquareIdSelector(NeighborType.UPLEFT);
-        KeySelector<EPGMVertex, Integer> leftSelector = new SquareIdSelector(NeighborType.LEFT);
-
-        ComputeRepulsiveForces repulsionFunction = new ComputeRepulsiveForces(k, new StandardRepulsingForce());
-
-        DataSet<Force> directNeighbors = vertices.join(vertices)
-          .where(selfSelector).equalTo(selfSelector)
-          .with(repulsionFunction);
-
-        DataSet<Force> upNeighbors = vertices.join(vertices)
-          .where(upSelector).equalTo(selfSelector)
-          .with(repulsionFunction);
-
-        DataSet<Force> upRightNeighbors = vertices.join(vertices)
-          .where(upRightSelector).equalTo(selfSelector)
-          .with(repulsionFunction);
-
-        DataSet<Force> upLeftNeighbors = vertices.join(vertices)
-          .where(upLeftSelector).equalTo(selfSelector)
-          .with(repulsionFunction);
-
-        DataSet<Force> leftNeighbors = vertices.join(vertices)
-          .where(leftSelector).equalTo(selfSelector)
-          .with(repulsionFunction);
-
-        return directNeighbors
-          .union(upNeighbors)
-          .union(upRightNeighbors)
-          .union(upLeftNeighbors)
-          .union(leftNeighbors);
+      return new ForceDirectedGraphCollectionLayout(this);
     }
-
-    private DataSet<Force> attractiveForces(DataSet<EPGMVertex> vertices, DataSet<EPGMEdge> edges) {
-        // first we need to add the position of the source/target vertex to the respective edge
-        DataSet<EPGMEdge> positionedEdges = edges
-                .join(vertices).where("sourceId").equalTo("id").with(new TransferPosition(TAIL))
-                .join(vertices).where("targetId").equalTo("id").with(new TransferPosition(HEAD));
-
-        return positionedEdges.map(new ComputeAttractingForces(k, new StandardAttractingForce()));
-    }
-
-    private DataSet<Force> weightedAttractiveForces(DataSet<EPGMVertex> vertices, DataSet<EPGMEdge> edges) {
-        DataSet<EPGMEdge> positionedEdges = edges
-                .join(vertices).where("sourceId").equalTo("id").with(new TransferPosition(TAIL))
-                .join(vertices).where("targetId").equalTo("id").with(new TransferPosition(HEAD));
-
-        positionedEdges = positionedEdges
-                .join(vertices).where("sourceId").equalTo("id").with(new TransferGraphIds(TAIL))
-                .join(vertices).where("targetId").equalTo("id").with(new TransferGraphIds(HEAD));
-
-        return positionedEdges.map(new ComputeWeightedAttractingForces(k, new WeightedAttractingForce()));
-    }
+  }
 }

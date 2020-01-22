@@ -5,6 +5,7 @@ import org.gradoop.common.model.impl.pojo.EPGMEdge;
 import org.gradoop.common.model.impl.pojo.EPGMVertex;
 import org.rascat.gcl.layout.model.Force;
 
-public interface AttractingForces {
-  DataSet<Force> compute(DataSet<EPGMVertex> vertices, DataSet<EPGMEdge> edges);
+public interface AttractiveForces {
+
+  DataSet<Force> compute(DataSet<EPGMVertex> vertices, DataSet<EPGMEdge> edges, double k);
 }

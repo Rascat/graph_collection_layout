@@ -5,5 +5,5 @@ import org.gradoop.common.model.impl.pojo.EPGMVertex;
 import org.rascat.gcl.layout.model.Force;
 
 public interface RepulsiveForces {
-  DataSet<Force> compute(DataSet<EPGMVertex> vertices);
+  DataSet<Force> compute(DataSet<EPGMVertex> vertices, double k);
 }
