@@ -1,5 +1,7 @@
 package org.rascat.gcl.layout.functions.cooling;
 
+import org.rascat.gcl.layout.api.CoolingSchedule;
+
 public class LinearSimulatedAnnealing implements CoolingSchedule {
 
   private double startTemperature;

@@ -4,6 +4,7 @@ import org.apache.commons.math3.exception.MathArithmeticException;
 import org.apache.commons.math3.geometry.euclidean.twod.Vector2D;
 import org.apache.flink.api.common.functions.MapFunction;
 import org.gradoop.common.model.impl.pojo.EPGMEdge;
+import org.rascat.gcl.layout.api.AttractionFunction;
 import org.rascat.gcl.layout.model.Force;
 
 import static org.rascat.gcl.layout.model.VertexType.*;

@@ -1,4 +1,4 @@
-package org.rascat.gcl.layout.functions.cooling;
+package org.rascat.gcl.layout.api;
 
 import java.io.Serializable;
 

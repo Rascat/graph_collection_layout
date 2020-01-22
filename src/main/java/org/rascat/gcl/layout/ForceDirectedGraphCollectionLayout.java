@@ -7,7 +7,7 @@ import org.gradoop.common.model.impl.pojo.EPGMEdge;
 import org.gradoop.common.model.impl.pojo.EPGMGraphHead;
 import org.gradoop.common.model.impl.pojo.EPGMVertex;
 import org.gradoop.flink.model.impl.epgm.GraphCollection;
-import org.rascat.gcl.layout.functions.cooling.CoolingSchedule;
+import org.rascat.gcl.layout.api.CoolingSchedule;
 import org.rascat.gcl.layout.functions.cooling.ExponentialSimulatedAnnealing;
 import org.rascat.gcl.layout.functions.forces.*;
 import org.rascat.gcl.layout.functions.grid.NeighborType;

@@ -1,4 +1,4 @@
-package org.rascat.gcl.layout.functions.forces;
+package org.rascat.gcl.layout.api;
 
 import java.io.Serializable;
 

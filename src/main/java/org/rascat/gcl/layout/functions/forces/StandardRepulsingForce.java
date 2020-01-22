@@ -1,6 +1,8 @@
 package org.rascat.gcl.layout.functions.forces;
 
-public class StandardRepulsingForce implements RepulsionFunction{
+import org.rascat.gcl.layout.api.RepulsionFunction;
+
+public class StandardRepulsingForce implements RepulsionFunction {
 
     @Override
     public double repulsion(double distance, double optimalDistance) {

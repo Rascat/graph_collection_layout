@@ -1,5 +1,7 @@
 package org.rascat.gcl.layout.functions.cooling;
 
+import org.rascat.gcl.layout.api.CoolingSchedule;
+
 public class ExponentialSimulatedAnnealing implements CoolingSchedule {
 
   private double startTemp;

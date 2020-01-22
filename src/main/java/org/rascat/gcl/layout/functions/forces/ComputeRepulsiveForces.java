@@ -5,7 +5,7 @@ import org.apache.commons.math3.geometry.euclidean.twod.Vector2D;
 import org.apache.flink.api.common.functions.CrossFunction;
 import org.apache.flink.api.common.functions.JoinFunction;
 import org.gradoop.common.model.impl.pojo.EPGMVertex;
-import org.rascat.gcl.layout.functions.forces.RepulsionFunction;
+import org.rascat.gcl.layout.api.RepulsionFunction;
 import org.rascat.gcl.layout.model.Force;
 
 import static org.rascat.gcl.layout.AbstractGraphCollectionLayout.*;
@@ -49,6 +49,10 @@ public class ComputeRepulsiveForces implements CrossFunction<EPGMVertex, EPGMVer
 
     if (v.equals(u) || distance > k) {
       return new Force(v.getId(), new Vector2D(0, 0));
+    }
+
+    if (distance == 0) {
+      System.out.println(String.format("\n0 distance between %s and %s\n", v.getLabel(), u.getLabel()));
     }
 
     Vector2D displacement;
