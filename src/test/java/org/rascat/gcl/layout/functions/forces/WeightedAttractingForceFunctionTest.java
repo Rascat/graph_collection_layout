@@ -4,11 +4,11 @@ import org.testng.annotations.Test;
 import org.testng.Assert;
 
 
-public class WeightedAttractingForceTest {
+public class WeightedAttractingForceFunctionTest {
 
   @Test
   public void testDefaultWeightedAttraction() {
-    WeightedAttractingForce force = new WeightedAttractingForce();
+    WeightedAttractingForceFunction force = new WeightedAttractingForceFunction();
     double distance = 10D;
     double optimalDistance = 7D;
     boolean sameGraph = false;

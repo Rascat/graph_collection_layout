@@ -13,6 +13,18 @@ import static org.rascat.gcl.layout.model.VertexType.TAIL;
 
 public class WeightedAttractiveForces implements AttractiveForces {
 
+  private double sameGraphFactor;
+  private double differentGraphFactor = 1D;
+
+  public WeightedAttractiveForces(double sameGraphFactor, double differentGraphFactor) {
+    this.sameGraphFactor = sameGraphFactor;
+    this.differentGraphFactor = differentGraphFactor;
+  }
+
+  public WeightedAttractiveForces(double sameGraphFactor) {
+    this.sameGraphFactor = sameGraphFactor;
+  }
+
   @Override
   public DataSet<Force> compute(DataSet<EPGMVertex> vertices, DataSet<EPGMEdge> edges, double k) {
     DataSet<EPGMEdge> positionedEdges = edges
@@ -23,6 +35,15 @@ public class WeightedAttractiveForces implements AttractiveForces {
       .join(vertices).where("sourceId").equalTo("id").with(new TransferGraphIds(TAIL))
       .join(vertices).where("targetId").equalTo("id").with(new TransferGraphIds(HEAD));
 
-    return positionedEdges.map(new ComputeWeightedAttractingForces(k, new WeightedAttractingForce()));
+    return positionedEdges.map(new ComputeWeightedAttractingForces(
+      k, new WeightedAttractingForceFunction(sameGraphFactor, differentGraphFactor)));
+  }
+
+  @Override
+  public String toString() {
+    return "WeightedAttractiveForces{" +
+      "sameGraphFactor=" + sameGraphFactor +
+      ", differentGraphFactor=" + differentGraphFactor +
+      '}';
   }
 }

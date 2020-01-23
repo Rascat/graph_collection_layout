@@ -33,7 +33,7 @@ public class Workbench {
         ForceDirectedGraphCollectionLayout layout = new ForceDirectedGraphCollectionLayout
           .Builder(width, height, params.vertices(20))
           .initialLayout(new RandomPlacement(width - (width / 10), height - (height / 10)))
-          .attractiveForces(new WeightedAttractiveForces())
+          .attractiveForces(new WeightedAttractiveForces(100))
           .repulsiveForces(new GridRepulsiveForces())
           .isIntermediary(params.isIntermediary())
           .iterations(params.iteration(10))

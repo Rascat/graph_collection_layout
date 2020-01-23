@@ -9,6 +9,6 @@ public class NaiveRepulsiveForces implements RepulsiveForces {
 
   @Override
   public DataSet<Force> compute(DataSet<EPGMVertex> vertices, double k) {
-    return vertices.cross(vertices).with(new ComputeRepulsiveForces(k, new StandardRepulsingForce()));
+    return vertices.cross(vertices).with(new ComputeRepulsiveForces(k, new StandardRepulsingForceFunction()));
   }
 }

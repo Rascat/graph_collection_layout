@@ -21,7 +21,7 @@ public class GridRepulsiveForces implements RepulsiveForces {
     KeySelector<EPGMVertex, Integer> upLeftSelector = new SquareIdSelector(NeighborType.UPLEFT);
     KeySelector<EPGMVertex, Integer> leftSelector = new SquareIdSelector(NeighborType.LEFT);
 
-    ComputeRepulsiveForces repulsionFunction = new ComputeRepulsiveForces(k, new StandardRepulsingForce());
+    ComputeRepulsiveForces repulsionFunction = new ComputeRepulsiveForces(k, new StandardRepulsingForceFunction());
 
     DataSet<Force> directNeighbors = vertices.join(vertices)
       .where(selfSelector).equalTo(selfSelector)

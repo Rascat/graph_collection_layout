@@ -15,9 +15,9 @@ import static org.rascat.gcl.layout.model.VertexType.*;
 public class ComputeWeightedAttractingForces implements MapFunction<EPGMEdge, Force> {
 
     private double k;
-    private WeightedAttractingForce function;
+    private WeightedAttractingForceFunction function;
 
-    public ComputeWeightedAttractingForces(double k, WeightedAttractingForce function) {
+    public ComputeWeightedAttractingForces(double k, WeightedAttractingForceFunction function) {
         this.k = k;
         this.function = function;
     }
