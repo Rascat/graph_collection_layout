@@ -1,4 +1,4 @@
-package org.rascat.gcl.layout.functions.forces;
+package org.rascat.gcl.layout.functions.forces.repulsive;
 
 import org.apache.flink.api.java.DataSet;
 import org.apache.flink.api.java.functions.KeySelector;
@@ -11,8 +11,16 @@ import org.rascat.gcl.layout.model.Force;
 
 public class GridRepulsiveForces implements RepulsiveForces {
 
+  private RepulsionFunction repulsionFunction;
+
+  public GridRepulsiveForces(RepulsionFunction repulsionFunction){
+    this.repulsionFunction = repulsionFunction;
+  }
+
   @Override
   public DataSet<Force> compute(DataSet<EPGMVertex> vertices, double k) {
+    repulsionFunction.setK(k);
+
     vertices = vertices.map(new SquareIdMapper((int) k * 2));
 
     KeySelector<EPGMVertex, Integer> selfSelector = new SquareIdSelector(NeighborType.SELF);
@@ -20,8 +28,6 @@ public class GridRepulsiveForces implements RepulsiveForces {
     KeySelector<EPGMVertex, Integer> upRightSelector = new SquareIdSelector(NeighborType.UPRIGHT);
     KeySelector<EPGMVertex, Integer> upLeftSelector = new SquareIdSelector(NeighborType.UPLEFT);
     KeySelector<EPGMVertex, Integer> leftSelector = new SquareIdSelector(NeighborType.LEFT);
-
-    ComputeRepulsiveForces repulsionFunction = new ComputeRepulsiveForces(k, new StandardRepulsingForceFunction());
 
     DataSet<Force> directNeighbors = vertices.join(vertices)
       .where(selfSelector).equalTo(selfSelector)

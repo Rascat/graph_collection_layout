@@ -13,6 +13,9 @@ import org.rascat.gcl.layout.api.RepulsiveForces;
 import org.rascat.gcl.layout.functions.cooling.ExponentialSimulatedAnnealing;
 import org.rascat.gcl.layout.functions.forces.*;
 
+import org.rascat.gcl.layout.functions.forces.attractive.StandardAttractiveForces;
+import org.rascat.gcl.layout.functions.forces.repulsive.NaiveRepulsiveForces;
+import org.rascat.gcl.layout.functions.forces.repulsive.StandardRepulsionFunction;
 import org.rascat.gcl.layout.functions.prepare.RandomPlacement;
 
 import org.rascat.gcl.layout.model.Force;
@@ -117,7 +120,7 @@ public class ForceDirectedGraphCollectionLayout extends AbstractGraphCollectionL
     private int iterations = 1;
     private boolean isIntermediary = false;
     private MapFunction<EPGMVertex, EPGMVertex> initialLayout; // we initialize this during build()
-    private RepulsiveForces repulsiveForces = new NaiveRepulsiveForces();
+    private RepulsiveForces repulsiveForces = new NaiveRepulsiveForces(new StandardRepulsionFunction());
     private AttractiveForces attractiveForces = new StandardAttractiveForces();
 
     public Builder(int width, int height, int vertices) {

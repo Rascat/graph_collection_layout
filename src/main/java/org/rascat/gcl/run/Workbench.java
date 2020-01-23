@@ -8,8 +8,10 @@ import org.gradoop.flink.model.impl.epgm.GraphCollection;
 import org.gradoop.flink.util.FlinkAsciiGraphLoader;
 import org.gradoop.flink.util.GradoopFlinkConfig;
 import org.jetbrains.annotations.NotNull;
-import org.rascat.gcl.layout.functions.forces.GridRepulsiveForces;
-import org.rascat.gcl.layout.functions.forces.WeightedAttractiveForces;
+import org.rascat.gcl.layout.functions.forces.repulsive.GridRepulsiveForces;
+import org.rascat.gcl.layout.functions.forces.attractive.WeightedAttractiveForces;
+import org.rascat.gcl.layout.functions.forces.repulsive.StandardRepulsionFunction;
+import org.rascat.gcl.layout.functions.forces.repulsive.WeightedRepulsionFunction;
 import org.rascat.gcl.layout.functions.prepare.RandomPlacement;
 import org.rascat.gcl.layout.functions.prepare.SetPosProperty;
 import org.rascat.gcl.layout.ForceDirectedGraphCollectionLayout;
@@ -33,8 +35,8 @@ public class Workbench {
         ForceDirectedGraphCollectionLayout layout = new ForceDirectedGraphCollectionLayout
           .Builder(width, height, params.vertices(20))
           .initialLayout(new RandomPlacement(width - (width / 10), height - (height / 10)))
-          .attractiveForces(new WeightedAttractiveForces(100))
-          .repulsiveForces(new GridRepulsiveForces())
+          .attractiveForces(new WeightedAttractiveForces(100, 1))
+          .repulsiveForces(new GridRepulsiveForces(new WeightedRepulsionFunction(1, 100)))
           .isIntermediary(params.isIntermediary())
           .iterations(params.iteration(10))
           .build();

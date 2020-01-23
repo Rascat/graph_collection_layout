@@ -1,4 +1,4 @@
-package org.rascat.gcl.layout.functions.forces;
+package org.rascat.gcl.layout.functions.forces.attractive;
 
 import org.apache.flink.api.java.DataSet;
 import org.gradoop.common.model.impl.pojo.EPGMEdge;
@@ -35,8 +35,7 @@ public class WeightedAttractiveForces implements AttractiveForces {
       .join(vertices).where("sourceId").equalTo("id").with(new TransferGraphIds(TAIL))
       .join(vertices).where("targetId").equalTo("id").with(new TransferGraphIds(HEAD));
 
-    return positionedEdges.map(new ComputeWeightedAttractingForces(
-      k, new WeightedAttractingForceFunction(sameGraphFactor, differentGraphFactor)));
+    return positionedEdges.map(new WeightedAttractionFunction(k, sameGraphFactor, differentGraphFactor));
   }
 
   @Override

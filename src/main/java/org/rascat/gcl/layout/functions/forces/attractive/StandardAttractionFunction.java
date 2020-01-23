@@ -1,22 +1,19 @@
-package org.rascat.gcl.layout.functions.forces;
+package org.rascat.gcl.layout.functions.forces.attractive;
 
 import org.apache.commons.math3.exception.MathArithmeticException;
 import org.apache.commons.math3.geometry.euclidean.twod.Vector2D;
 import org.apache.flink.api.common.functions.MapFunction;
 import org.gradoop.common.model.impl.pojo.EPGMEdge;
-import org.rascat.gcl.layout.api.AttractionFunction;
 import org.rascat.gcl.layout.model.Force;
 
 import static org.rascat.gcl.layout.model.VertexType.*;
 
-public class ComputeAttractingForces implements MapFunction<EPGMEdge, Force> {
+public class StandardAttractionFunction implements MapFunction<EPGMEdge, Force> {
 
   private double k;
-  private AttractionFunction function;
 
-  public ComputeAttractingForces(double k, AttractionFunction function) {
+  public StandardAttractionFunction(double k) {
     this.k = k;
-    this.function = function;
   }
 
   @Override
@@ -29,13 +26,17 @@ public class ComputeAttractingForces implements MapFunction<EPGMEdge, Force> {
 
     Vector2D result;
     try {
-      result = delta.normalize().scalarMultiply(function.attraction(delta.getNorm(), k) * -1);
+      result = delta.normalize().scalarMultiply(attraction(delta.getNorm(), k) * -1);
     } catch (MathArithmeticException e) {
       // we probably tried to normalize a zero vector
       result = new Vector2D(0, 0);
     }
 
     return new Force(edge.getSourceId(), result);
+  }
+
+  public double attraction(double distance, double optimalDistance) {
+    return (distance * distance) / optimalDistance;
   }
 
   private static void checkEdge(EPGMEdge edge) {

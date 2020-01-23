@@ -1,4 +1,4 @@
-package org.rascat.gcl.layout.functions.forces;
+package org.rascat.gcl.layout.functions.forces.attractive;
 
 import org.apache.commons.math3.exception.MathArithmeticException;
 import org.apache.commons.math3.geometry.euclidean.twod.Vector2D;
@@ -12,18 +12,20 @@ import java.util.List;
 
 import static org.rascat.gcl.layout.model.VertexType.*;
 
-public class ComputeWeightedAttractingForces implements MapFunction<EPGMEdge, Force> {
+public class WeightedAttractionFunction implements MapFunction<EPGMEdge, Force> {
 
     private double k;
-    private WeightedAttractingForceFunction function;
+    private double sameGraphFactor;
+    private double differentGraphFactor;
 
-    public ComputeWeightedAttractingForces(double k, WeightedAttractingForceFunction function) {
+    public WeightedAttractionFunction(double k, double sameGraphFactor, double differentGraphFactor) {
         this.k = k;
-        this.function = function;
+        this.sameGraphFactor = sameGraphFactor;
+        this.differentGraphFactor = differentGraphFactor;
     }
 
     @Override
-    public Force map(EPGMEdge edge) throws Exception {
+    public Force map(EPGMEdge edge) {
         checkEdge(edge);
 
         Vector2D vPos = new Vector2D(edge.getPropertyValue(TAIL.getKeyX()).getDouble(), edge.getPropertyValue(TAIL.getKeyY()).getDouble());
@@ -37,11 +39,16 @@ public class ComputeWeightedAttractingForces implements MapFunction<EPGMEdge, Fo
 
         Vector2D result;
         try {
-            result = delta.normalize().scalarMultiply(function.weightedAttraction(delta.getNorm(), k, sameGraph) * -1);
+            result = delta.normalize().scalarMultiply(weightedAttraction(delta.getNorm(), k, sameGraph) * -1);
         } catch (MathArithmeticException e) {
             result = new Vector2D(0,0);
         }
         return new Force(edge.getSourceId(), result);
+    }
+
+    private double weightedAttraction(double distance, double optimalDistance, boolean sameGraph) {
+        double factor = sameGraph ? sameGraphFactor : differentGraphFactor;
+        return (distance*distance / optimalDistance) * factor;
     }
 
     private GradoopIdSet unwrapGradoopIdSet(List<PropertyValue> wrappedGradoopIdSet) {
