@@ -10,7 +10,6 @@ import org.gradoop.flink.util.GradoopFlinkConfig;
 import org.jetbrains.annotations.NotNull;
 import org.rascat.gcl.layout.functions.forces.repulsive.GridRepulsiveForces;
 import org.rascat.gcl.layout.functions.forces.attractive.WeightedAttractiveForces;
-import org.rascat.gcl.layout.functions.forces.repulsive.StandardRepulsionFunction;
 import org.rascat.gcl.layout.functions.forces.repulsive.WeightedRepulsionFunction;
 import org.rascat.gcl.layout.functions.prepare.RandomPlacement;
 import org.rascat.gcl.layout.functions.prepare.SetPosProperty;
