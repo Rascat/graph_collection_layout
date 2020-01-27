@@ -62,8 +62,8 @@ public class WeightedRepulsionFunction extends RepulsionFunction {
     return new Force(v.getId(), displacement);
   }
 
-  private double weightedRepulsion(double distance, double optimaDistance, boolean sameGraph) {
+  private double weightedRepulsion(double distance, double optimalDistance, boolean sameGraph) {
     double factor = sameGraph ? sameGraphFactor : differentGraphFactor;
-    return ((optimaDistance * optimaDistance) / distance) * factor;
+    return ((optimalDistance * optimalDistance) / distance) * factor;
   }
 }

@@ -1,5 +1,6 @@
 package org.rascat.gcl.run;
 
+import org.antlr.v4.runtime.tree.xpath.XPathRuleAnywhereElement;
 import org.apache.commons.cli.*;
 
 public class LayoutParameters {
@@ -15,6 +16,9 @@ public class LayoutParameters {
   private final String PARAM_INTERMEDIARY = "intermediary";
   private final String PARAM_COMBI_LAYOUT_QUALITY = "quality";
   private final String PARAM_FUSING_LAYOUT_THRESHOLD = "threshold";
+  private final String PARAM_SAME_GRAPH_FACTOR = "sgf";
+  private final String PARAM_DIFFERENT_GRAPH_FACTOR = "dgf";
+  private final String PARAM_INPUT_TYPE = "type";
 
   public LayoutParameters(String[] args) throws ParseException {
     Options options = createOptions();
@@ -62,6 +66,28 @@ public class LayoutParameters {
   public double threshold(double defaultValue) {
       return cmd.getOptionValue(PARAM_FUSING_LAYOUT_THRESHOLD) == null ? defaultValue
         : Double.parseDouble(cmd.getOptionValue(PARAM_FUSING_LAYOUT_THRESHOLD));
+  }
+
+  public double sameGraphFactor(double defaultValue) {
+    return cmd.getOptionValue(PARAM_SAME_GRAPH_FACTOR) == null ? defaultValue
+      : Double.parseDouble(cmd.getOptionValue(PARAM_SAME_GRAPH_FACTOR));
+  }
+
+  public double differentGraphFactor(double defaultValue){
+    return cmd.getOptionValue(PARAM_DIFFERENT_GRAPH_FACTOR) == null ? defaultValue
+      : Double.parseDouble(cmd.getOptionValue(PARAM_DIFFERENT_GRAPH_FACTOR));
+  }
+
+  public InputType inputType(InputType defaultValue) {
+    if (cmd.getOptionValue(PARAM_INPUT_TYPE) == null)
+      return defaultValue;
+
+    for (InputType type : InputType.values()) {
+      if (type.getId().equals(cmd.getOptionValue(PARAM_INPUT_TYPE)))
+        return type;
+    }
+
+    throw new IllegalArgumentException("Could not map user input " + cmd.getOptionValue(PARAM_INPUT_TYPE) + " to input type");
   }
 
   private Options createOptions() {
@@ -122,6 +148,24 @@ public class LayoutParameters {
         "Value must be in the range 0 <= x <= 1.")
       .build();
 
+    Option sameGraphFactor = Option.builder(PARAM_SAME_GRAPH_FACTOR)
+      .required(false)
+      .hasArg(true)
+      .desc("Factor with which the computed force between two elements of the same logical graph will be modified")
+      .build();
+
+    Option differentGraphFactor = Option.builder(PARAM_DIFFERENT_GRAPH_FACTOR)
+      .required(false)
+      .hasArg(true)
+      .desc("Factor with which the computed force between two elements of different logical graphs will be modified")
+      .build();
+
+    Option inputType = Option.builder(PARAM_INPUT_TYPE)
+      .required(false)
+      .hasArg(true)
+      .desc("Type of the input.")
+      .build();
+
     return options
       .addOption(input)
       .addOption(output)
@@ -131,6 +175,24 @@ public class LayoutParameters {
       .addOption(vertices)
       .addOption(intermediary)
       .addOption(quality)
-      .addOption(threshold);
+      .addOption(threshold)
+      .addOption(sameGraphFactor)
+      .addOption(differentGraphFactor)
+      .addOption(inputType);
+  }
+
+  public enum InputType {
+    GDL("gdl"),
+    CSV("csv");
+
+    private String id;
+
+    InputType(String id) {
+      this.id = id;
+    }
+
+    public String getId() {
+      return this.id;
+    }
   }
 }

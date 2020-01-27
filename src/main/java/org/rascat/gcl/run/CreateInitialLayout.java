@@ -38,11 +38,11 @@ public class CreateInitialLayout {
     collection = collection.getFactory()
       .fromDataSets(collection.getGraphHeads(), positionedVertices, collection.getEdges());
 
-    CSVDataSink sink = new CSVDataSink(params.outputPath() + "/initial-layout-csv", cfg);
+    CSVDataSink sink = new CSVDataSink(params.outputPath() + "/initial-layout-int-csv", cfg);
 
     collection.writeTo(sink, true);
 
-    Render render = new Render(height, width, params.outputPath() + "/initial-layout.png");
+    Render render = new Render(height, width, params.outputPath() + "/initial-layout-int.png");
     render.renderGraphCollection(collection, env);
   }
 }

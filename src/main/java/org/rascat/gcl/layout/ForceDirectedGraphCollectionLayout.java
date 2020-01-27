@@ -54,8 +54,12 @@ public class ForceDirectedGraphCollectionLayout extends AbstractGraphCollectionL
     } else {
       // make sure int values get cast to double
       vertices = vertices.map(vertex -> {
-        vertex.setProperty(KEY_X_COORD, (double) vertex.getPropertyValue(KEY_X_COORD).getInt());
-        vertex.setProperty(KEY_Y_COORD, (double) vertex.getPropertyValue(KEY_Y_COORD).getInt());
+        if (vertex.getPropertyValue(KEY_X_COORD).isInt()) {
+          vertex.setProperty(KEY_X_COORD, (double) vertex.getPropertyValue(KEY_X_COORD).getInt());
+        }
+        if (vertex.getPropertyValue(KEY_Y_COORD).isInt()) {
+          vertex.setProperty(KEY_Y_COORD, (double) vertex.getPropertyValue(KEY_Y_COORD).getInt());
+        }
         return vertex;
       });
     }

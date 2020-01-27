@@ -48,7 +48,7 @@ public class WeightedAttractionFunction implements MapFunction<EPGMEdge, Force> 
 
     private double weightedAttraction(double distance, double optimalDistance, boolean sameGraph) {
         double factor = sameGraph ? sameGraphFactor : differentGraphFactor;
-        return (distance*distance / optimalDistance) * factor;
+        return ((distance*distance) / optimalDistance) * factor;
     }
 
     private GradoopIdSet unwrapGradoopIdSet(List<PropertyValue> wrappedGradoopIdSet) {
