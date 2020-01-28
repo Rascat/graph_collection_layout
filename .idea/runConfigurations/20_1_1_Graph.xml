@@ -1,0 +1,10 @@
+<component name="ProjectRunConfigurationManager">
+  <configuration default="false" name="20-1-1 Graph" type="Application" factoryName="Application">
+    <option name="MAIN_CLASS_NAME" value="org.rascat.gcl.run.Workbench" />
+    <module name="graph-collection-layout" />
+    <option name="PROGRAM_PARAMETERS" value="-input out/init/initial-layout-csv -output out/weighted -intermediary -iterations 20" />
+    <method v="2">
+      <option name="Make" enabled="true" />
+    </method>
+  </configuration>
+</component>

@@ -1,0 +1,10 @@
+<component name="ProjectRunConfigurationManager">
+  <configuration default="false" name="LayoutSamples -i -iterations 7" type="Application" factoryName="Application">
+    <option name="MAIN_CLASS_NAME" value="org.rascat.gcl.run.LayoutSamples" />
+    <module name="graph-collection-layout" />
+    <option name="PROGRAM_PARAMETERS" value="-input out/init/initial-layout-int-csv -output out/samples -iterations 7 -width 1000 -height 1000 -quality 0.5 -threshold 0.3 -type csv -intermediary" />
+    <method v="2">
+      <option name="Make" enabled="true" />
+    </method>
+  </configuration>
+</component>

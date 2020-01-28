@@ -1,0 +1,10 @@
+<component name="ProjectRunConfigurationManager">
+  <configuration default="false" name="CreateInitialLayout" type="Application" factoryName="Application">
+    <option name="MAIN_CLASS_NAME" value="org.rascat.gcl.run.CreateInitialLayout" />
+    <module name="graph-collection-layout" />
+    <option name="PROGRAM_PARAMETERS" value="-input data/gdl/example2.gdl -output out/init" />
+    <method v="2">
+      <option name="Make" enabled="true" />
+    </method>
+  </configuration>
+</component>
