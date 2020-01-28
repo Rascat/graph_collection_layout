@@ -1,8 +1,11 @@
 package org.rascat.gcl.run;
 
+import org.apache.flink.api.common.functions.MapFunction;
 import org.apache.flink.api.java.DataSet;
 import org.apache.flink.api.java.ExecutionEnvironment;
+import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.common.model.impl.pojo.EPGMVertex;
+import org.gradoop.common.model.impl.properties.PropertyValue;
 import org.gradoop.flink.io.api.DataSource;
 import org.gradoop.flink.io.impl.csv.CSVDataSource;
 import org.gradoop.flink.io.impl.dot.DOTDataSink;
@@ -19,6 +22,8 @@ import org.rascat.gcl.layout.ForceDirectedGraphCollectionLayout;
 import org.rascat.gcl.io.Render;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
 public class Workbench {
     public static void main(@NotNull String[] args) throws Exception {
@@ -48,12 +53,24 @@ public class Workbench {
 
         GraphCollection testCollection = layout.execute(collection);
 
+        // set pos property so we can view the layout with tools like gephi
         DataSet<EPGMVertex> positionedVertices = testCollection.getVertices().map(new SetPosProperty());
 
+        // set graph id as property so we can partition the graph against that
+        DataSet<EPGMVertex> annotatedVertices = positionedVertices.map(
+          (MapFunction<EPGMVertex, EPGMVertex>) value -> {
+            List<PropertyValue> ids = new ArrayList<>();
+            for (GradoopId id: value.getGraphIds()){
+                ids.add(PropertyValue.create(id));
+            }
+            value.setProperty("graphids", ids);
+
+            return value;
+        });
 
         String outputPath = params.outputPath();
 
-        testCollection = testCollection.getFactory().fromDataSets(testCollection.getGraphHeads(), positionedVertices, testCollection.getEdges());
+        testCollection = testCollection.getFactory().fromDataSets(testCollection.getGraphHeads(), annotatedVertices, testCollection.getEdges());
 
         DOTDataSink sink = new DOTDataSink(String.format("%s/%d-%.0f-%.0f.dot", outputPath, iterations, sameGraphFactor, differentGraphFactor), true, DOTDataSink.DotFormat.SIMPLE);
         testCollection.writeTo(sink, true);
