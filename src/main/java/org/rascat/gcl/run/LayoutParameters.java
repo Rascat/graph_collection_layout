@@ -1,7 +1,8 @@
 package org.rascat.gcl.run;
 
-import org.antlr.v4.runtime.tree.xpath.XPathRuleAnywhereElement;
 import org.apache.commons.cli.*;
+
+import static org.rascat.gcl.run.GraphCollectionLoader.*;
 
 public class LayoutParameters {
 
@@ -18,7 +19,7 @@ public class LayoutParameters {
   private final String PARAM_FUSING_LAYOUT_THRESHOLD = "threshold";
   private final String PARAM_SAME_GRAPH_FACTOR = "sgf";
   private final String PARAM_DIFFERENT_GRAPH_FACTOR = "dgf";
-  private final String PARAM_INPUT_TYPE = "type";
+  private final String PARAM_INPUT_FORMAT = "format";
 
   public LayoutParameters(String[] args) throws ParseException {
     Options options = createOptions();
@@ -78,16 +79,16 @@ public class LayoutParameters {
       : Double.parseDouble(cmd.getOptionValue(PARAM_DIFFERENT_GRAPH_FACTOR));
   }
 
-  public InputType inputType(InputType defaultValue) {
-    if (cmd.getOptionValue(PARAM_INPUT_TYPE) == null)
+  public InputFormat inputFormat(InputFormat defaultValue) {
+    if (cmd.getOptionValue(PARAM_INPUT_FORMAT) == null)
       return defaultValue;
 
-    for (InputType type : InputType.values()) {
-      if (type.getId().equals(cmd.getOptionValue(PARAM_INPUT_TYPE)))
+    for (InputFormat type : InputFormat.values()) {
+      if (type.getId().equals(cmd.getOptionValue(PARAM_INPUT_FORMAT)))
         return type;
     }
 
-    throw new IllegalArgumentException("Could not map user input " + cmd.getOptionValue(PARAM_INPUT_TYPE) + " to input type");
+    throw new IllegalArgumentException("Could not map user input " + cmd.getOptionValue(PARAM_INPUT_FORMAT) + " to input type");
   }
 
   private Options createOptions() {
@@ -160,10 +161,10 @@ public class LayoutParameters {
       .desc("Factor with which the computed force between two elements of different logical graphs will be modified")
       .build();
 
-    Option inputType = Option.builder(PARAM_INPUT_TYPE)
+    Option inputFormat = Option.builder(PARAM_INPUT_FORMAT)
       .required(false)
       .hasArg(true)
-      .desc("Type of the input.")
+      .desc("Format of the input.")
       .build();
 
     return options
@@ -178,21 +179,7 @@ public class LayoutParameters {
       .addOption(threshold)
       .addOption(sameGraphFactor)
       .addOption(differentGraphFactor)
-      .addOption(inputType);
+      .addOption(inputFormat);
   }
 
-  public enum InputType {
-    GDL("gdl"),
-    CSV("csv");
-
-    private String id;
-
-    InputType(String id) {
-      this.id = id;
-    }
-
-    public String getId() {
-      return this.id;
-    }
-  }
 }

@@ -1,11 +1,8 @@
 package org.rascat.gcl.run;
 
 import org.apache.flink.api.java.ExecutionEnvironment;
-import org.gradoop.flink.io.api.DataSource;
-import org.gradoop.flink.io.impl.csv.CSVDataSource;
 import org.gradoop.flink.io.impl.dot.DOTDataSink;
 import org.gradoop.flink.model.impl.epgm.GraphCollection;
-import org.gradoop.flink.util.FlinkAsciiGraphLoader;
 import org.gradoop.flink.util.GradoopFlinkConfig;
 import org.jetbrains.annotations.NotNull;
 import org.rascat.gcl.layout.functions.forces.repulsive.GridRepulsiveForces;
@@ -18,7 +15,8 @@ import org.rascat.gcl.layout.ForceDirectedGraphCollectionLayout;
 import org.rascat.gcl.io.Render;
 
 import java.io.File;
-import java.io.IOException;
+
+import static org.rascat.gcl.run.GraphCollectionLoader.*;
 
 public class Workbench {
     public static void main(@NotNull String[] args) throws Exception {
@@ -31,11 +29,14 @@ public class Workbench {
         int vertices = params.vertices(20);
         boolean isIntermediary = params.isIntermediary();
         String outputPath = params.outputPath();
+        String inputPath = params.inputPath();
+        InputFormat inputFormat = params.inputFormat(InputFormat.GDL);
 
         ExecutionEnvironment env = ExecutionEnvironment.createLocalEnvironment();
         GradoopFlinkConfig cfg = GradoopFlinkConfig.createConfig(env);
+        GraphCollectionLoader loader = new GraphCollectionLoader(cfg);
 
-        GraphCollection collection = loadGraphCollection(params.inputPath(), params.inputType(LayoutParameters.InputType.GDL), cfg);
+        GraphCollection collection = loader.load(inputPath, inputFormat);
 
         ForceDirectedGraphCollectionLayout layout = new ForceDirectedGraphCollectionLayout
           .Builder(width, height, vertices)
@@ -65,20 +66,5 @@ public class Workbench {
 
         Render render = new Render(height, width, pngFileName);
         render.renderGraphCollection(layoutCollection, env);
-    }
-
-    private static GraphCollection loadGraphCollection(String inputPath, LayoutParameters.InputType type, GradoopFlinkConfig cfg) throws IOException {
-        if (type == LayoutParameters.InputType.GDL) {
-            FlinkAsciiGraphLoader loader = new FlinkAsciiGraphLoader(cfg);
-            loader.initDatabaseFromFile(inputPath);
-            return  loader.getGraphCollection();
-
-        } else if (type == LayoutParameters.InputType.CSV) {
-            DataSource source = new CSVDataSource(inputPath, cfg);
-            return  source.getGraphCollection();
-
-        } else {
-            throw new IllegalArgumentException("Unable to handle file type " + type);
-        }
     }
 }
