@@ -1,11 +1,6 @@
 package org.rascat.gcl.run;
 
-import org.apache.flink.api.common.functions.MapFunction;
-import org.apache.flink.api.java.DataSet;
 import org.apache.flink.api.java.ExecutionEnvironment;
-import org.gradoop.common.model.impl.id.GradoopId;
-import org.gradoop.common.model.impl.pojo.EPGMVertex;
-import org.gradoop.common.model.impl.properties.PropertyValue;
 import org.gradoop.flink.io.api.DataSource;
 import org.gradoop.flink.io.impl.csv.CSVDataSource;
 import org.gradoop.flink.io.impl.dot.DOTDataSink;
@@ -17,13 +12,13 @@ import org.rascat.gcl.layout.functions.forces.repulsive.GridRepulsiveForces;
 import org.rascat.gcl.layout.functions.forces.attractive.WeightedAttractiveForces;
 import org.rascat.gcl.layout.functions.forces.repulsive.WeightedRepulsionFunction;
 import org.rascat.gcl.layout.functions.prepare.RandomPlacement;
+import org.rascat.gcl.layout.functions.prepare.SetGraphIdsProperty;
 import org.rascat.gcl.layout.functions.prepare.SetPosProperty;
 import org.rascat.gcl.layout.ForceDirectedGraphCollectionLayout;
 import org.rascat.gcl.io.Render;
 
+import java.io.File;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
 
 public class Workbench {
     public static void main(@NotNull String[] args) throws Exception {
@@ -35,6 +30,7 @@ public class Workbench {
         double differentGraphFactor = params.differentGraphFactor(1);
         int vertices = params.vertices(20);
         boolean isIntermediary = params.isIntermediary();
+        String outputPath = params.outputPath();
 
         ExecutionEnvironment env = ExecutionEnvironment.createLocalEnvironment();
         GradoopFlinkConfig cfg = GradoopFlinkConfig.createConfig(env);
@@ -50,34 +46,25 @@ public class Workbench {
           .iterations(iterations)
           .build();
 
-
-        GraphCollection testCollection = layout.execute(collection);
+        GraphCollection layoutCollection = layout.execute(collection);
 
         // set pos property so we can view the layout with tools like gephi
-        DataSet<EPGMVertex> positionedVertices = testCollection.getVertices().map(new SetPosProperty());
+        layoutCollection = layoutCollection.callForCollection(new SetPosProperty());
 
         // set graph id as property so we can partition the graph against that
-        DataSet<EPGMVertex> annotatedVertices = positionedVertices.map(
-          (MapFunction<EPGMVertex, EPGMVertex>) value -> {
-            List<PropertyValue> ids = new ArrayList<>();
-            for (GradoopId id: value.getGraphIds()){
-                ids.add(PropertyValue.create(id));
-            }
-            value.setProperty("graphids", ids);
+        layoutCollection = layoutCollection.callForCollection(new SetGraphIdsProperty());
 
-            return value;
-        });
+        String dotFileName = String.format("%s%c%d-%.0f-%.0f.dot",
+          outputPath, File.separatorChar, iterations, sameGraphFactor, differentGraphFactor);
 
-        String outputPath = params.outputPath();
+        DOTDataSink sink = new DOTDataSink(dotFileName, true, DOTDataSink.DotFormat.SIMPLE);
+        layoutCollection.writeTo(sink, true);
 
-        testCollection = testCollection.getFactory().fromDataSets(testCollection.getGraphHeads(), annotatedVertices, testCollection.getEdges());
+        String pngFileName = String.format("%s%c%d-%.0f-%.0f.png",
+          outputPath, File.separatorChar, iterations, sameGraphFactor, differentGraphFactor);
 
-        DOTDataSink sink = new DOTDataSink(String.format("%s/%d-%.0f-%.0f.dot", outputPath, iterations, sameGraphFactor, differentGraphFactor), true, DOTDataSink.DotFormat.SIMPLE);
-        testCollection.writeTo(sink, true);
-
-
-        Render render = new Render(height, width, String.format("%s/%d-%.0f-%.0f.png", outputPath, iterations, sameGraphFactor, differentGraphFactor));
-        render.renderGraphCollection(testCollection, env);
+        Render render = new Render(height, width, pngFileName);
+        render.renderGraphCollection(layoutCollection, env);
     }
 
     private static GraphCollection loadGraphCollection(String inputPath, LayoutParameters.InputType type, GradoopFlinkConfig cfg) throws IOException {

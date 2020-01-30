@@ -33,10 +33,8 @@ public class CreateInitialLayout {
     RandomGraphCollectionLayout layout = new RandomGraphCollectionLayout(width, height);
 
     collection = layout.execute(collection);
-    DataSet<EPGMVertex> positionedVertices= collection.getVertices().map(new SetPosProperty());
 
-    collection = collection.getFactory()
-      .fromDataSets(collection.getGraphHeads(), positionedVertices, collection.getEdges());
+    collection = collection.callForCollection(new SetPosProperty());
 
     CSVDataSink sink = new CSVDataSink(params.outputPath() + "/initial-layout-int-csv", cfg);
 
