@@ -13,10 +13,12 @@ import org.rascat.gcl.layout.functions.prepare.SetGraphIdsProperty;
 import org.rascat.gcl.layout.functions.prepare.SetPosProperty;
 import org.rascat.gcl.layout.ForceDirectedGraphCollectionLayout;
 import org.rascat.gcl.io.Render;
+import org.rascat.gcl.util.GraphCollectionLoader;
+import org.rascat.gcl.util.LayoutParameters;
 
 import java.io.File;
 
-import static org.rascat.gcl.run.GraphCollectionLoader.*;
+import static org.rascat.gcl.util.GraphCollectionLoader.*;
 
 public class Workbench {
     public static void main(@NotNull String[] args) throws Exception {

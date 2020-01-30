@@ -5,6 +5,8 @@ import org.gradoop.flink.io.impl.image.ImageDataSink;
 import org.gradoop.flink.model.impl.epgm.GraphCollection;
 import org.gradoop.flink.model.impl.operators.layouting.*;
 import org.gradoop.flink.util.GradoopFlinkConfig;
+import org.rascat.gcl.util.GraphCollectionLoader;
+import org.rascat.gcl.util.LayoutParameters;
 
 import java.io.File;
 import java.text.DateFormat;

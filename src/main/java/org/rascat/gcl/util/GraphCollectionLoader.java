@@ -1,4 +1,4 @@
-package org.rascat.gcl.run;
+package org.rascat.gcl.util;
 
 import org.gradoop.flink.io.api.DataSource;
 import org.gradoop.flink.io.impl.csv.CSVDataSource;

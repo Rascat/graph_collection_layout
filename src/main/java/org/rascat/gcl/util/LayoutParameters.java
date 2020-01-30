@@ -1,8 +1,8 @@
-package org.rascat.gcl.run;
+package org.rascat.gcl.util;
 
 import org.apache.commons.cli.*;
 
-import static org.rascat.gcl.run.GraphCollectionLoader.*;
+import static org.rascat.gcl.util.GraphCollectionLoader.*;
 
 public class LayoutParameters {
 

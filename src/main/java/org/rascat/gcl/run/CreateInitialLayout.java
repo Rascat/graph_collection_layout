@@ -7,6 +7,8 @@ import org.gradoop.flink.util.GradoopFlinkConfig;
 import org.rascat.gcl.io.Render;
 import org.rascat.gcl.layout.RandomGraphCollectionLayout;
 import org.rascat.gcl.layout.functions.prepare.SetPosProperty;
+import org.rascat.gcl.util.GraphCollectionLoader;
+import org.rascat.gcl.util.LayoutParameters;
 
 public class CreateInitialLayout {
   public static void main(String[] args) throws Exception {
