@@ -1,5 +1,6 @@
 package org.rascat.gcl.layout.functions.forces;
 
+import org.apache.commons.math3.exception.MathArithmeticException;
 import org.apache.commons.math3.geometry.euclidean.twod.Vector2D;
 import org.apache.flink.api.common.functions.RichJoinFunction;
 import org.gradoop.common.model.impl.pojo.EPGMVertex;
@@ -35,7 +36,11 @@ public class ApplyForces extends RichJoinFunction<EPGMVertex, Force, EPGMVertex>
 
 
         double temperature = schedule.computeTemperature(getIterationRuntimeContext().getSuperstepNumber());
-        vPos = vPos.add(vDisp.normalize().scalarMultiply(Math.min(vDisp.getNorm(), temperature)));
+        try {
+            vPos = vPos.add(vDisp.normalize().scalarMultiply(Math.min(vDisp.getNorm(), temperature)));
+        } catch (MathArithmeticException e) {
+            vPos = vPos.add(new Vector2D(0,0));
+        }
         double vPosX = vPos.getX();
         double vPosY = vPos.getY();
 
