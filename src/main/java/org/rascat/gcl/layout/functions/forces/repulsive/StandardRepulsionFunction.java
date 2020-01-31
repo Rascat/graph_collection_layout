@@ -19,7 +19,7 @@ public class StandardRepulsionFunction extends RepulsionFunction {
   }
 
   @Override
-  public Force join(EPGMVertex v, EPGMVertex u) throws Exception {
+  public Force join(EPGMVertex v, EPGMVertex u) {
     setPositionalValues(v, u);
 
     if (v.equals(u) || distance > k) {
