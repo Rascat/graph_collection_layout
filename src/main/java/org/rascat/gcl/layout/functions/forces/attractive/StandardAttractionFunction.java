@@ -2,13 +2,15 @@ package org.rascat.gcl.layout.functions.forces.attractive;
 
 import org.apache.commons.math3.exception.MathArithmeticException;
 import org.apache.commons.math3.geometry.euclidean.twod.Vector2D;
+import org.apache.flink.api.common.functions.FlatMapFunction;
 import org.apache.flink.api.common.functions.MapFunction;
+import org.apache.flink.util.Collector;
 import org.gradoop.common.model.impl.pojo.EPGMEdge;
 import org.rascat.gcl.layout.model.Force;
 
 import static org.rascat.gcl.layout.model.VertexType.*;
 
-public class StandardAttractionFunction implements MapFunction<EPGMEdge, Force> {
+public class StandardAttractionFunction implements MapFunction<EPGMEdge, Force>, FlatMapFunction<EPGMEdge, Force> {
 
   private double k;
 
@@ -18,10 +20,29 @@ public class StandardAttractionFunction implements MapFunction<EPGMEdge, Force> 
 
   @Override
   public Force map(EPGMEdge edge) {
+    Vector2D displacement = calculateDisplacement(edge);
+
+    return new Force(edge.getSourceId(), displacement);
+  }
+
+  @Override
+  public void flatMap(EPGMEdge edge, Collector<Force> out) {
+    Vector2D displacement = calculateDisplacement(edge);
+
+    out.collect(new Force(edge.getSourceId(), displacement));
+    out.collect(new Force(edge.getTargetId(), displacement.scalarMultiply(-1)));
+  }
+
+  private Vector2D calculateDisplacement(EPGMEdge edge) {
     checkEdge(edge);
 
-    Vector2D vPos = new Vector2D(edge.getPropertyValue(TAIL.getKeyX()).getDouble(), edge.getPropertyValue(TAIL.getKeyY()).getDouble());
-    Vector2D uPos = new Vector2D(edge.getPropertyValue(HEAD.getKeyX()).getDouble(), edge.getPropertyValue(HEAD.getKeyY()).getDouble());
+    Vector2D vPos = new Vector2D(
+      edge.getPropertyValue(TAIL.getKeyX()).getDouble(),
+      edge.getPropertyValue(TAIL.getKeyY()).getDouble());
+    Vector2D uPos = new Vector2D(
+      edge.getPropertyValue(HEAD.getKeyX()).getDouble(),
+      edge.getPropertyValue(HEAD.getKeyY()).getDouble());
+
     Vector2D delta = vPos.subtract(uPos);
 
     Vector2D result;
@@ -32,7 +53,7 @@ public class StandardAttractionFunction implements MapFunction<EPGMEdge, Force> 
       result = new Vector2D(0, 0);
     }
 
-    return new Force(edge.getSourceId(), result);
+    return result;
   }
 
   public double attraction(double distance, double optimalDistance) {
