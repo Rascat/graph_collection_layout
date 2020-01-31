@@ -2,7 +2,7 @@
   <configuration default="false" name="10-1-25 Graph" type="Application" factoryName="Application">
     <option name="MAIN_CLASS_NAME" value="org.rascat.gcl.run.Workbench" />
     <module name="graph-collection-layout" />
-    <option name="PROGRAM_PARAMETERS" value="-input out/init/initial-layout-csv -output out/weighted -intermediary -dgf 25" />
+    <option name="PROGRAM_PARAMETERS" value="-input data/csv/initial-layout-csv -output out/weighted -intermediary -dgf 25 -format csv" />
     <method v="2">
       <option name="Make" enabled="true" />
     </method>
