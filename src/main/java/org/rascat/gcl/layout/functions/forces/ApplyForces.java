@@ -50,7 +50,7 @@ public class ApplyForces extends RichJoinFunction<EPGMVertex, Force, EPGMVertex>
         vertex.setProperty(KEY_X_COORD, vPosX);
         vertex.setProperty(KEY_Y_COORD, vPosY);
 
-        System.out.println(String.format("[%s]: (%.0f, %.0f)-->(%.0f, %.0f)", vertex.getId().toString().substring(vertex.getId().toString().length() - 4), x, y, vPosX, vPosY));
+        // System.out.println(String.format("[%s]: (%.0f, %.0f)-->(%.0f, %.0f)", vertex.getId().toString().substring(vertex.getId().toString().length() - 4), x, y, vPosX, vPosY));
         return vertex;
     }
 }

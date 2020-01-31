@@ -5,6 +5,7 @@ import org.gradoop.flink.io.impl.dot.DOTDataSink;
 import org.gradoop.flink.model.impl.epgm.GraphCollection;
 import org.gradoop.flink.util.GradoopFlinkConfig;
 import org.jetbrains.annotations.NotNull;
+import org.rascat.gcl.layout.functions.forces.attractive.StandardAttractiveForces;
 import org.rascat.gcl.layout.functions.forces.repulsive.GridRepulsiveForces;
 import org.rascat.gcl.layout.functions.forces.attractive.WeightedAttractiveForces;
 import org.rascat.gcl.layout.functions.forces.repulsive.WeightedRepulsionFunction;
