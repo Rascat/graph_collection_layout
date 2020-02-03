@@ -19,6 +19,10 @@ public class WeightedAttractionFunction implements MapFunction<EPGMEdge, Force> 
     private double differentGraphFactor;
 
     public WeightedAttractionFunction(double k, double sameGraphFactor, double differentGraphFactor) {
+        if (k <= 0) {
+            throw new IllegalArgumentException("K must be greater than zero: " + k);
+        }
+
         this.k = k;
         this.sameGraphFactor = sameGraphFactor;
         this.differentGraphFactor = differentGraphFactor;
@@ -28,8 +32,12 @@ public class WeightedAttractionFunction implements MapFunction<EPGMEdge, Force> 
     public Force map(EPGMEdge edge) {
         checkEdge(edge);
 
-        Vector2D vPos = new Vector2D(edge.getPropertyValue(TAIL.getKeyX()).getDouble(), edge.getPropertyValue(TAIL.getKeyY()).getDouble());
-        Vector2D uPos = new Vector2D(edge.getPropertyValue(HEAD.getKeyX()).getDouble(), edge.getPropertyValue(HEAD.getKeyY()).getDouble());
+        Vector2D vPos = new Vector2D(
+            edge.getPropertyValue(TAIL.getKeyX()).getDouble(),
+            edge.getPropertyValue(TAIL.getKeyY()).getDouble());
+        Vector2D uPos = new Vector2D(
+            edge.getPropertyValue(HEAD.getKeyX()).getDouble(),
+            edge.getPropertyValue(HEAD.getKeyY()).getDouble());
 
         GradoopIdSet tailIds = unwrapGradoopIdSet(edge.getPropertyValue(TAIL.getKeyGraphIds()).getList());
         GradoopIdSet headIds = unwrapGradoopIdSet(edge.getPropertyValue(HEAD.getKeyGraphIds()).getList());
@@ -39,16 +47,16 @@ public class WeightedAttractionFunction implements MapFunction<EPGMEdge, Force> 
 
         Vector2D result;
         try {
-            result = delta.normalize().scalarMultiply(weightedAttraction(delta.getNorm(), k, sameGraph) * -1);
+            result = delta.normalize().scalarMultiply(weightedAttraction(delta.getNorm(), sameGraph) * -1);
         } catch (MathArithmeticException e) {
             result = new Vector2D(0,0);
         }
         return new Force(edge.getSourceId(), result);
     }
 
-    private double weightedAttraction(double distance, double optimalDistance, boolean sameGraph) {
+    private double weightedAttraction(double distance, boolean sameGraph) {
         double factor = sameGraph ? sameGraphFactor : differentGraphFactor;
-        return ((distance*distance) / optimalDistance) * factor;
+        return ((distance*distance) / this.k) * factor;
     }
 
     private GradoopIdSet unwrapGradoopIdSet(List<PropertyValue> wrappedGradoopIdSet) {
