@@ -59,13 +59,8 @@ public class StandardAttractionFunctionTest {
     };
   }
 
-  @Test
-  public void testFlatMap() {
-    EPGMEdge edge = createEdge(10, 10, 3, 3);
-
-    Force expectedForceV = new Force(sourceId, new Vector2D(-9.2395286075,-9.2395286075));
-    Force expectedForceU = new Force(targetId, new Vector2D(9.2395286075,9.2395286075));
-
+  @Test(dataProvider = "testFlatMapProvider")
+  public void testFlatMap(EPGMEdge edge, Force expectedForceV, Force expectedForceU) {
     List<Force> actualForces = new ArrayList<>();
     Collector<Force> forceCollector = new ListCollector<>(actualForces);
 
@@ -79,6 +74,28 @@ public class StandardAttractionFunctionTest {
     assertEquals(actualForces.get(1).getVector().getX(), expectedForceU.getVector().getX(), delta);
     assertEquals(actualForces.get(1).getVector().getY(), expectedForceU.getVector().getY(), delta);
   }
+
+  @DataProvider
+  public Object[][] testFlatMapProvider() {
+    EPGMEdge edge1 = createEdge(10, 10, 3, 3);
+    EPGMEdge edge2 = createEdge(1, 1, 1, 1);
+
+    Force expectedForceV = new Force(sourceId, new Vector2D(-9.2395286075,-9.2395286075));
+    Force expectedForceU = new Force(targetId, new Vector2D(9.2395286075,9.2395286075));
+    Force zeroForceV = new Force(sourceId, new Vector2D(0, 0));
+    Force zeroForceU = new Force(targetId, new Vector2D(0 , 0));
+
+    return new Object[][] {
+        {edge1, expectedForceV, expectedForceU},
+        {edge2, zeroForceV, zeroForceU}
+    };
+  }
+
+  @Test(expectedExceptions = IllegalArgumentException.class)
+  public void testInvalidConstruction() {
+    new StandardAttractionFunction(0);
+  }
+
 
   private EPGMEdge createEdge(double tailX, double tailY, double headX, double headY) {
     EPGMEdge edge = new EPGMEdge();

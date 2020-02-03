@@ -15,6 +15,10 @@ public class StandardAttractionFunction implements MapFunction<EPGMEdge, Force>,
   private double k;
 
   public StandardAttractionFunction(double k) {
+    if (k <= 0) {
+      throw new IllegalArgumentException("K must be greater than zero: " + k);
+    }
+
     this.k = k;
   }
 
@@ -47,7 +51,7 @@ public class StandardAttractionFunction implements MapFunction<EPGMEdge, Force>,
 
     Vector2D result;
     try {
-      result = delta.normalize().scalarMultiply(attraction(delta.getNorm(), k) * -1);
+      result = delta.normalize().scalarMultiply(attraction(delta.getNorm()) * -1);
     } catch (MathArithmeticException e) {
       // we probably tried to normalize a zero vector
       result = new Vector2D(0, 0);
@@ -56,8 +60,8 @@ public class StandardAttractionFunction implements MapFunction<EPGMEdge, Force>,
     return result;
   }
 
-  public double attraction(double distance, double optimalDistance) {
-    return (distance * distance) / optimalDistance;
+  public double attraction(double distance) {
+    return (distance * distance) / this.k;
   }
 
   private static void checkEdge(EPGMEdge edge) {
