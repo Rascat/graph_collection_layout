@@ -37,4 +37,15 @@ public class Force extends Tuple2<GradoopId, Vector2D> {
   public String toString() {
     return String.format("[%s]: (%f, %f)", getId(), getVector().getX(), getVector().getY());
   }
+
+  @Override
+  public boolean equals(Object o) {
+    if (o == this)
+      return true;
+    if (!(o instanceof Force))
+      return false;
+    Force other = (Force) o;
+
+    return this.getId().equals(other.getId()) && this.getVector().equals(other.getVector());
+  }
 }
