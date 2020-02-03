@@ -21,14 +21,18 @@ public class TransferGraphIds implements JoinFunction<EPGMEdge, EPGMVertex, EPGM
 
     @Override
     public EPGMEdge join(EPGMEdge edge, EPGMVertex vertex) {
-        GradoopIdSet idSet = vertex.getGraphIds();
+        List<PropertyValue> graphIds = translateToPropertyValueList(vertex.getGraphIds());
+        edge.setProperty(type.getKeyGraphIds(), PropertyValue.create(graphIds));
+        return edge;
+    }
+
+    public static List<PropertyValue> translateToPropertyValueList(GradoopIdSet set) {
         List<PropertyValue> ids = new ArrayList<>();
 
-        for (GradoopId id: idSet) {
+        for (GradoopId id: set) {
             ids.add(PropertyValue.create(id));
         }
 
-        edge.setProperty(type.getKeyGraphIds(), PropertyValue.create(ids));
-        return edge;
+        return ids;
     }
 }
