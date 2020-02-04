@@ -2,7 +2,9 @@ package org.rascat.gcl.layout.functions.forces.attractive;
 
 import org.apache.commons.math3.exception.MathArithmeticException;
 import org.apache.commons.math3.geometry.euclidean.twod.Vector2D;
+import org.apache.flink.api.common.functions.FlatMapFunction;
 import org.apache.flink.api.common.functions.MapFunction;
+import org.apache.flink.util.Collector;
 import org.gradoop.common.model.impl.id.GradoopIdSet;
 import org.gradoop.common.model.impl.pojo.EPGMEdge;
 import org.gradoop.common.model.impl.properties.PropertyValue;
@@ -12,7 +14,7 @@ import java.util.List;
 
 import static org.rascat.gcl.layout.model.VertexType.*;
 
-public class WeightedAttractionFunction implements MapFunction<EPGMEdge, Force> {
+public class WeightedAttractionFunction implements MapFunction<EPGMEdge, Force>, FlatMapFunction<EPGMEdge, Force> {
 
     private double k;
     private double sameGraphFactor;
@@ -52,6 +54,33 @@ public class WeightedAttractionFunction implements MapFunction<EPGMEdge, Force> 
             result = new Vector2D(0,0);
         }
         return new Force(edge.getSourceId(), result);
+    }
+
+    @Override
+    public void flatMap(EPGMEdge edge, Collector<Force> out) throws Exception {
+        checkEdge(edge);
+
+        Vector2D vPos = new Vector2D(
+            edge.getPropertyValue(TAIL.getKeyX()).getDouble(),
+            edge.getPropertyValue(TAIL.getKeyY()).getDouble());
+        Vector2D uPos = new Vector2D(
+            edge.getPropertyValue(HEAD.getKeyX()).getDouble(),
+            edge.getPropertyValue(HEAD.getKeyY()).getDouble());
+
+        GradoopIdSet tailIds = unwrapGradoopIdSet(edge.getPropertyValue(TAIL.getKeyGraphIds()).getList());
+        GradoopIdSet headIds = unwrapGradoopIdSet(edge.getPropertyValue(HEAD.getKeyGraphIds()).getList());
+
+        boolean sameGraph = tailIds.containsAny(headIds);
+        Vector2D delta = vPos.subtract(uPos);
+
+        Vector2D result;
+        try {
+            result = delta.normalize().scalarMultiply(weightedAttraction(delta.getNorm(), sameGraph) * -1);
+        } catch (MathArithmeticException e) {
+            result = new Vector2D(0,0);
+        }
+        out.collect(new Force(edge.getSourceId(), result));
+        out.collect(new Force(edge.getTargetId(), result.scalarMultiply(-1)));
     }
 
     private double weightedAttraction(double distance, boolean sameGraph) {
