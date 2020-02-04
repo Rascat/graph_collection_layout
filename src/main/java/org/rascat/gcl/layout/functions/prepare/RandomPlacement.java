@@ -1,7 +1,7 @@
 package org.rascat.gcl.layout.functions.prepare;
 
 import org.apache.flink.api.common.functions.MapFunction;
-import org.gradoop.common.model.impl.pojo.EPGMVertex;
+import org.gradoop.common.model.api.entities.Element;
 import org.gradoop.common.model.impl.properties.Property;
 
 import java.util.StringJoiner;
@@ -9,30 +9,38 @@ import java.util.concurrent.ThreadLocalRandom;
 
 import static org.rascat.gcl.layout.AbstractGraphCollectionLayout.*;
 
-public class RandomPlacement implements MapFunction<EPGMVertex, EPGMVertex> {
+public class RandomPlacement<T extends Element> implements MapFunction<T, T> {
 
-    private int limitX;
-    private int limitY;
+    private int lowerBoundX = 0;
+    private int lowerBoundY = 0;
+    private int upperBoundX;
+    private int upperBoundY;
 
-    public RandomPlacement(int limitX, int limitY) {
-        this.limitX = limitX;
-        this.limitY = limitY;
+    public RandomPlacement(int upperBoundX, int upperBoundY) {
+        this.upperBoundX = upperBoundX;
+        this.upperBoundY = upperBoundY;
+    }
+
+    public RandomPlacement(int lowerBoundX, int lowerBoundY, int upperBoundX, int upperBoundY) {
+        this(upperBoundX, upperBoundY);
+        this.lowerBoundX = lowerBoundX;
+        this.lowerBoundY = lowerBoundY;
     }
 
     @Override
-    public EPGMVertex map(EPGMVertex vertex) {
-        double x = ThreadLocalRandom.current().nextDouble(this.limitX);
-        double y = ThreadLocalRandom.current().nextDouble(this.limitY);
-        vertex.setProperty(Property.create(KEY_X_COORD, x));
-        vertex.setProperty(Property.create(KEY_Y_COORD, y));
-        return vertex;
+    public T map(T value) {
+        double x = ThreadLocalRandom.current().nextDouble(this.lowerBoundX, this.upperBoundX);
+        double y = ThreadLocalRandom.current().nextDouble(this.lowerBoundY, this.upperBoundY);
+        value.setProperty(Property.create(KEY_X_COORD, x));
+        value.setProperty(Property.create(KEY_Y_COORD, y));
+        return value;
     }
 
     @Override
     public String toString() {
         return new StringJoiner(", ", RandomPlacement.class.getSimpleName() + "[", "]")
-          .add("limitX=" + limitX)
-          .add("limitY=" + limitY)
+          .add("limitX=" + upperBoundX)
+          .add("limitY=" + upperBoundY)
           .toString();
     }
 }

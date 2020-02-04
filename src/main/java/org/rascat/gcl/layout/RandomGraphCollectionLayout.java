@@ -18,7 +18,7 @@ public class RandomGraphCollectionLayout extends AbstractGraphCollectionLayout {
         DataSet<EPGMEdge> edges = collection.getEdges();
         DataSet<EPGMGraphHead> graphHeads = collection.getGraphHeads();
 
-        DataSet<EPGMVertex> mappedVertices = vertices.map(new RandomPlacement(this.width, this.height));
+        DataSet<EPGMVertex> mappedVertices = vertices.map(new RandomPlacement<>(this.width, this.height));
 
         return collection.getFactory().fromDataSets(graphHeads, mappedVertices, edges);
     }

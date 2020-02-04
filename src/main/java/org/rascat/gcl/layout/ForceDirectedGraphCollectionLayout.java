@@ -166,7 +166,7 @@ public class ForceDirectedGraphCollectionLayout extends AbstractGraphCollectionL
 
     public ForceDirectedGraphCollectionLayout build() {
       if (this.initialLayout == null) {
-        this.initialLayout = new RandomPlacement(this.width, this.height);
+        this.initialLayout = new RandomPlacement<>(this.width, this.height);
       }
       if (k == -1) {
         k = Math.sqrt((width * height) / (double) vertices);
