@@ -24,8 +24,6 @@ import java.util.StringJoiner;
 
 public class ForceDirectedGraphCollectionLayout extends AbstractGraphCollectionLayout {
 
-  private final int width;
-  private final int height;
   private final double k;
   private final int iterations;
   private final boolean isIntermediaryLayout;
@@ -34,8 +32,7 @@ public class ForceDirectedGraphCollectionLayout extends AbstractGraphCollectionL
   private final AttractiveForces attractiveForces;
 
   public ForceDirectedGraphCollectionLayout(Builder builder) {
-    this.width = builder.width;
-    this.height = builder.height;
+    super(builder.width, builder.height);
     this.k = builder.k;
     this.iterations = builder.iterations;
     this.isIntermediaryLayout = builder.isIntermediary;

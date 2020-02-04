@@ -8,12 +8,9 @@ import org.gradoop.flink.model.impl.epgm.GraphCollection;
 import org.rascat.gcl.layout.functions.prepare.RandomPlacement;
 
 public class RandomGraphCollectionLayout extends AbstractGraphCollectionLayout {
-    private int width;
-    private int height;
 
     public RandomGraphCollectionLayout(int width, int height) {
-        this.height = height;
-        this.width = width;
+        super(width, height);
     }
 
     public GraphCollection execute(GraphCollection collection) {
