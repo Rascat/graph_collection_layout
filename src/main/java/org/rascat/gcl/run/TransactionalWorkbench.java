@@ -1,11 +1,13 @@
 package org.rascat.gcl.run;
 
 import org.apache.flink.api.java.ExecutionEnvironment;
+import org.gradoop.flink.io.impl.image.ImageDataSink;
 import org.gradoop.flink.model.impl.epgm.GraphCollection;
+import org.gradoop.flink.model.impl.epgm.LogicalGraph;
+import org.gradoop.flink.model.impl.operators.layouting.FRLayouter;
 import org.gradoop.flink.util.GradoopFlinkConfig;
 import org.jetbrains.annotations.NotNull;
-import org.rascat.gcl.io.Render;
-import org.rascat.gcl.layout.TransactionalGraphCollectionLayout;
+import org.rascat.gcl.layout.transformations.GraphTransactionsToLogicalGraphTransformation;
 import org.rascat.gcl.util.GraphCollectionLoader;
 import org.rascat.gcl.util.LayoutParameters;
 
@@ -31,10 +33,16 @@ public class TransactionalWorkbench {
 
     GraphCollection collection = loader.load(inputPath, inputFormat);
 
-    TransactionalGraphCollectionLayout layout = new TransactionalGraphCollectionLayout(width, height);
-    collection = layout.execute(collection);
+    GraphTransactionsToLogicalGraphTransformation transformation = new GraphTransactionsToLogicalGraphTransformation(cfg);
+    LogicalGraph graph = transformation.transform(collection.getGraphTransactions());
 
-    Render render = new Render(height, width, outputPath + File.separator + "transactional.png");
-    render.renderGraphCollection(collection, env);
+    FRLayouter layout = new FRLayouter(iterations, vertices);
+    layout.k(300);
+    graph = layout.execute(graph);
+
+    ImageDataSink sink = new ImageDataSink(outputPath + File.separator + "transform.png", layout, 1000, 1000);
+    graph.writeTo(sink);
+
+    env.execute();
   }
 }
