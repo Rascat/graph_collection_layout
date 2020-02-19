@@ -13,5 +13,9 @@ public abstract class AbstractGraphCollectionLayout {
     this.height = height;
   }
 
+  public int area() {
+    return this.width * this.height;
+  }
+
   public abstract GraphCollection execute(GraphCollection collection) throws Exception;
 }

@@ -83,10 +83,6 @@ public class ForceDirectedGraphCollectionLayout extends AbstractGraphCollectionL
     return collection.getFactory().fromDataSets(graphHeads, pVertices, edges);
   }
 
-  private int area() {
-    return this.height * this.width;
-  }
-
   private DataSet<Force> computeAttractiveForces(DataSet<EPGMVertex> vertices, DataSet<EPGMEdge> edges) {
     return this.attractiveForces.compute(vertices, edges, this.k);
   }
