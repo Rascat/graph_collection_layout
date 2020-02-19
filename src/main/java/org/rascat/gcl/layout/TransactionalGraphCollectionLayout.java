@@ -12,10 +12,12 @@ public class TransactionalGraphCollectionLayout extends AbstractGraphCollectionL
   }
 
   @Override
-  public GraphCollection execute(GraphCollection collection) {
+  public GraphCollection execute(GraphCollection collection) throws Exception {
     DataSet<GraphTransaction> transactions = collection.getGraphTransactions();
 
-    transactions = transactions.map(new TransactionalRandomPlacement(width, height));
+    double k = Math.sqrt(area() / collection.getVertices().count());
+
+    transactions = transactions.map(new TransactionalRandomPlacement(width, height, k));
 
     return collection.getFactory().fromTransactions(transactions);
   }
