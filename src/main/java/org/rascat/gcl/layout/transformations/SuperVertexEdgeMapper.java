@@ -12,7 +12,7 @@ public class SuperVertexEdgeMapper implements FlatJoinFunction<Tuple2<EPGMVertex
   private EPGMEdgeFactory factory = new EPGMEdgeFactory();
 
   @Override
-  public void join(Tuple2<EPGMVertex, EPGMEdge> sourceVertexAndEdge, EPGMVertex targetVertex, Collector<EPGMEdge> out) throws Exception {
+  public void join(Tuple2<EPGMVertex, EPGMEdge> sourceVertexAndEdge, EPGMVertex targetVertex, Collector<EPGMEdge> out) {
     EPGMVertex sourceVertex = sourceVertexAndEdge.f0;
     if (sourceVertex.getGraphIds().containsAny(targetVertex.getGraphIds())) {
       EPGMEdge result = factory.createEdge(
