@@ -33,9 +33,11 @@ public class SuperVertexGraphCollectionLayout extends AbstractGraphCollectionLay
 
   @Override
   public GraphCollection execute(GraphCollection collection) throws Exception {
-    this.k = (double) area() / collection.getVertices().count();
+    this.k = computeK((int) collection.getVertices().count());
+
     // we start with the creation of a super-vertex-graph
     LogicalGraph superGraph = reduce.transform(collection);
+
     // create layout for super graph
     initSuperGraphLayout(superGraph);
     superGraph = superGraphLayout.execute(superGraph);
@@ -60,7 +62,6 @@ public class SuperVertexGraphCollectionLayout extends AbstractGraphCollectionLay
 
   private DataSet<Force> computeRepulsiveForces(DataSet<EPGMVertex> vertices) {
     StandardRepulsionFunction repulsionFunction = new StandardRepulsionFunction();
-    System.out.println(k);
     repulsionFunction.setK(k);
 
     return vertices.join(vertices)
@@ -73,10 +74,15 @@ public class SuperVertexGraphCollectionLayout extends AbstractGraphCollectionLay
   }
 
   private void initSuperGraphLayout(LogicalGraph graph) throws Exception {
-    long graphCount = graph.getVertices().count();
-    this.superK = (double) area() / graphCount;
+    long superGraphVertexCount = graph.getVertices().count();
+    this.superK = computeK((int) superGraphVertexCount);
 
-    this.superGraphLayout = new FRLayouter(5, (int) graphCount);
+    this.superGraphLayout = new FRLayouter(5, (int) superGraphVertexCount);
     this.superGraphLayout.k(superK);
+    this.superGraphLayout.area(width, height);
+  }
+
+  private double computeK (int vertexCount) {
+    return Math.sqrt((double) (area() / vertexCount));
   }
 }

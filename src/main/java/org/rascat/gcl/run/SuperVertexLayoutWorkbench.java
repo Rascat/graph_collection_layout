@@ -3,13 +3,10 @@ package org.rascat.gcl.run;
 import org.apache.flink.api.java.ExecutionEnvironment;
 import org.gradoop.flink.io.impl.image.ImageDataSink;
 import org.gradoop.flink.model.impl.epgm.GraphCollection;
-import org.gradoop.flink.model.impl.epgm.LogicalGraph;
-import org.gradoop.flink.model.impl.operators.layouting.FRLayouter;
 import org.gradoop.flink.util.GradoopFlinkConfig;
 import org.jetbrains.annotations.NotNull;
 import org.rascat.gcl.io.Render;
 import org.rascat.gcl.layout.SuperVertexGraphCollectionLayout;
-import org.rascat.gcl.layout.transformations.SuperVertexReduce;
 import org.rascat.gcl.util.GraphCollectionLoader;
 import org.rascat.gcl.util.LayoutParameters;
 

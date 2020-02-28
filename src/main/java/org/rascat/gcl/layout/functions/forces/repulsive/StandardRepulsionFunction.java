@@ -40,7 +40,6 @@ public class StandardRepulsionFunction extends RepulsionFunction implements Flat
     setPositionalValues(v, u);
 
     if (v.equals(u)) {
-      System.out.println("no result");
       return;
     }
 
