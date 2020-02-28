@@ -19,7 +19,7 @@ public abstract class RepulsionFunction implements JoinFunction<EPGMVertex, EPGM
   protected Vector2D delta;
   protected double distance;
 
-  protected void setK(double k) {
+  public void setK(double k) {
     this.k = k;
   }
 

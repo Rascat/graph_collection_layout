@@ -7,6 +7,8 @@ import org.gradoop.flink.model.impl.epgm.LogicalGraph;
 import org.gradoop.flink.model.impl.operators.layouting.FRLayouter;
 import org.gradoop.flink.util.GradoopFlinkConfig;
 import org.jetbrains.annotations.NotNull;
+import org.rascat.gcl.io.Render;
+import org.rascat.gcl.layout.SuperVertexGraphCollectionLayout;
 import org.rascat.gcl.layout.transformations.SuperVertexReduce;
 import org.rascat.gcl.util.GraphCollectionLoader;
 import org.rascat.gcl.util.LayoutParameters;
@@ -30,15 +32,15 @@ public class SuperVertexLayoutWorkbench {
 
     GraphCollection collection = loader.load(inputPath, inputFormat);
 
-    SuperVertexReduce transformation = new SuperVertexReduce(cfg);
-    LogicalGraph result = transformation.transform(collection);
+    SuperVertexGraphCollectionLayout layout = new SuperVertexGraphCollectionLayout(width, height, cfg);
+    collection = layout.execute(collection);
 
-    FRLayouter layout = new FRLayouter(iterations, vertices);
-    result = layout.execute(result);
+    Render render = new Render(height, width, outputPath + "/supervertex.png");
+    render.renderGraphCollection(collection, env);
 
-    ImageDataSink sink = new ImageDataSink(outputPath + File.separator + "super-vertex.png", layout, width, height);
-    result.writeTo(sink);
+//    ImageDataSink sink = new ImageDataSink(outputPath + File.separator + "super-vertex.png", layout, width, height);
+//    result.writeTo(sink);
 
-    env.execute();
+//    env.execute();
   }
 }
