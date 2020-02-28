@@ -54,7 +54,7 @@ public class SuperVertexGraphCollectionLayout extends AbstractGraphCollectionLay
     DataSet<EPGMVertex> pVertices = initVertices.join(repulsiveForces)
         .where("id").equalTo("f0")
         .with(new ApplyForcesAroundCenter(width, height, superK, schedule));
-    
+
     return collection.getFactory().fromDataSets(collection.getGraphHeads(), pVertices, collection.getEdges());
   }
 

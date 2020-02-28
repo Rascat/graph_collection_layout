@@ -23,7 +23,7 @@ public class SuperVertexReduce implements Serializable {
 
   public LogicalGraph transform(GraphCollection collection) {
     DataSet<EPGMGraphHead> graphHeads = collection.getGraphHeads();
-    DataSet<EPGMVertex> vertices = graphHeads.map(new ElementToVertexMapper<>());
+    DataSet<EPGMVertex> vertices = graphHeads.map(new VertexWithSameGraphIdMapper<>());
 
     DataSet<EPGMEdge> edges = collection.getVertices()
         .join(collection.getEdges()).where("id").equalTo("sourceId")

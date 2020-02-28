@@ -7,11 +7,11 @@ import org.gradoop.common.model.impl.pojo.EPGMVertexFactory;
 
 import java.io.Serializable;
 
-public class ElementToVertexMapper<E extends Element> implements MapFunction<E, EPGMVertex>, Serializable {
+public class VertexWithSameGraphIdMapper<E extends Element> implements MapFunction<E, EPGMVertex>, Serializable {
 
   private EPGMVertexFactory factory;
 
-  public ElementToVertexMapper() {
+  public VertexWithSameGraphIdMapper() {
     this.factory = new EPGMVertexFactory();
   }
 
