@@ -25,9 +25,10 @@ public class SuperVertexReduce implements Serializable {
     DataSet<EPGMGraphHead> graphHeads = collection.getGraphHeads();
     DataSet<EPGMVertex> vertices = graphHeads.map(new VertexWithSameGraphIdMapper<>());
 
-    DataSet<EPGMEdge> edges = collection.getVertices()
-        .join(collection.getEdges()).where("id").equalTo("sourceId")
-        .join(collection.getVertices()).where("f1.targetId").equalTo("id")
+    DataSet<EPGMEdge> edges = collection.getVertices().join(collection.getEdges())
+        .where("id").equalTo("sourceId")
+        .join(collection.getVertices())
+        .where("f1.targetId").equalTo("id")
         .with(new SuperVertexEdgeMapper());
 
     return graphFactory.fromDataSets(vertices, edges);
