@@ -19,7 +19,7 @@ public class StandardAttractiveForces implements AttractiveForces {
       .join(vertices).where("sourceId").equalTo("id").with(new TransferPosition(TAIL))
       .join(vertices).where("targetId").equalTo("id").with(new TransferPosition(HEAD));
 
-//    return positionedEdges.map(new StandardAttractionFunction(k));
+    // return positionedEdges.map(new StandardAttractionFunction(k));
     return positionedEdges.flatMap(new StandardAttractionFunction(k));
   }
 }

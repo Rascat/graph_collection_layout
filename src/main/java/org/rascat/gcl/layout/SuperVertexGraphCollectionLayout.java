@@ -11,11 +11,14 @@ import org.gradoop.flink.util.GradoopFlinkConfig;
 import org.rascat.gcl.layout.api.CoolingSchedule;
 import org.rascat.gcl.layout.functions.cooling.ExponentialSimulatedAnnealing;
 import org.rascat.gcl.layout.functions.forces.ApplyForcesAroundCenter;
+import org.rascat.gcl.layout.functions.forces.attractive.StandardAttractionFunction;
 import org.rascat.gcl.layout.functions.forces.repulsive.StandardRepulsionFunction;
 import org.rascat.gcl.layout.functions.prepare.RandomPlacementAroundCenter;
 import org.rascat.gcl.layout.functions.prepare.TransferCenterPosition;
+import org.rascat.gcl.layout.functions.prepare.TransferPosition;
 import org.rascat.gcl.layout.functions.select.SelectFirstGraphId;
 import org.rascat.gcl.layout.model.Force;
+import org.rascat.gcl.layout.model.VertexType;
 import org.rascat.gcl.layout.transformations.SuperVertexReduce;
 
 public class SuperVertexGraphCollectionLayout extends AbstractGraphCollectionLayout{
@@ -52,9 +55,19 @@ public class SuperVertexGraphCollectionLayout extends AbstractGraphCollectionLay
 
     DataSet<Force> repulsiveForces = computeRepulsiveForces(initVertices);
 
+    DataSet<Force> attractiveForces = computeAttractiveForces(initVertices, collection.getEdges());
+
+    DataSet<Force> forces = repulsiveForces.union(attractiveForces)
+        .groupBy(Force.ID_POSITION)
+        .reduce((firstForce, secondForce) -> {
+          firstForce.setVector(firstForce.getVector().add(secondForce.getVector()));
+          return firstForce;
+        });
+
     CoolingSchedule schedule = new ExponentialSimulatedAnnealing(this.width, this.height, this.k, iterations);
-    DataSet<EPGMVertex> pVertices = initVertices.join(repulsiveForces)
-        .where("id").equalTo("f0")
+    
+    DataSet<EPGMVertex> pVertices = initVertices.join(forces)
+        .where("id").equalTo(Force.ID_POSITION)
         .with(new ApplyForcesAroundCenter(width, height, superK, schedule));
 
     return collection.getFactory().fromDataSets(collection.getGraphHeads(), pVertices, collection.getEdges());
@@ -69,8 +82,13 @@ public class SuperVertexGraphCollectionLayout extends AbstractGraphCollectionLay
         .with((FlatJoinFunction<EPGMVertex, EPGMVertex, Force>) repulsionFunction);
   }
 
-  private DataSet<Force> computeAttractiveForces(DataSet<EPGMVertex>vertices, DataSet<EPGMEdge> edges){
-    return null;
+
+  private DataSet<Force> computeAttractiveForces(DataSet<EPGMVertex> vertices, DataSet<EPGMEdge> edges){
+    DataSet<EPGMEdge> positionedEdges = edges
+        .join(vertices).where("sourceId").equalTo("id").with(new TransferPosition(VertexType.TAIL))
+        .join(vertices).where("targetId").equalTo("id").with(new TransferPosition(VertexType.HEAD));
+
+    return positionedEdges.flatMap(new StandardAttractionFunction(this.k));
   }
 
   private void initSuperGraphLayout(LogicalGraph graph) throws Exception {
