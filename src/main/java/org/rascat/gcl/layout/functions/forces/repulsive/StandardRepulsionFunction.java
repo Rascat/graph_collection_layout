@@ -6,7 +6,6 @@ import org.apache.flink.api.common.functions.FlatJoinFunction;
 import org.apache.flink.util.Collector;
 import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.common.model.impl.pojo.EPGMVertex;
-import org.rascat.gcl.layout.AbstractGraphCollectionLayout;
 import org.rascat.gcl.layout.model.Force;
 
 import java.util.concurrent.ThreadLocalRandom;
@@ -46,7 +45,7 @@ public class StandardRepulsionFunction extends RepulsionFunction implements Flat
   public void join(EPGMVertex v, EPGMVertex u, Collector<Force> out) {
     setPositionalValues(v, u);
 
-    if (v.equals(u)) {
+    if (v.equals(u) || distance > k) {
       return;
     }
 
@@ -92,15 +91,17 @@ public class StandardRepulsionFunction extends RepulsionFunction implements Flat
     int x = (int) vertex.getPropertyValue(KEY_X_COORD).getDouble();
     int y = (int) vertex.getPropertyValue(KEY_Y_COORD).getDouble();
 
+    int step = 1;
+
     switch(direction) {
-      case 0: y -= 1; break;
-      case 1: x += 1; y -= 1; break;
-      case 2: y += 1; break;
-      case 3: x += 1; y += 1; break;
-      case 4: x += 1; break;
-      case 5: x -= 1; y += 1; break;
-      case 6: x -= 1; break;
-      case 7: x -= 1; y -= 1; break;
+      case 0: y -= step; break;
+      case 1: x += step; y -= step; break;
+      case 2: y += step; break;
+      case 3: x += step; y += step; break;
+      case 4: x += step; break;
+      case 5: x -= step; y += step; break;
+      case 6: x -= step; break;
+      case 7: x -= step; y -= step; break;
     }
     vertex.setProperty(KEY_X_COORD, (double) x);
     vertex.setProperty(KEY_Y_COORD, (double) y);
