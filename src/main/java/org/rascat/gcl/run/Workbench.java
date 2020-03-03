@@ -5,7 +5,6 @@ import org.gradoop.flink.io.impl.dot.DOTDataSink;
 import org.gradoop.flink.model.impl.epgm.GraphCollection;
 import org.gradoop.flink.util.GradoopFlinkConfig;
 import org.jetbrains.annotations.NotNull;
-import org.rascat.gcl.layout.functions.forces.attractive.StandardAttractiveForces;
 import org.rascat.gcl.layout.functions.forces.repulsive.GridRepulsiveForces;
 import org.rascat.gcl.layout.functions.forces.attractive.WeightedAttractiveForces;
 import org.rascat.gcl.layout.functions.forces.repulsive.WeightedRepulsionFunction;
@@ -26,7 +25,7 @@ public class Workbench {
         LayoutParameters params = new LayoutParameters(args);
         int height = params.height(1000);
         int width = params.width(1000);
-        int iterations = params.iteration(10);
+        int iterations = params.iterations(10);
         double  sameGraphFactor = params.sameGraphFactor(1);
         double differentGraphFactor = params.differentGraphFactor(1);
         int vertices = params.vertices(20);

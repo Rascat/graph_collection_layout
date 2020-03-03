@@ -18,7 +18,7 @@ public class LayoutSamples {
     LayoutParameters params = new LayoutParameters(args);
     int height = params.height(1000);
     int width = params.width(1000);
-    int iterations = params.iteration(1);
+    int iterations = params.iterations(1);
     int vertices = params.vertices(20);
     GraphCollectionLoader.InputFormat type = params.inputFormat(GraphCollectionLoader.InputFormat.GDL);
     boolean isIntermediary = params.isIntermediary();

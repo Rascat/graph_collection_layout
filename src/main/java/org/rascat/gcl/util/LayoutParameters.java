@@ -11,6 +11,7 @@ public class LayoutParameters {
   private final String PARAM_INPUT = "input";
   private final String PARAM_OUTPUT = "output";
   private final String PARAM_ITERATIONS = "iterations";
+  private final String PARAM_PRE_LAYOUT_ITERATIONS = "prelayoutiterations";
   private final String PARAM_WIDTH = "width";
   private final String PARAM_HEIGHT = "height";
   private final String PARAM_VERTICES = "vertices";
@@ -35,9 +36,14 @@ public class LayoutParameters {
     return cmd.getOptionValue(PARAM_OUTPUT);
   }
 
-  public int iteration(int defaultValue) {
+  public int iterations(int defaultValue) {
     return cmd.getOptionValue(PARAM_ITERATIONS) == null ? defaultValue
       : Integer.parseInt(cmd.getOptionValue(PARAM_ITERATIONS));
+  }
+
+  public int preLayoutIterations(int defaultValue) {
+    return cmd.getOptionValue(PARAM_PRE_LAYOUT_ITERATIONS) == null ? defaultValue
+      : Integer.parseInt(cmd.getOptionValue(PARAM_PRE_LAYOUT_ITERATIONS));
   }
 
   public int width(int defaultValue) {
@@ -60,13 +66,13 @@ public class LayoutParameters {
   }
 
   public double quality(double defaultValue) {
-      return cmd.getOptionValue(PARAM_COMBI_LAYOUT_QUALITY) == null ? defaultValue
-        : Double.parseDouble(cmd.getOptionValue(PARAM_COMBI_LAYOUT_QUALITY));
+    return cmd.getOptionValue(PARAM_COMBI_LAYOUT_QUALITY) == null ? defaultValue
+      : Double.parseDouble(cmd.getOptionValue(PARAM_COMBI_LAYOUT_QUALITY));
   }
 
   public double threshold(double defaultValue) {
-      return cmd.getOptionValue(PARAM_FUSING_LAYOUT_THRESHOLD) == null ? defaultValue
-        : Double.parseDouble(cmd.getOptionValue(PARAM_FUSING_LAYOUT_THRESHOLD));
+    return cmd.getOptionValue(PARAM_FUSING_LAYOUT_THRESHOLD) == null ? defaultValue
+      : Double.parseDouble(cmd.getOptionValue(PARAM_FUSING_LAYOUT_THRESHOLD));
   }
 
   public double sameGraphFactor(double defaultValue) {
@@ -74,7 +80,7 @@ public class LayoutParameters {
       : Double.parseDouble(cmd.getOptionValue(PARAM_SAME_GRAPH_FACTOR));
   }
 
-  public double differentGraphFactor(double defaultValue){
+  public double differentGraphFactor(double defaultValue) {
     return cmd.getOptionValue(PARAM_DIFFERENT_GRAPH_FACTOR) == null ? defaultValue
       : Double.parseDouble(cmd.getOptionValue(PARAM_DIFFERENT_GRAPH_FACTOR));
   }
@@ -167,6 +173,12 @@ public class LayoutParameters {
       .desc("Format of the input.")
       .build();
 
+    Option preLayoutIterations = Option.builder(PARAM_PRE_LAYOUT_ITERATIONS)
+      .required(false)
+      .hasArg(true)
+      .desc("Number of iterations the pre layout is executed")
+      .build();
+
     return options
       .addOption(input)
       .addOption(output)
@@ -179,7 +191,8 @@ public class LayoutParameters {
       .addOption(threshold)
       .addOption(sameGraphFactor)
       .addOption(differentGraphFactor)
-      .addOption(inputFormat);
+      .addOption(inputFormat)
+      .addOption(preLayoutIterations);
   }
 
 }

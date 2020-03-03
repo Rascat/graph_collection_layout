@@ -9,7 +9,6 @@ import org.gradoop.common.model.impl.pojo.EPGMVertex;
 import org.gradoop.flink.model.impl.epgm.GraphCollection;
 import org.gradoop.flink.model.impl.epgm.LogicalGraph;
 import org.gradoop.flink.model.impl.operators.layouting.FRLayouter;
-import org.gradoop.flink.util.GradoopFlinkConfig;
 import org.rascat.gcl.layout.api.CoolingSchedule;
 import org.rascat.gcl.layout.functions.cooling.ExponentialSimulatedAnnealing;
 import org.rascat.gcl.layout.functions.forces.ApplyForcesAroundCenter;
@@ -25,15 +24,18 @@ import org.rascat.gcl.layout.transformations.SuperVertexReduce;
 
 public class SuperVertexGraphCollectionLayout extends AbstractGraphCollectionLayout{
 
-  private SuperVertexReduce reduce;
   private FRLayouter superGraphLayout;
   private double k;
   private double superK;
-  private int iterations = 10;
+  private int iterations;
+  private int centerLayoutIterations;
 
-  public SuperVertexGraphCollectionLayout(int width, int height, GradoopFlinkConfig cfg) {
-    super(width, height);
-    this.reduce = new SuperVertexReduce(cfg);
+  public SuperVertexGraphCollectionLayout(Builder builder) {
+    super(builder.width, builder.height);
+    this.iterations = builder.iterations;
+    this.centerLayoutIterations = builder.preLayoutIterations;
+    this.k = builder.k;
+    this.superK = builder.superK;
   }
 
   @Override
@@ -42,9 +44,13 @@ public class SuperVertexGraphCollectionLayout extends AbstractGraphCollectionLay
     DataSet<EPGMVertex> vertices = collection.getVertices();
     DataSet<EPGMGraphHead> graphHeads = collection.getGraphHeads();
 
-    this.k = computeK((int) vertices.count());
+    // compute k if not explicitly set to certain value
+    if (this.k == -1) {
+      this.k = computeK((int) vertices.count());
+    }
 
     // we start with the creation of a super-vertex-graph
+    SuperVertexReduce reduce = new SuperVertexReduce(collection.getConfig());
     LogicalGraph superGraph = reduce.transform(collection);
 
     // create layout for super graph
@@ -52,10 +58,9 @@ public class SuperVertexGraphCollectionLayout extends AbstractGraphCollectionLay
     superGraph = superGraphLayout.execute(superGraph);
 
     DataSet<EPGMVertex> centeredVertices =
-        superGraph.getVertices().join(collection.getVertices())
+        superGraph.getVertices().join(vertices)
         .where("id").equalTo(new SelectFirstGraphId<>())
         .with(new TransferCenterPosition<>());
-
 
     DataSet<EPGMVertex> initVertices = centeredVertices.map(new RandomPlacementAroundCenter<>(superGraphLayout.getK()));
 
@@ -100,14 +105,75 @@ public class SuperVertexGraphCollectionLayout extends AbstractGraphCollectionLay
 
   private void initSuperGraphLayout(LogicalGraph graph) throws Exception {
     long superGraphVertexCount = graph.getVertices().count();
-    this.superK = computeK((int) superGraphVertexCount);
+    // compute superK if not set to certain value
+    if (Double.compare(superK, -1) == 0) {
+      this.superK = computeK((int) superGraphVertexCount);
+    }
 
-    this.superGraphLayout = new FRLayouter(5, (int) superGraphVertexCount);
+    this.superGraphLayout = new FRLayouter(centerLayoutIterations, (int) superGraphVertexCount);
     this.superGraphLayout.k(superK);
     this.superGraphLayout.area(width, height);
   }
 
   private double computeK (int vertexCount) {
     return Math.sqrt((double) (area() / vertexCount));
+  }
+
+  public static class Builder {
+
+    // required
+    private final int width;
+    private final int height;
+
+    //optional
+    private double k = -1;
+    private double superK = -1;
+    private int iterations = 1;
+    private int preLayoutIterations = 1;
+
+    public Builder(int width, int height) {
+      this.width = width;
+      this.height = height;
+    }
+
+    public Builder k(double k){
+      if (k <= 0) {
+        throw new IllegalArgumentException("K needs to be > 0.");
+      }
+
+      this.k = k;
+      return this;
+    }
+
+    public Builder superK(double superK) {
+      if (superK <= 0) {
+        throw new IllegalArgumentException("K needs to be > 0.");
+      }
+
+      this.superK = superK;
+      return this;
+    }
+
+    public Builder iterations(int iterations) {
+      if (iterations <= 0) {
+        throw new IllegalArgumentException("Iterations needs to be a positive integer.");
+      }
+
+      this.iterations = iterations;
+      return this;
+    }
+
+    public Builder preLayoutIterations(int preLayoutIterations) {
+      if (preLayoutIterations <= 0) {
+        throw new IllegalArgumentException("Pre-Layout iterations needs to be a positive integer.");
+      }
+
+      this.preLayoutIterations = preLayoutIterations;
+      return this;
+    }
+
+    public SuperVertexGraphCollectionLayout build() {
+      return new SuperVertexGraphCollectionLayout(this);
+    }
   }
 }
