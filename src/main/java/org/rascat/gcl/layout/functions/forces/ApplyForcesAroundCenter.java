@@ -26,7 +26,7 @@ public class ApplyForcesAroundCenter extends RichJoinFunction<EPGMVertex, Force,
   }
 
   @Override
-  public EPGMVertex join(EPGMVertex vertex, Force force) throws Exception {
+  public EPGMVertex join(EPGMVertex vertex, Force force) {
     double x = vertex.getPropertyValue(KEY_X_COORD).getDouble();
     double y = vertex.getPropertyValue(KEY_Y_COORD).getDouble();
     double centerX = vertex.getPropertyValue(TransferCenterPosition.KEY_CENTER_X_COORD).getDouble();
@@ -36,7 +36,7 @@ public class ApplyForcesAroundCenter extends RichJoinFunction<EPGMVertex, Force,
     Vector2D vDisp = force.getVector();
 
 
-    double temperature = schedule.computeTemperature(/*getIterationRuntimeContext().getSuperstepNumber()*/ 1);
+    double temperature = schedule.computeTemperature(getIterationRuntimeContext().getSuperstepNumber());
     try {
       vPos = vPos.add(vDisp.normalize().scalarMultiply(Math.min(vDisp.getNorm(), temperature)));
     } catch (MathArithmeticException e) {

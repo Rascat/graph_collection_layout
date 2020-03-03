@@ -2,7 +2,9 @@ package org.rascat.gcl.layout;
 
 import org.apache.flink.api.common.functions.FlatJoinFunction;
 import org.apache.flink.api.java.DataSet;
+import org.apache.flink.api.java.operators.IterativeDataSet;
 import org.gradoop.common.model.impl.pojo.EPGMEdge;
+import org.gradoop.common.model.impl.pojo.EPGMGraphHead;
 import org.gradoop.common.model.impl.pojo.EPGMVertex;
 import org.gradoop.flink.model.impl.epgm.GraphCollection;
 import org.gradoop.flink.model.impl.epgm.LogicalGraph;
@@ -27,7 +29,7 @@ public class SuperVertexGraphCollectionLayout extends AbstractGraphCollectionLay
   private FRLayouter superGraphLayout;
   private double k;
   private double superK;
-  private int iterations = 1;
+  private int iterations = 10;
 
   public SuperVertexGraphCollectionLayout(int width, int height, GradoopFlinkConfig cfg) {
     super(width, height);
@@ -36,7 +38,11 @@ public class SuperVertexGraphCollectionLayout extends AbstractGraphCollectionLay
 
   @Override
   public GraphCollection execute(GraphCollection collection) throws Exception {
-    this.k = computeK((int) collection.getVertices().count());
+    DataSet<EPGMEdge> edges = collection.getEdges();
+    DataSet<EPGMVertex> vertices = collection.getVertices();
+    DataSet<EPGMGraphHead> graphHeads = collection.getGraphHeads();
+
+    this.k = computeK((int) vertices.count());
 
     // we start with the creation of a super-vertex-graph
     LogicalGraph superGraph = reduce.transform(collection);
@@ -53,9 +59,11 @@ public class SuperVertexGraphCollectionLayout extends AbstractGraphCollectionLay
 
     DataSet<EPGMVertex> initVertices = centeredVertices.map(new RandomPlacementAroundCenter<>(superGraphLayout.getK()));
 
-    DataSet<Force> repulsiveForces = computeRepulsiveForces(initVertices);
+    IterativeDataSet<EPGMVertex> verticesLoop = initVertices.iterate(iterations);
 
-    DataSet<Force> attractiveForces = computeAttractiveForces(initVertices, collection.getEdges());
+    DataSet<Force> repulsiveForces = computeRepulsiveForces(verticesLoop);
+
+    DataSet<Force> attractiveForces = computeAttractiveForces(verticesLoop, edges);
 
     DataSet<Force> forces = repulsiveForces.union(attractiveForces)
         .groupBy(Force.ID_POSITION)
@@ -64,13 +72,12 @@ public class SuperVertexGraphCollectionLayout extends AbstractGraphCollectionLay
           return firstForce;
         });
 
-    CoolingSchedule schedule = new ExponentialSimulatedAnnealing(this.width, this.height, this.k, iterations);
-    
-    DataSet<EPGMVertex> pVertices = initVertices.join(forces)
+    CoolingSchedule schedule = new ExponentialSimulatedAnnealing(this.width, this.height, this.k, this.iterations);
+    DataSet<EPGMVertex> positionedVertices = verticesLoop.closeWith(verticesLoop.join(forces)
         .where("id").equalTo(Force.ID_POSITION)
-        .with(new ApplyForcesAroundCenter(width, height, superK, schedule));
+        .with(new ApplyForcesAroundCenter(width, height, superK, schedule)));
 
-    return collection.getFactory().fromDataSets(collection.getGraphHeads(), pVertices, collection.getEdges());
+    return collection.getFactory().fromDataSets(graphHeads, positionedVertices, edges);
   }
 
   private DataSet<Force> computeRepulsiveForces(DataSet<EPGMVertex> vertices) {
