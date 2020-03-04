@@ -6,6 +6,7 @@ import org.apache.flink.api.common.functions.JoinFunction;
 import org.gradoop.common.model.impl.pojo.EPGMEdge;
 import org.gradoop.common.model.impl.pojo.EPGMVertex;
 import org.rascat.gcl.layout.model.Force;
+import org.rascat.gcl.layout.model.Point;
 
 import static org.rascat.gcl.layout.AbstractGraphCollectionLayout.KEY_X_COORD;
 import static org.rascat.gcl.layout.AbstractGraphCollectionLayout.KEY_Y_COORD;
@@ -26,13 +27,10 @@ public abstract class RepulsionFunction implements JoinFunction<EPGMVertex, EPGM
   protected void setPositionalValues(EPGMVertex v, EPGMVertex u) {
     checkVertices(v, u);
 
-    Vector2D vPos = new Vector2D(
-      v.getPropertyValue(KEY_X_COORD).getDouble(),
-      v.getPropertyValue(KEY_Y_COORD).getDouble());
-    Vector2D uPos = new Vector2D(
-      u.getPropertyValue(KEY_X_COORD).getDouble(),
-      u.getPropertyValue(KEY_Y_COORD).getDouble());
-    this.delta = vPos.subtract(uPos);
+    Point vPosition = Point.fromEPGMElement(v);
+    Point uPosition = Point.fromEPGMElement(u);
+
+    this.delta = vPosition.subtract(uPosition);
     this.distance = delta.getNorm();
   }
 

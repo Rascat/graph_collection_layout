@@ -7,10 +7,9 @@ import org.apache.flink.util.Collector;
 import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.common.model.impl.pojo.EPGMVertex;
 import org.rascat.gcl.layout.model.Force;
+import org.rascat.gcl.layout.model.Point;
 
 import java.util.concurrent.ThreadLocalRandom;
-
-import static org.rascat.gcl.layout.AbstractGraphCollectionLayout.*;
 
 public class StandardRepulsionFunction extends RepulsionFunction implements FlatJoinFunction<EPGMVertex, EPGMVertex, Force> {
 
@@ -88,8 +87,9 @@ public class StandardRepulsionFunction extends RepulsionFunction implements Flat
    */
   private void relocate(EPGMVertex vertex) {
     int direction = ThreadLocalRandom.current().nextInt(8);
-    int x = (int) vertex.getPropertyValue(KEY_X_COORD).getDouble();
-    int y = (int) vertex.getPropertyValue(KEY_Y_COORD).getDouble();
+    Point position = Point.fromEPGMElement(vertex);
+    double x =  position.getX();
+    double y =  position.getY();
 
     int step = 1;
 
@@ -103,7 +103,8 @@ public class StandardRepulsionFunction extends RepulsionFunction implements Flat
       case 6: x -= step; break;
       case 7: x -= step; y -= step; break;
     }
-    vertex.setProperty(KEY_X_COORD, (double) x);
-    vertex.setProperty(KEY_Y_COORD, (double) y);
+
+    Point newPosition = new Point(x, y);
+    newPosition.addPositionPropertyToElement(vertex);
   }
 }

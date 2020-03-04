@@ -9,6 +9,7 @@ import org.gradoop.common.model.impl.id.GradoopIdSet;
 import org.gradoop.common.model.impl.pojo.EPGMEdge;
 import org.gradoop.common.model.impl.properties.PropertyValue;
 import org.rascat.gcl.layout.model.Force;
+import org.rascat.gcl.layout.model.Point;
 
 import java.util.List;
 
@@ -34,12 +35,8 @@ public class WeightedAttractionFunction implements MapFunction<EPGMEdge, Force>,
     public Force map(EPGMEdge edge) {
         checkEdge(edge);
 
-        Vector2D vPos = new Vector2D(
-            edge.getPropertyValue(TAIL.getKeyX()).getDouble(),
-            edge.getPropertyValue(TAIL.getKeyY()).getDouble());
-        Vector2D uPos = new Vector2D(
-            edge.getPropertyValue(HEAD.getKeyX()).getDouble(),
-            edge.getPropertyValue(HEAD.getKeyY()).getDouble());
+        Point vPos = Point.fromEPGMElement(edge, TAIL.getKeyX(), TAIL.getKeyY());
+        Point uPos = Point.fromEPGMElement(edge, HEAD.getKeyX(), HEAD.getKeyY());
 
         GradoopIdSet tailIds = unwrapGradoopIdSet(edge.getPropertyValue(TAIL.getKeyGraphIds()).getList());
         GradoopIdSet headIds = unwrapGradoopIdSet(edge.getPropertyValue(HEAD.getKeyGraphIds()).getList());
@@ -57,15 +54,11 @@ public class WeightedAttractionFunction implements MapFunction<EPGMEdge, Force>,
     }
 
     @Override
-    public void flatMap(EPGMEdge edge, Collector<Force> out) throws Exception {
+    public void flatMap(EPGMEdge edge, Collector<Force> out) {
         checkEdge(edge);
 
-        Vector2D vPos = new Vector2D(
-            edge.getPropertyValue(TAIL.getKeyX()).getDouble(),
-            edge.getPropertyValue(TAIL.getKeyY()).getDouble());
-        Vector2D uPos = new Vector2D(
-            edge.getPropertyValue(HEAD.getKeyX()).getDouble(),
-            edge.getPropertyValue(HEAD.getKeyY()).getDouble());
+        Point vPos = Point.fromEPGMElement(edge, TAIL.getKeyX(), TAIL.getKeyY());
+        Point uPos = Point.fromEPGMElement(edge, HEAD.getKeyX(), HEAD.getKeyY());
 
         GradoopIdSet tailIds = unwrapGradoopIdSet(edge.getPropertyValue(TAIL.getKeyGraphIds()).getList());
         GradoopIdSet headIds = unwrapGradoopIdSet(edge.getPropertyValue(HEAD.getKeyGraphIds()).getList());

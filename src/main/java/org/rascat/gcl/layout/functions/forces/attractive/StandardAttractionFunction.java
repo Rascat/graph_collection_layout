@@ -7,6 +7,7 @@ import org.apache.flink.api.common.functions.MapFunction;
 import org.apache.flink.util.Collector;
 import org.gradoop.common.model.impl.pojo.EPGMEdge;
 import org.rascat.gcl.layout.model.Force;
+import org.rascat.gcl.layout.model.Point;
 
 import static org.rascat.gcl.layout.model.VertexType.*;
 
@@ -40,21 +41,17 @@ public class StandardAttractionFunction implements MapFunction<EPGMEdge, Force>,
   private Vector2D calculateDisplacement(EPGMEdge edge) {
     checkEdge(edge);
 
-    Vector2D vPos = new Vector2D(
-      edge.getPropertyValue(TAIL.getKeyX()).getDouble(),
-      edge.getPropertyValue(TAIL.getKeyY()).getDouble());
-    Vector2D uPos = new Vector2D(
-      edge.getPropertyValue(HEAD.getKeyX()).getDouble(),
-      edge.getPropertyValue(HEAD.getKeyY()).getDouble());
+    Point vPosition = Point.fromEPGMElement(edge, TAIL.getKeyX(), TAIL.getKeyY());
+    Point uPosition = Point.fromEPGMElement(edge, HEAD.getKeyX(), HEAD.getKeyY());
 
-    Vector2D delta = vPos.subtract(uPos);
+    Vector2D delta = vPosition.subtract(uPosition);
 
     Vector2D result;
     try {
       result = delta.normalize().scalarMultiply(attraction(delta.getNorm()) * -1);
     } catch (MathArithmeticException e) {
       // we probably tried to normalize a zero vector
-      result = new Vector2D(0, 0);
+      result = Vector2D.ZERO;
     }
 
     return result;

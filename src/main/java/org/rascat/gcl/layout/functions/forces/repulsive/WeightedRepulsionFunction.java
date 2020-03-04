@@ -21,7 +21,7 @@ public class WeightedRepulsionFunction extends RepulsionFunction {
     setPositionalValues(v, u);
 
     if (v.equals(u)) {
-      return new Force(v.getId(), new Vector2D(0, 0));
+      return new Force(v.getId(), Vector2D.ZERO);
     }
 
     if (distance == 0) {
@@ -37,7 +37,7 @@ public class WeightedRepulsionFunction extends RepulsionFunction {
     setPositionalValues(v, u);
 
     if (v.equals(u) || distance > k) {
-      return new Force(v.getId(), new Vector2D(0, 0));
+      return new Force(v.getId(), Vector2D.ZERO);
     }
 
     if (distance == 0) {

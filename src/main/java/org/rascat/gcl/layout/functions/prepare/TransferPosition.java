@@ -3,9 +3,8 @@ package org.rascat.gcl.layout.functions.prepare;
 import org.apache.flink.api.common.functions.JoinFunction;
 import org.gradoop.common.model.impl.pojo.EPGMEdge;
 import org.gradoop.common.model.impl.pojo.EPGMVertex;
+import org.rascat.gcl.layout.model.Point;
 import org.rascat.gcl.layout.model.VertexType;
-
-import static org.rascat.gcl.layout.AbstractGraphCollectionLayout.*;
 
 public class TransferPosition implements JoinFunction<EPGMEdge, EPGMVertex, EPGMEdge> {
 
@@ -17,9 +16,8 @@ public class TransferPosition implements JoinFunction<EPGMEdge, EPGMVertex, EPGM
 
   @Override
   public EPGMEdge join(EPGMEdge edge, EPGMVertex vertex) {
-    edge.setProperty(type.getKeyX(), vertex.getPropertyValue(KEY_X_COORD));
-    edge.setProperty(type.getKeyY(), vertex.getPropertyValue(KEY_Y_COORD));
-    return edge;
+    return Point.fromEPGMElement(vertex)
+      .addPositionPropertyToElement(edge, type.getKeyX(), type.getKeyY());
   }
 
 }

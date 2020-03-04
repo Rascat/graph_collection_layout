@@ -6,8 +6,7 @@ import org.apache.flink.api.common.functions.RichJoinFunction;
 import org.gradoop.common.model.impl.pojo.EPGMVertex;
 import org.rascat.gcl.layout.api.CoolingSchedule;
 import org.rascat.gcl.layout.model.Force;
-
-import static org.rascat.gcl.layout.AbstractGraphCollectionLayout.*;
+import org.rascat.gcl.layout.model.Point;
 
 public class ApplyForces extends RichJoinFunction<EPGMVertex, Force, EPGMVertex> {
 
@@ -27,29 +26,24 @@ public class ApplyForces extends RichJoinFunction<EPGMVertex, Force, EPGMVertex>
     }
 
     @Override
-    public EPGMVertex join(EPGMVertex vertex, Force force) throws Exception {
-        double x = vertex.getPropertyValue(KEY_X_COORD).getDouble();
-        double y = vertex.getPropertyValue(KEY_Y_COORD).getDouble();
-
-        Vector2D vPos = new Vector2D(x, y);
+    public EPGMVertex join(EPGMVertex vertex, Force force) {
+        Point vPosition = Point.fromEPGMElement(vertex);
         Vector2D vDisp = force.getVector();
 
+        double temp = schedule.computeTemperature(getIterationRuntimeContext().getSuperstepNumber());
 
-        double temperature = schedule.computeTemperature(getIterationRuntimeContext().getSuperstepNumber());
+        Vector2D newPosition;
         try {
-            vPos = vPos.add(vDisp.normalize().scalarMultiply(Math.min(vDisp.getNorm(), temperature)));
+            newPosition = vPosition.add(vDisp.normalize().scalarMultiply(Math.min(vDisp.getNorm(), temp)));
         } catch (MathArithmeticException e) {
-            vPos = vPos.add(new Vector2D(0,0));
+            newPosition = vPosition.add(Vector2D.ZERO);
         }
-        double vPosX = vPos.getX();
-        double vPosY = vPos.getY();
+        double newX = newPosition.getX();
+        double newY = newPosition.getY();
 
-        vPosX = Math.min(width, Math.max(0, vPosX));
-        vPosY = Math.min(height, Math.max(0, vPosY));
+        newX = Math.min(width, Math.max(0, newX));
+        newY = Math.min(height, Math.max(0, newY));
 
-        vertex.setProperty(KEY_X_COORD, vPosX);
-        vertex.setProperty(KEY_Y_COORD, vPosY);
-
-        return vertex;
+        return new Point(newX, newY).addPositionPropertyToElement(vertex);
     }
 }

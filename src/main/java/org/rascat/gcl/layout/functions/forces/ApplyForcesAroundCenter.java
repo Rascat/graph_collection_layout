@@ -5,11 +5,10 @@ import org.apache.commons.math3.geometry.euclidean.twod.Vector2D;
 import org.apache.flink.api.common.functions.RichJoinFunction;
 import org.gradoop.common.model.impl.pojo.EPGMVertex;
 import org.rascat.gcl.layout.api.CoolingSchedule;
-import org.rascat.gcl.layout.functions.prepare.TransferCenterPosition;
 import org.rascat.gcl.layout.model.Force;
+import org.rascat.gcl.layout.model.Point;
 
-import static org.rascat.gcl.layout.AbstractGraphCollectionLayout.KEY_X_COORD;
-import static org.rascat.gcl.layout.AbstractGraphCollectionLayout.KEY_Y_COORD;
+import static org.rascat.gcl.layout.functions.prepare.TransferCenterPosition.*;
 
 public class ApplyForcesAroundCenter extends RichJoinFunction<EPGMVertex, Force, EPGMVertex> {
   private int width;
@@ -27,35 +26,33 @@ public class ApplyForcesAroundCenter extends RichJoinFunction<EPGMVertex, Force,
 
   @Override
   public EPGMVertex join(EPGMVertex vertex, Force force) {
-    double x = vertex.getPropertyValue(KEY_X_COORD).getDouble();
-    double y = vertex.getPropertyValue(KEY_Y_COORD).getDouble();
-    double centerX = vertex.getPropertyValue(TransferCenterPosition.KEY_CENTER_X_COORD).getDouble();
-    double centerY = vertex.getPropertyValue(TransferCenterPosition.KEY_CENTER_Y_COORD).getDouble();
+    Point vPosition = Point.fromEPGMElement(vertex);
+    Point vCenter = Point.fromEPGMElement(vertex, KEY_CENTER_X_COORD, KEY_CENTER_Y_COORD);
 
-    Vector2D vPos = new Vector2D(x, y);
     Vector2D vDisp = force.getVector();
 
+    double temp = schedule.computeTemperature(getIterationRuntimeContext().getSuperstepNumber());
 
-    double temperature = schedule.computeTemperature(getIterationRuntimeContext().getSuperstepNumber());
+    Vector2D newPosition;
     try {
-      vPos = vPos.add(vDisp.normalize().scalarMultiply(Math.min(vDisp.getNorm(), temperature)));
+      newPosition = vPosition.add(vDisp.normalize().scalarMultiply(Math.min(vDisp.getNorm(), temp)));
     } catch (MathArithmeticException e) {
-      vPos = vPos.add(new Vector2D(0,0));
+      newPosition = vPosition.add(Vector2D.ZERO);
     }
-    double vPosX = vPos.getX();
-    double vPosY = vPos.getY();
+
+    double newX = newPosition.getX();
+    double newY = newPosition.getY();
+    double centerX = vCenter.getX();
+    double centerY = vCenter.getY();
 
     // Restrict position to super vertex layout space
-    vPosX = Math.min(centerX + radius, Math.max(centerX - radius, vPosX));
-    vPosY = Math.min(centerY + radius, Math.max(centerY - radius, vPosY));
+    newX = Math.min(centerX + radius, Math.max(centerX - radius, newX));
+    newY = Math.min(centerY + radius, Math.max(centerY - radius, newY));
 
     // Restrict position to total layout space
-    vPosX = Math.min(width, Math.max(0, vPosX));
-    vPosY = Math.min(height, Math.max(0, vPosY));
+    newX = Math.min(width, Math.max(0, newX));
+    newY = Math.min(height, Math.max(0, newY));
 
-    vertex.setProperty(KEY_X_COORD, vPosX);
-    vertex.setProperty(KEY_Y_COORD, vPosY);
-
-    return vertex;
+    return new Point(newX, newY).addPositionPropertyToElement(vertex);
   }
 }
