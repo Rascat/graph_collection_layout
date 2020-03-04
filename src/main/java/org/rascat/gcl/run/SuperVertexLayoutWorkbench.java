@@ -26,7 +26,7 @@ public class SuperVertexLayoutWorkbench {
 
     GraphCollection collection = loader.load(inputPath, inputFormat);
 
-    SuperVertexGraphCollectionLayout layout = new SuperVertexGraphCollectionLayout.Builder(width, height)
+    SuperVertexGraphCollectionLayout layout = SuperVertexGraphCollectionLayout.builder(width, height)
       .preLayoutIterations(5)
       .iterations(iterations)
       .preLayoutIterations(preLayoutIterations)

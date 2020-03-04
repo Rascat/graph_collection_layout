@@ -40,8 +40,7 @@ public class Workbench {
 
         GraphCollection collection = loader.load(inputPath, inputFormat);
 
-        ForceDirectedGraphCollectionLayout layout = new ForceDirectedGraphCollectionLayout
-          .Builder(width, height, vertices)
+        ForceDirectedGraphCollectionLayout layout = ForceDirectedGraphCollectionLayout.builder(width, height, vertices)
           .initialLayout(new RandomPlacement<>(width / 10, height / 10, width - (width / 10), height - (height / 10)))
           .attractiveForces(new WeightedAttractiveForces(sameGraphFactor, 1))
           .repulsiveForces(new GridRepulsiveForces(new WeightedRepulsionFunction(1, differentGraphFactor)))

@@ -41,6 +41,10 @@ public class ForceDirectedGraphCollectionLayout extends AbstractGraphCollectionL
     this.attractiveForces = builder.attractiveForces;
   }
 
+  public static Builder builder(int width, int height, int vertices) {
+    return new Builder(width, height, vertices);
+  }
+
   public GraphCollection execute(GraphCollection collection) {
     DataSet<EPGMEdge> edges = collection.getEdges();
     DataSet<EPGMVertex> vertices = collection.getVertices();
@@ -105,7 +109,7 @@ public class ForceDirectedGraphCollectionLayout extends AbstractGraphCollectionL
       .toString();
   }
 
-  public static class Builder {
+  public static final class Builder {
 
     // required
     private final int width;
@@ -120,7 +124,7 @@ public class ForceDirectedGraphCollectionLayout extends AbstractGraphCollectionL
     private RepulsiveForces repulsiveForces = new NaiveRepulsiveForces(new StandardRepulsionFunction());
     private AttractiveForces attractiveForces = new StandardAttractiveForces();
 
-    public Builder(int width, int height, int vertices) {
+    private Builder(int width, int height, int vertices) {
       this.width = width;
       this.height = height;
       this.vertices = vertices;

@@ -38,6 +38,10 @@ public class SuperVertexGraphCollectionLayout extends AbstractGraphCollectionLay
     this.superK = builder.superK;
   }
 
+  public static Builder builder(int width, int height) {
+    return new Builder(width, height);
+  }
+
   @Override
   public GraphCollection execute(GraphCollection collection) throws Exception {
     DataSet<EPGMEdge> edges = collection.getEdges();
@@ -119,7 +123,7 @@ public class SuperVertexGraphCollectionLayout extends AbstractGraphCollectionLay
     return Math.sqrt((double) (area() / vertexCount));
   }
 
-  public static class Builder {
+  public static final class Builder {
 
     // required
     private final int width;
@@ -131,7 +135,7 @@ public class SuperVertexGraphCollectionLayout extends AbstractGraphCollectionLay
     private int iterations = 1;
     private int preLayoutIterations = 1;
 
-    public Builder(int width, int height) {
+    private Builder(int width, int height) {
       this.width = width;
       this.height = height;
     }
