@@ -21,16 +21,20 @@ public class ApplyForces extends RichJoinFunction<EPGMVertex, Force, EPGMVertex>
         this.schedule = schedule;
     }
 
-    public void setSchedule(CoolingSchedule schedule) {
-        this.schedule = schedule;
-    }
-
     @Override
     public EPGMVertex join(EPGMVertex vertex, Force force) {
         Point vPosition = Point.fromEPGMElement(vertex);
         Vector2D vDisp = force.getVector();
 
-        double temp = schedule.computeTemperature(getIterationRuntimeContext().getSuperstepNumber());
+        int superstepNumber;
+        try {
+            superstepNumber = getIterationRuntimeContext().getSuperstepNumber();
+        } catch (IllegalStateException e) {
+            // if join is not executed in an iteration runtime context, we assign it a const
+            // in order to make it more stable and testable
+            superstepNumber = 1;
+        }
+        double temp = schedule.computeTemperature(superstepNumber);
 
         Vector2D newPosition;
         try {
