@@ -27,6 +27,7 @@ public class SuperVertexGraphCollectionLayout extends AbstractGraphCollectionLay
   private FRLayouter superGraphLayout;
   private double k;
   private double superK;
+  private double superKFactor;
   private int iterations;
   private int centerLayoutIterations;
 
@@ -36,6 +37,7 @@ public class SuperVertexGraphCollectionLayout extends AbstractGraphCollectionLay
     this.centerLayoutIterations = builder.preLayoutIterations;
     this.k = builder.k;
     this.superK = builder.superK;
+    this.superKFactor = builder.superKFactor;
   }
 
   public static Builder builder(int width, int height) {
@@ -111,7 +113,7 @@ public class SuperVertexGraphCollectionLayout extends AbstractGraphCollectionLay
     long superGraphVertexCount = graph.getVertices().count();
     // compute superK if not set to certain value
     if (Double.compare(superK, -1) == 0) {
-      this.superK = computeK((int) superGraphVertexCount);
+      this.superK = computeK((int) superGraphVertexCount) * superKFactor;
     }
 
     this.superGraphLayout = new FRLayouter(centerLayoutIterations, (int) superGraphVertexCount);
@@ -134,6 +136,7 @@ public class SuperVertexGraphCollectionLayout extends AbstractGraphCollectionLay
     private double superK = -1;
     private int iterations = 1;
     private int preLayoutIterations = 1;
+    private double superKFactor = 1;
 
     private Builder(int width, int height) {
       this.width = width;
@@ -173,6 +176,11 @@ public class SuperVertexGraphCollectionLayout extends AbstractGraphCollectionLay
       }
 
       this.preLayoutIterations = preLayoutIterations;
+      return this;
+    }
+
+    public Builder superKFactor(double superKFactor) {
+      this.superKFactor = superKFactor;
       return this;
     }
 
