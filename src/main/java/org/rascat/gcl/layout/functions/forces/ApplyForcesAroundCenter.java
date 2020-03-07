@@ -31,7 +31,15 @@ public class ApplyForcesAroundCenter extends RichJoinFunction<EPGMVertex, Force,
 
     Vector2D vDisp = force.getVector();
 
-    double temp = schedule.computeTemperature(getIterationRuntimeContext().getSuperstepNumber());
+    int superstepNumber;
+    try {
+      superstepNumber = getIterationRuntimeContext().getSuperstepNumber();
+    } catch (IllegalStateException e) {
+      // if join is not executed in an iteration runtime context, we assign it a const
+      // in order to make it more stable and testable
+      superstepNumber = 1;
+    }
+    double temp = schedule.computeTemperature(superstepNumber);
 
     Vector2D newPosition;
     try {
