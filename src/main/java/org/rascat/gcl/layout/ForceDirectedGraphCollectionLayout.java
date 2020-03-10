@@ -31,7 +31,7 @@ public class ForceDirectedGraphCollectionLayout extends AbstractGraphCollectionL
   private final RepulsiveForces repulsiveForces;
   private final AttractiveForces attractiveForces;
 
-  public ForceDirectedGraphCollectionLayout(Builder builder) {
+  private ForceDirectedGraphCollectionLayout(Builder builder) {
     super(builder.width, builder.height);
     this.k = builder.k;
     this.iterations = builder.iterations;

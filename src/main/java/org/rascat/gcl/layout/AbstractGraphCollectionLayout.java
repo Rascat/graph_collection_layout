@@ -13,9 +13,22 @@ public abstract class AbstractGraphCollectionLayout {
     this.height = height;
   }
 
+  /**
+   * Computes the area of this layout (width * height).
+   *
+   * @return the area
+   */
   public int area() {
     return this.width * this.height;
   }
 
+  /**
+   * Compute 2D-embedding for the given graph collection. The resulting position of each vertex from the input graph
+   * collection is annotated as properties with the keys 'X' and 'Y'.
+   *
+   * @param collection the input graph collection
+   * @return the input graph collection with positioned vertices
+   * @throws Exception if something goes wrong
+   */
   public abstract GraphCollection execute(GraphCollection collection) throws Exception;
 }

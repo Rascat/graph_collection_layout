@@ -29,10 +29,12 @@ public class SuperVertexLayoutWorkbench {
 
     GraphCollection collection = loader.load(inputPath, inputFormat);
 
+    double superKFactor = 4D;
+
     SuperVertexGraphCollectionLayout layout = SuperVertexGraphCollectionLayout.builder(width, height)
-      .preLayoutIterations(5)
       .iterations(iterations)
       .preLayoutIterations(preLayoutIterations)
+      .superKFactor(superKFactor)
       .build();
 
     collection = layout.execute(collection);
@@ -43,10 +45,12 @@ public class SuperVertexLayoutWorkbench {
     // set graph id as property so we can partition the graph against that
     collection = collection.callForCollection(new SetGraphIdsProperty());
 
-    DOTDataSink sink = new DOTDataSink(outputPath + "/foodbroker_svl.dot", true, DOTDataSink.DotFormat.SIMPLE);
+    String filename = String.format("%s/food_svl_%d_%d_%.2fk", outputPath, preLayoutIterations, iterations, superKFactor);
+
+    DOTDataSink sink = new DOTDataSink(filename + ".dot", true, DOTDataSink.DotFormat.SIMPLE);
     collection.writeTo(sink, true);
 
-    Render render = new Render(height, width, outputPath + "/supervertex.png");
+    Render render = new Render(height, width, filename + ".png");
     render.renderGraphCollection(collection, env);
   }
 }
