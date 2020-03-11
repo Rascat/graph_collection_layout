@@ -3,6 +3,7 @@
 import argparse
 import math
 
+
 def main():
     parser = argparse.ArgumentParser(description='Compute displacement of two vertices connected by an edge')
     parser.add_argument('v', type=str, help='position of vertex v (x, y)')
@@ -28,7 +29,7 @@ def main():
     delta_len = math.sqrt((delta[0] * delta[0]) + (delta[1] * delta[1]))
     delta_norm = (delta[0] / delta_len, delta[1] / delta_len)
 
-    repulsion = (k*k) / delta_len
+    repulsion = (k * k) / delta_len
     v_disp = (delta_norm[0] * repulsion, delta_norm[1] * repulsion)
     u_disp = (v_disp[0] * -1, v_disp[1] * -1)
 
@@ -43,7 +44,7 @@ def main():
     v_disp_norm = (v_disp[0] / v_disp_len, v_disp[1] / v_disp_len)
     u_disp_len = math.sqrt((u_disp[0] * u_disp[0]) + (u_disp[1] * u_disp[1]))
     u_disp_norm = (u_disp[0] / u_disp_len, u_disp[1] / u_disp_len)
-    
+
     v_new_x = int(v[0] + v_disp_norm[0] * t)
     v_new_y = int(v[1] + v_disp_norm[1] * t)
     v_new_x = min(w, max(0, v_new_x))
@@ -53,7 +54,7 @@ def main():
     u_new_y = int(u[1] + u_disp_norm[1] * t)
     u_new_x = min(w, max(0, u_new_x))
     u_new_y = min(h, max(0, u_new_y))
-    
+
     v_new = (v_new_x, v_new_y)
     u_new = (u_new_x, u_new_y)
 

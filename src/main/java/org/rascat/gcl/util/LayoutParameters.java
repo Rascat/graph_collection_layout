@@ -10,6 +10,7 @@ public class LayoutParameters {
 
   private final String PARAM_INPUT = "input";
   private final String PARAM_OUTPUT = "output";
+  private final String PARAM_STATISTICS = "statistics";
   private final String PARAM_ITERATIONS = "iterations";
   private final String PARAM_PRE_LAYOUT_ITERATIONS = "prelayoutiterations";
   private final String PARAM_WIDTH = "width";
@@ -97,6 +98,11 @@ public class LayoutParameters {
     throw new IllegalArgumentException("Could not map user input " + cmd.getOptionValue(PARAM_INPUT_FORMAT) + " to input type");
   }
 
+  public String statistics(String defaultValue) {
+    return cmd.getOptionValue(PARAM_STATISTICS) == null ? defaultValue
+      : cmd.getOptionValue(PARAM_STATISTICS);
+  }
+
   private Options createOptions() {
     Options options = new Options();
 
@@ -179,6 +185,12 @@ public class LayoutParameters {
       .desc("Number of iterations the pre layout is executed")
       .build();
 
+    Option statistics = Option.builder(PARAM_STATISTICS)
+      .required(false)
+      .hasArg(true)
+      .desc("Path to statistics csv file.")
+      .build();
+
     return options
       .addOption(input)
       .addOption(output)
@@ -192,7 +204,8 @@ public class LayoutParameters {
       .addOption(sameGraphFactor)
       .addOption(differentGraphFactor)
       .addOption(inputFormat)
-      .addOption(preLayoutIterations);
+      .addOption(preLayoutIterations)
+      .addOption(statistics);
   }
 
 }
