@@ -14,58 +14,111 @@ def main():
     config = configparser.ConfigParser()
     config.read(config_path)
 
+    params = build_params(config)
+    print('Running command:\n================\n\n' + ' '.join(params))
+
+    repeat = config.getint('SYSTEM', 'repeat')
+    for i in range(repeat):
+        print('\n+++ REPEAT: ' + str(i + 1) + '/' + str(repeat) + '+++')
+        subprocess.run(params, check=True)
+
+
+def check_section(config, section_name):
+    if config.has_section(section_name) is False:
+        raise RuntimeError('Error while reading config: section "' + section_name + '" not found.')
+
+
+def build_params(config):
+    params = []
+
     # read system config
-    system_config = config['SYSTEM']
-    flink = system_config['flinkroot']
-    hdfs = system_config['hdfsroot']
+    system_section_name = 'SYSTEM'
+    check_section(config, system_section_name)
+
+    if config.has_option(system_section_name, 'flink'):
+        flink = config.get(system_section_name, 'flink')
+        params.append(flink + "/bin/flink")
+        params.append("run")
+    else:
+        raise RuntimeError("Error while reading config: missing flink executable.")
+
+    if config.has_option(system_section_name, 'hadoop'):
+        pass
 
     # read flink config
-    flink_config = config['FLINK']
-    clazz = flink_config['class']
-    jar = flink_config['jar']
-    parallelism = flink_config['parallelism']
-    repeat = flink_config['repeat']
+    flink_section_name = 'FLINK'
+    check_section(config, flink_section_name)
+
+    if config.has_option(flink_section_name, 'parallelism'):
+        parallelism = config.get(flink_section_name, 'parallelism')
+        params.append("-p")
+        params.append(parallelism)
+    else:
+        raise RuntimeError("Error while reading config: missing parallelism.")
+
+    if config.has_option(flink_section_name, 'class'):
+        clazz = config.get(flink_section_name, 'class')
+        params.append("-c")
+        params.append(clazz)
+    else:
+        raise RuntimeError("Error while reading config: missing benchmark class.")
+
+    if config.has_option(flink_section_name, 'jar'):
+        jar = config.get(flink_section_name, 'jar')
+        params.append(jar)
+    else:
+        raise RuntimeError("Error while reading config: missing jar.")
 
     # read benchmark config
-    benchmark_config = config['BENCHMARK']
-    input_path = benchmark_config['inputpath']
-    output_path = benchmark_config['outputpath']
-    statistics_path = benchmark_config['statisticspath']
-    width = benchmark_config['width']
-    height = benchmark_config['height']
-    vertices = benchmark_config['vertices']
-    sgf = benchmark_config['sgf']
-    dgf = benchmark_config['dgf']
-    iterations = benchmark_config['iterations']
+    benchmark_section_name = 'BENCHMARK'
+    check_section(config, benchmark_section_name)
 
-    # build subprocess call
-    flink_param = flink + "/bin/flink run "
-    parallelism_param = "-p " + parallelism + " "
-    class_param = "-c " + clazz + " "
-    jar_param = jar + " "
-    input_param = "-input " + input_path + " "
-    output_param = "-output " + output_path + " "
-    statistics_param = "-statistics " + statistics_path + " "
-    width_param = "-width " + width + " "
-    height_param = "-height " + height + " "
-    vertices_param = "-vertices " + vertices + " "
-    sgf_param = "-sgf " + sgf + " "
-    dgf_param = "-dgf " + dgf + " "
+    if config.has_option(benchmark_section_name, 'inputpath'):
+        input_path = config.get(benchmark_section_name, 'inputpath')
+        params.append('-input')
+        params.append(input_path)
 
-    subprocess.run([
-        flink_param,
-        parallelism_param,
-        class_param,
-        jar_param,
-        input_param,
-        output_param,
-        statistics_param,
-        width_param,
-        height_param,
-        vertices_param,
-        sgf_param,
-        dgf_param
-    ], shell=True, check=True)
+    if config.has_option(benchmark_section_name, 'outputpath'):
+        output_path = config.get(benchmark_section_name, 'outputpath')
+        params.append('-output')
+        params.append(output_path)
+
+    if config.has_option(benchmark_section_name, 'statisticspath'):
+        statistics_path = config.get(benchmark_section_name, 'statisticspath')
+        params.append('-statistics')
+        params.append(statistics_path)
+
+    if config.has_option(benchmark_section_name, 'width'):
+        width = config.get(benchmark_section_name, 'width')
+        params.append('-width')
+        params.append(width)
+
+    if config.has_option(benchmark_section_name, 'height'):
+        height = config.get(benchmark_section_name, 'height')
+        params.append('-height')
+        params.append(height)
+
+    if config.has_option(benchmark_section_name, 'vertices'):
+        vertices = config.get(benchmark_section_name, 'vertices')
+        params.append('-vertices')
+        params.append(vertices)
+
+    if config.has_option(benchmark_section_name, 'sgf'):
+        sgf = config.get(benchmark_section_name, 'sgf')
+        params.append('-sgf')
+        params.append(sgf)
+
+    if config.has_option(benchmark_section_name, 'dgf'):
+        dgf = config.get(benchmark_section_name, 'dgf')
+        params.append('-dgf')
+        params.append(dgf)
+
+    if config.has_option(benchmark_section_name, 'iterations'):
+        iterations = config.get(benchmark_section_name, 'iterations')
+        params.append('-iterations')
+        params.append(iterations)
+
+    return params
 
 
 if __name__ == "__main__":

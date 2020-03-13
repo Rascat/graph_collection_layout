@@ -64,7 +64,7 @@ public class ForceDirectedGraphCollectionLayoutBenchmark {
     collection = layout.execute(collection);
 
     DataSink sink = new CSVDataSink(OUTPUT_PATH, cfg);
-    collection.writeTo(sink);
+    collection.writeTo(sink, true);
 
     env.execute();
     writeMetaData(env);
@@ -78,7 +78,7 @@ public class ForceDirectedGraphCollectionLayoutBenchmark {
    */
   private static void writeMetaData(ExecutionEnvironment env) throws IOException {
 
-    String template = "s|%s|%s|%s|%s|%s|%s|%s|%s%n";
+    String template = "%s | %s | %s | %s | %s | %s | %s | %s | %s%n";
 
     String head = String.format(
       template,
