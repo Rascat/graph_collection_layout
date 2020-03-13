@@ -118,6 +118,11 @@ def build_params(config):
         params.append('-iterations')
         params.append(iterations)
 
+    if config.has_option(benchmark_section_name, 'prelayoutiterations'):
+        pre_layout_iterations = config.get(benchmark_section_name, 'prelayoutiterations')
+        params.append('-prelayoutiterations')
+        params.append(pre_layout_iterations)
+
     return params
 
 

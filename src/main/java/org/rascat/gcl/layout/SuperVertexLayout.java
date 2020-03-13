@@ -40,7 +40,7 @@ import org.rascat.gcl.layout.transformations.SuperVertexReduce;
  *
  * @author Lucas Schons
  */
-public class SuperVertexGraphCollectionLayout extends AbstractGraphCollectionLayout {
+public class SuperVertexLayout extends AbstractGraphCollectionLayout {
 
   private FRLayouter superGraphLayout;
   private double k;
@@ -56,7 +56,7 @@ public class SuperVertexGraphCollectionLayout extends AbstractGraphCollectionLay
    *
    * @param builder builder used to create this SuperVertexGraphCollectionLayout.
    */
-  private SuperVertexGraphCollectionLayout(Builder builder) {
+  private SuperVertexLayout(Builder builder) {
     super(builder.width, builder.height);
     this.iterations = builder.iterations;
     this.centerLayoutIterations = builder.preLayoutIterations;
@@ -185,7 +185,7 @@ public class SuperVertexGraphCollectionLayout extends AbstractGraphCollectionLay
   }
 
   /**
-   * A nested builder class to create {@link SuperVertexGraphCollectionLayout} instances using descriptive methods.
+   * A nested builder class to create {@link SuperVertexLayout} instances using descriptive methods.
    * <p>
    * Example usage:
    * <pre>
@@ -209,7 +209,7 @@ public class SuperVertexGraphCollectionLayout extends AbstractGraphCollectionLay
     private double superKFactor = 1;
 
     /**
-     * Private constructor used by {@link SuperVertexGraphCollectionLayout#builder(int, int)}.
+     * Private constructor used by {@link SuperVertexLayout#builder(int, int)}.
      *
      * @param width  the width of the total layout space
      * @param height the height of the total layout space
@@ -291,12 +291,12 @@ public class SuperVertexGraphCollectionLayout extends AbstractGraphCollectionLay
     }
 
     /**
-     * Constructs a {@link SuperVertexGraphCollectionLayout} with the values declared by this {@link Builder}.
+     * Constructs a {@link SuperVertexLayout} with the values declared by this {@link Builder}.
      *
-     * @return the new {@link SuperVertexGraphCollectionLayout}
+     * @return the new {@link SuperVertexLayout}
      */
-    public SuperVertexGraphCollectionLayout build() {
-      return new SuperVertexGraphCollectionLayout(this);
+    public SuperVertexLayout build() {
+      return new SuperVertexLayout(this);
     }
   }
 }

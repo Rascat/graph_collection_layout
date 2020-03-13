@@ -31,7 +31,7 @@ import java.util.StringJoiner;
  * to one ore more logical graphs to modify the computed forces. By doing this, it is possible to make graph structures
  * in regard to logical graphs more visible in the resulting layout.
  */
-public class ForceDirectedGraphCollectionLayout extends AbstractGraphCollectionLayout {
+public class AsymmetricForceDirectedLayout extends AbstractGraphCollectionLayout {
 
   private final double k;
   private final int iterations;
@@ -45,7 +45,7 @@ public class ForceDirectedGraphCollectionLayout extends AbstractGraphCollectionL
    *
    * @param builder the builder which contains the values used to create the object
    */
-  private ForceDirectedGraphCollectionLayout(Builder builder) {
+  private AsymmetricForceDirectedLayout(Builder builder) {
     super(builder.width, builder.height);
     this.k = builder.k;
     this.iterations = builder.iterations;
@@ -133,7 +133,7 @@ public class ForceDirectedGraphCollectionLayout extends AbstractGraphCollectionL
 
   @Override
   public String toString() {
-    return new StringJoiner(", ", ForceDirectedGraphCollectionLayout.class.getSimpleName() + "[", "]")
+    return new StringJoiner(", ", AsymmetricForceDirectedLayout.class.getSimpleName() + "[", "]")
       .add("width=" + width)
       .add("height=" + height)
       .add("k=" + k)
@@ -146,7 +146,7 @@ public class ForceDirectedGraphCollectionLayout extends AbstractGraphCollectionL
   }
 
   /**
-   * A nested builder class to create {@link ForceDirectedGraphCollectionLayout} instances using descriptive methods.
+   * A nested builder class to create {@link AsymmetricForceDirectedLayout} instances using descriptive methods.
    * <p>
    * Example usage:
    * <pre>
@@ -263,11 +263,11 @@ public class ForceDirectedGraphCollectionLayout extends AbstractGraphCollectionL
     }
 
     /**
-     * Constructs a {@link ForceDirectedGraphCollectionLayout} with the values declared by this {@link Builder}.
+     * Constructs a {@link AsymmetricForceDirectedLayout} with the values declared by this {@link Builder}.
      *
-     * @return the new {@link ForceDirectedGraphCollectionLayout}
+     * @return the new {@link AsymmetricForceDirectedLayout}
      */
-    public ForceDirectedGraphCollectionLayout build() {
+    public AsymmetricForceDirectedLayout build() {
       if (this.initialLayout == null) {
         this.initialLayout = new RandomPlacement<>(this.width, this.height);
       }
@@ -275,7 +275,7 @@ public class ForceDirectedGraphCollectionLayout extends AbstractGraphCollectionL
         k = Math.sqrt((width * height) / (double) vertices);
       }
 
-      return new ForceDirectedGraphCollectionLayout(this);
+      return new AsymmetricForceDirectedLayout(this);
     }
   }
 }

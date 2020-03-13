@@ -11,7 +11,7 @@ import org.rascat.gcl.layout.functions.forces.repulsive.WeightedRepulsionFunctio
 import org.rascat.gcl.layout.functions.prepare.RandomPlacement;
 import org.rascat.gcl.layout.functions.prepare.SetGraphIdsProperty;
 import org.rascat.gcl.layout.functions.prepare.SetPosProperty;
-import org.rascat.gcl.layout.ForceDirectedGraphCollectionLayout;
+import org.rascat.gcl.layout.AsymmetricForceDirectedLayout;
 import org.rascat.gcl.io.Render;
 import org.rascat.gcl.util.GraphCollectionLoader;
 import org.rascat.gcl.util.LayoutParameters;
@@ -40,7 +40,7 @@ public class Workbench {
 
         GraphCollection collection = loader.load(inputPath, inputFormat);
 
-        ForceDirectedGraphCollectionLayout layout = ForceDirectedGraphCollectionLayout.builder(width, height, vertices)
+        AsymmetricForceDirectedLayout layout = AsymmetricForceDirectedLayout.builder(width, height, vertices)
           .initialLayout(new RandomPlacement<>(width / 10, height / 10, width - (width / 10), height - (height / 10)))
           .attractiveForces(new WeightedAttractiveForces(sameGraphFactor, 1))
           .repulsiveForces(new GridRepulsiveForces(new WeightedRepulsionFunction(1, differentGraphFactor)))

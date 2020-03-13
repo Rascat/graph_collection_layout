@@ -62,7 +62,7 @@
                         <configuration>
                             <transformers>
                                 <transformer implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
-                                    <mainClass>org.rascat.gcl.run.benchmark.ForceDirectedGraphCollectionLayoutBenchmark</mainClass>
+                                    <mainClass>org.rascat.gcl.run.benchmark.AsymmetricForceDirectedLayoutBenchmark</mainClass>
                                 </transformer>
                             </transformers>
                         </configuration>

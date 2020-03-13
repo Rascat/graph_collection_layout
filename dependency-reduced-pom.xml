@@ -34,7 +34,7 @@
             <configuration>
               <transformers>
                 <transformer>
-                  <mainClass>org.rascat.gcl.run.benchmark.ForceDirectedGraphCollectionLayoutBenchmark</mainClass>
+                  <mainClass>org.rascat.gcl.run.benchmark.AsymmetricForceDirectedLayoutBenchmark</mainClass>
                 </transformer>
               </transformers>
             </configuration>

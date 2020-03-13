@@ -6,11 +6,7 @@ import org.gradoop.flink.io.api.DataSink;
 import org.gradoop.flink.io.impl.csv.CSVDataSink;
 import org.gradoop.flink.model.impl.epgm.GraphCollection;
 import org.gradoop.flink.util.GradoopFlinkConfig;
-import org.rascat.gcl.layout.ForceDirectedGraphCollectionLayout;
-import org.rascat.gcl.layout.functions.forces.attractive.WeightedAttractiveForces;
-import org.rascat.gcl.layout.functions.forces.repulsive.GridRepulsiveForces;
-import org.rascat.gcl.layout.functions.forces.repulsive.WeightedRepulsionFunction;
-import org.rascat.gcl.layout.functions.prepare.RandomPlacement;
+import org.rascat.gcl.layout.SuperVertexLayout;
 import org.rascat.gcl.util.GraphCollectionLoader;
 import org.rascat.gcl.util.LayoutParameters;
 
@@ -21,16 +17,14 @@ import java.util.concurrent.TimeUnit;
 
 import static org.rascat.gcl.util.GraphCollectionLoader.*;
 
-public class ForceDirectedGraphCollectionLayoutBenchmark {
-
+public class SuperVertexLayoutBenchmark {
   private static String INPUT_PATH;
   private static String OUTPUT_PATH;
   private static String STATISTICS_PATH;
   private static int WIDTH;
   private static int HEIGHT;
   private static int VERTICES;
-  private static double SGF;
-  private static double DGF;
+  private static int PRE_LAYOUT_ITERATIONS;
   private static int ITERATIONS;
 
   public static void main(String[] args) throws Exception {
@@ -41,10 +35,8 @@ public class ForceDirectedGraphCollectionLayoutBenchmark {
     WIDTH = params.width(1000);
     HEIGHT = params.height(1000);
     VERTICES = params.vertices(100);
-    SGF = params.sameGraphFactor(1);
-    DGF = params.differentGraphFactor(1);
+    PRE_LAYOUT_ITERATIONS = params.preLayoutIterations(1);
     ITERATIONS = params.iterations(1);
-    boolean isIntermediary = params.isIntermediary();
     InputFormat inputFormat = params.inputFormat(InputFormat.CSV);
 
     ExecutionEnvironment env = ExecutionEnvironment.getExecutionEnvironment();
@@ -53,12 +45,10 @@ public class ForceDirectedGraphCollectionLayoutBenchmark {
     GraphCollectionLoader loader = new GraphCollectionLoader(cfg);
     GraphCollection collection = loader.load(INPUT_PATH, inputFormat);
 
-    ForceDirectedGraphCollectionLayout layout = ForceDirectedGraphCollectionLayout.builder(WIDTH, HEIGHT, VERTICES)
-      .initialLayout(new RandomPlacement<>(WIDTH / 10, HEIGHT / 10, WIDTH - (WIDTH / 10), HEIGHT - (HEIGHT / 10)))
-      .attractiveForces(new WeightedAttractiveForces(SGF, 1))
-      .repulsiveForces(new GridRepulsiveForces(new WeightedRepulsionFunction(1, DGF)))
-      .isIntermediary(isIntermediary)
+    SuperVertexLayout layout = SuperVertexLayout.builder(WIDTH, HEIGHT)
+      .preLayoutIterations(PRE_LAYOUT_ITERATIONS)
       .iterations(ITERATIONS)
+      .superKFactor(3D)
       .build();
 
     collection = layout.execute(collection);
@@ -78,7 +68,7 @@ public class ForceDirectedGraphCollectionLayoutBenchmark {
    */
   private static void writeMetaData(ExecutionEnvironment env) throws IOException {
 
-    String template = "%s | %s | %s | %s | %s | %s | %s | %s | %s%n";
+    String template = "%s | %s | %s | %s | %s | %s | %s | %s%n";
 
     String head = String.format(
       template,
@@ -89,8 +79,7 @@ public class ForceDirectedGraphCollectionLayoutBenchmark {
       "Height",
       "Vertices",
       "Iterations",
-      "SGF",
-      "DGF"
+      "Pre-Layout-Iterations"
     );
 
     String tail = String.format(
@@ -102,8 +91,7 @@ public class ForceDirectedGraphCollectionLayoutBenchmark {
       HEIGHT,
       VERTICES,
       ITERATIONS,
-      SGF,
-      DGF
+      PRE_LAYOUT_ITERATIONS
     );
 
     File f = new File(STATISTICS_PATH);

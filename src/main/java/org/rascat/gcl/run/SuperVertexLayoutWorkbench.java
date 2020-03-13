@@ -6,7 +6,7 @@ import org.gradoop.flink.model.impl.epgm.GraphCollection;
 import org.gradoop.flink.util.GradoopFlinkConfig;
 import org.jetbrains.annotations.NotNull;
 import org.rascat.gcl.io.Render;
-import org.rascat.gcl.layout.SuperVertexGraphCollectionLayout;
+import org.rascat.gcl.layout.SuperVertexLayout;
 import org.rascat.gcl.layout.functions.prepare.SetGraphIdsProperty;
 import org.rascat.gcl.layout.functions.prepare.SetPosProperty;
 import org.rascat.gcl.util.GraphCollectionLoader;
@@ -31,7 +31,7 @@ public class SuperVertexLayoutWorkbench {
 
     double superKFactor = 4D;
 
-    SuperVertexGraphCollectionLayout layout = SuperVertexGraphCollectionLayout.builder(width, height)
+    SuperVertexLayout layout = SuperVertexLayout.builder(width, height)
       .iterations(iterations)
       .preLayoutIterations(preLayoutIterations)
       .superKFactor(superKFactor)
