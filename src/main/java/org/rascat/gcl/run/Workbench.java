@@ -28,7 +28,6 @@ public class Workbench {
         int iterations = params.iterations(10);
         double  sameGraphFactor = params.sameGraphFactor(1);
         double differentGraphFactor = params.differentGraphFactor(1);
-        int vertices = params.vertices(20);
         boolean isIntermediary = params.isIntermediary();
         String outputPath = params.outputPath();
         String inputPath = params.inputPath();
@@ -40,7 +39,7 @@ public class Workbench {
 
         GraphCollection collection = loader.load(inputPath, inputFormat);
 
-        AsymmetricForceDirectedLayout layout = AsymmetricForceDirectedLayout.builder(width, height, vertices)
+        AsymmetricForceDirectedLayout layout = AsymmetricForceDirectedLayout.builder(width, height)
           .initialLayout(new RandomPlacement<>(width / 10, height / 10, width - (width / 10), height - (height / 10)))
           .attractiveForces(new WeightedAttractiveForces(sameGraphFactor, 1))
           .repulsiveForces(new GridRepulsiveForces(new WeightedRepulsionFunction(1, differentGraphFactor)))

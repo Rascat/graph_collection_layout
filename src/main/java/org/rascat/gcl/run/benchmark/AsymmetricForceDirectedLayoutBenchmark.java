@@ -52,7 +52,7 @@ public class AsymmetricForceDirectedLayoutBenchmark {
     GraphCollectionLoader loader = new GraphCollectionLoader(cfg);
     GraphCollection collection = loader.load(INPUT_PATH, inputFormat);
 
-    AsymmetricForceDirectedLayout layout = AsymmetricForceDirectedLayout.builder(WIDTH, HEIGHT, VERTICES)
+    AsymmetricForceDirectedLayout layout = AsymmetricForceDirectedLayout.builder(WIDTH, HEIGHT)
       .initialLayout(new RandomPlacement<>(WIDTH / 10, HEIGHT / 10, WIDTH - (WIDTH / 10), HEIGHT - (HEIGHT / 10)))
       .attractiveForces(new WeightedAttractiveForces(SGF, 1))
       .repulsiveForces(new GridRepulsiveForces(new WeightedRepulsionFunction(1, DGF)))

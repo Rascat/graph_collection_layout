@@ -33,7 +33,7 @@ import java.util.StringJoiner;
  */
 public class AsymmetricForceDirectedLayout extends AbstractGraphCollectionLayout {
 
-  private final double k;
+  private double k;
   private final int iterations;
   private final boolean isIntermediaryLayout;
   private final MapFunction<EPGMVertex, EPGMVertex> initialLayout;
@@ -60,18 +60,24 @@ public class AsymmetricForceDirectedLayout extends AbstractGraphCollectionLayout
    *
    * @param width    the total width of the layout space in px
    * @param height   the total height of the layout space in px
-   * @param vertices the number of vertices in the graph collection
    * @return a new instance of Builder.
    */
-  public static Builder builder(int width, int height, int vertices) {
-    return new Builder(width, height, vertices);
+  public static Builder builder(int width, int height) {
+    return new Builder(width, height);
   }
 
   @Override
-  public GraphCollection execute(GraphCollection collection) {
+  public GraphCollection execute(GraphCollection collection) throws Exception {
     DataSet<EPGMEdge> edges = collection.getEdges();
     DataSet<EPGMVertex> vertices = collection.getVertices();
     DataSet<EPGMGraphHead> graphHeads = collection.getGraphHeads();
+
+    if (this.k == -1) {
+      long numVertices = vertices.count();
+      System.out.println(numVertices);
+      this.k = Math.sqrt(area() / (double) numVertices) * 3;
+      System.out.println(this.k);
+    }
 
     if (!isIntermediaryLayout) {
       vertices = vertices.map(initialLayout);
@@ -160,7 +166,6 @@ public class AsymmetricForceDirectedLayout extends AbstractGraphCollectionLayout
     // required
     private final int width;
     private final int height;
-    private final int vertices;
 
     // optional
     private double k = -1;
@@ -175,12 +180,10 @@ public class AsymmetricForceDirectedLayout extends AbstractGraphCollectionLayout
      *
      * @param width    the total width of the layout space
      * @param height   the total height of the layout space
-     * @param vertices the amount of vertices in the graph collection
      */
-    private Builder(int width, int height, int vertices) {
+    private Builder(int width, int height) {
       this.width = width;
       this.height = height;
-      this.vertices = vertices;
     }
 
     /**
@@ -270,9 +273,6 @@ public class AsymmetricForceDirectedLayout extends AbstractGraphCollectionLayout
     public AsymmetricForceDirectedLayout build() {
       if (this.initialLayout == null) {
         this.initialLayout = new RandomPlacement<>(this.width, this.height);
-      }
-      if (k == -1) {
-        k = Math.sqrt((width * height) / (double) vertices);
       }
 
       return new AsymmetricForceDirectedLayout(this);
