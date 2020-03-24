@@ -13,6 +13,9 @@
         <project.maven.version>3.0.0</project.maven.version>
         <maven.compiler.source>1.8</maven.compiler.source>
         <maven.compiler.target>1.8</maven.compiler.target>
+
+        <dep.flink.version>1.6.0</dep.flink.version>
+        <dep.gradoop.version>0.6.0-SNAPSHOT</dep.gradoop.version>
     </properties>
 
     <repositories>
@@ -60,15 +63,49 @@
                             <goal>shade</goal>
                         </goals>
                         <configuration>
-                            <transformers>
-                                <transformer implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
-                                    <mainClass>org.rascat.gcl.run.benchmark.AsymmetricForceDirectedLayoutBenchmark</mainClass>
-                                </transformer>
-                            </transformers>
+                            <minimizeJar>true</minimizeJar>
+                            <relocations>
+                                <relocation>
+                                    <pattern>org.apache.commons.cli</pattern>
+                                    <shadedPattern>org.gradoop.examples.thirdparty.commons_cli</shadedPattern>
+                                </relocation>
+                            </relocations>
+                            <filters>
+                                <!-- Filters out signed files to avoid SecurityException when integrating a signed jar in the resulting jar. -->
+                                <filter>
+                                    <artifact>*:*</artifact>
+                                    <excludes>
+                                        <exclude>META-INF/*.SF</exclude>
+                                        <exclude>META-INF/*.DSA</exclude>
+                                        <exclude>META-INF/*.RSA</exclude>
+                                    </excludes>
+                                </filter>
+                            </filters>
                         </configuration>
                     </execution>
                 </executions>
             </plugin>
+
+<!--            <plugin>-->
+<!--                <groupId>org.apache.maven.plugins</groupId>-->
+<!--                <artifactId>maven-shade-plugin</artifactId>-->
+<!--                <version>3.2.2</version>-->
+<!--                <executions>-->
+<!--                    <execution>-->
+<!--                        <phase>package</phase>-->
+<!--                        <goals>-->
+<!--                            <goal>shade</goal>-->
+<!--                        </goals>-->
+<!--                        <configuration>-->
+<!--                            <transformers>-->
+<!--                                <transformer implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">-->
+<!--                                    <mainClass>org.rascat.gcl.run.benchmark.AsymmetricForceDirectedLayoutBenchmark</mainClass>-->
+<!--                                </transformer>-->
+<!--                            </transformers>-->
+<!--                        </configuration>-->
+<!--                    </execution>-->
+<!--                </executions>-->
+<!--            </plugin>-->
         </plugins>
         <pluginManagement>
             <plugins>
@@ -85,19 +122,19 @@
         <dependency>
             <groupId>org.gradoop</groupId>
             <artifactId>gradoop-flink</artifactId>
-            <version>0.6.0-SNAPSHOT</version>
+            <version>${dep.gradoop.version}</version>
         </dependency>
 
         <dependency>
             <groupId>org.apache.flink</groupId>
             <artifactId>flink-java</artifactId>
-            <version>1.7.2</version>
+            <version>${dep.flink.version}</version>
         </dependency>
 
         <dependency>
             <groupId>org.apache.flink</groupId>
             <artifactId>flink-clients_2.11</artifactId>
-            <version>1.7.2</version>
+            <version>${dep.flink.version}</version>
         </dependency>
 
         <dependency>
@@ -129,7 +166,7 @@
         <dependency>
             <groupId>org.apache.flink</groupId>
             <artifactId>flink-test-utils_2.11</artifactId>
-            <version>1.9.0</version>
+            <version>${dep.flink.version}</version>
         </dependency>
 
         <dependency>

@@ -34,6 +34,7 @@ import java.util.StringJoiner;
 public class AsymmetricForceDirectedLayout extends AbstractGraphCollectionLayout {
 
   private double k;
+  private int numVertices;
   private final int iterations;
   private final boolean isIntermediaryLayout;
   private final MapFunction<EPGMVertex, EPGMVertex> initialLayout;
@@ -53,6 +54,7 @@ public class AsymmetricForceDirectedLayout extends AbstractGraphCollectionLayout
     this.initialLayout = builder.initialLayout;
     this.repulsiveForces = builder.repulsiveForces;
     this.attractiveForces = builder.attractiveForces;
+    this.numVertices = builder.numVertices;
   }
 
   /**
@@ -72,11 +74,13 @@ public class AsymmetricForceDirectedLayout extends AbstractGraphCollectionLayout
     DataSet<EPGMVertex> vertices = collection.getVertices();
     DataSet<EPGMGraphHead> graphHeads = collection.getGraphHeads();
 
+    if (this.numVertices != 0) {
+      this.k = Math.sqrt(area() / (double) numVertices) * 3;
+    }
+
     if (this.k == -1) {
       long numVertices = vertices.count();
-      System.out.println(numVertices);
       this.k = Math.sqrt(area() / (double) numVertices) * 3;
-      System.out.println(this.k);
     }
 
     if (!isIntermediaryLayout) {
@@ -174,6 +178,7 @@ public class AsymmetricForceDirectedLayout extends AbstractGraphCollectionLayout
     private MapFunction<EPGMVertex, EPGMVertex> initialLayout; // we initialize this during build()
     private RepulsiveForces repulsiveForces = new NaiveRepulsiveForces(new StandardRepulsionFunction());
     private AttractiveForces attractiveForces = new StandardAttractiveForces();
+    private int numVertices = 0;
 
     /**
      * Private constructor used by the parent class to create a {@link Builder} object.
@@ -262,6 +267,11 @@ public class AsymmetricForceDirectedLayout extends AbstractGraphCollectionLayout
      */
     public Builder attractiveForces(AttractiveForces attractiveForces) throws NullPointerException {
       this.attractiveForces = Objects.requireNonNull(attractiveForces);
+      return this;
+    }
+
+    public Builder numVertices(int numVertices) {
+      this.numVertices = numVertices;
       return this;
     }
 

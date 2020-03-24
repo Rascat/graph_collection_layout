@@ -32,11 +32,23 @@
               <goal>shade</goal>
             </goals>
             <configuration>
-              <transformers>
-                <transformer>
-                  <mainClass>org.rascat.gcl.run.benchmark.AsymmetricForceDirectedLayoutBenchmark</mainClass>
-                </transformer>
-              </transformers>
+              <minimizeJar>true</minimizeJar>
+              <relocations>
+                <relocation>
+                  <pattern>org.apache.commons.cli</pattern>
+                  <shadedPattern>org.gradoop.examples.thirdparty.commons_cli</shadedPattern>
+                </relocation>
+              </relocations>
+              <filters>
+                <filter>
+                  <artifact>*:*</artifact>
+                  <excludes>
+                    <exclude>META-INF/*.SF</exclude>
+                    <exclude>META-INF/*.DSA</exclude>
+                    <exclude>META-INF/*.RSA</exclude>
+                  </excludes>
+                </filter>
+              </filters>
             </configuration>
           </execution>
         </executions>
@@ -84,6 +96,8 @@
   </dependencies>
   <properties>
     <project.maven.version>3.0.0</project.maven.version>
+    <dep.gradoop.version>0.6.0-SNAPSHOT</dep.gradoop.version>
+    <dep.flink.version>1.6.0</dep.flink.version>
     <maven.compiler.source>1.8</maven.compiler.source>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <maven.compiler.target>1.8</maven.compiler.target>

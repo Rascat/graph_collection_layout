@@ -3,7 +3,9 @@ package org.rascat.gcl.run.benchmark;
 import org.apache.commons.io.FileUtils;
 import org.apache.flink.api.java.ExecutionEnvironment;
 import org.gradoop.flink.io.api.DataSink;
+import org.gradoop.flink.io.api.DataSource;
 import org.gradoop.flink.io.impl.csv.CSVDataSink;
+import org.gradoop.flink.io.impl.csv.CSVDataSource;
 import org.gradoop.flink.model.impl.epgm.GraphCollection;
 import org.gradoop.flink.util.GradoopFlinkConfig;
 import org.rascat.gcl.layout.AsymmetricForceDirectedLayout;
@@ -40,7 +42,7 @@ public class AsymmetricForceDirectedLayoutBenchmark {
     STATISTICS_PATH = params.statistics("out/statistics.csv");
     WIDTH = params.width(1000);
     HEIGHT = params.height(1000);
-    VERTICES = params.vertices(100);
+    VERTICES = params.vertices(0);
     SGF = params.sameGraphFactor(1);
     DGF = params.differentGraphFactor(1);
     ITERATIONS = params.iterations(1);
@@ -49,14 +51,17 @@ public class AsymmetricForceDirectedLayoutBenchmark {
     ExecutionEnvironment env = ExecutionEnvironment.getExecutionEnvironment();
     GradoopFlinkConfig cfg = GradoopFlinkConfig.createConfig(env);
 
-    GraphCollectionLoader loader = new GraphCollectionLoader(cfg);
-    GraphCollection collection = loader.load(INPUT_PATH, inputFormat);
+//    GraphCollectionLoader loader = new GraphCollectionLoader(cfg);
+//    GraphCollection collection = loader.load(INPUT_PATH, inputFormat);
+    DataSource source = new CSVDataSource(INPUT_PATH, cfg);
+    GraphCollection collection = source.getGraphCollection();
 
     AsymmetricForceDirectedLayout layout = AsymmetricForceDirectedLayout.builder(WIDTH, HEIGHT)
       .initialLayout(new RandomPlacement<>(WIDTH / 10, HEIGHT / 10, WIDTH - (WIDTH / 10), HEIGHT - (HEIGHT / 10)))
       .attractiveForces(new WeightedAttractiveForces(SGF, 1))
       .repulsiveForces(new GridRepulsiveForces(new WeightedRepulsionFunction(1, DGF)))
       .iterations(ITERATIONS)
+      .numVertices(VERTICES)
       .build();
 
     collection = layout.execute(collection);
