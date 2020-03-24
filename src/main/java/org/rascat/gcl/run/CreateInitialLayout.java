@@ -5,7 +5,7 @@ import org.gradoop.flink.io.impl.csv.CSVDataSink;
 import org.gradoop.flink.model.impl.epgm.GraphCollection;
 import org.gradoop.flink.util.GradoopFlinkConfig;
 import org.rascat.gcl.io.Render;
-import org.rascat.gcl.layout.RandomGraphCollectionLayout;
+import org.rascat.gcl.layout.RandomLayout;
 import org.rascat.gcl.layout.functions.prepare.SetPosProperty;
 import org.rascat.gcl.util.GraphCollectionLoader;
 import org.rascat.gcl.util.LayoutParameters;
@@ -25,7 +25,7 @@ public class CreateInitialLayout {
 
     GraphCollection collection = loader.load(inputPath, type);
 
-    RandomGraphCollectionLayout layout = new RandomGraphCollectionLayout(width, height);
+    RandomLayout layout = new RandomLayout(width, height);
 
     collection = layout.execute(collection);
 

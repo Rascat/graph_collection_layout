@@ -7,9 +7,9 @@ import org.gradoop.common.model.impl.pojo.EPGMVertex;
 import org.gradoop.flink.model.impl.epgm.GraphCollection;
 import org.rascat.gcl.layout.functions.prepare.RandomPlacement;
 
-public class RandomGraphCollectionLayout extends AbstractGraphCollectionLayout {
+public class RandomLayout extends AbstractGraphCollectionLayout {
 
-    public RandomGraphCollectionLayout(int width, int height) {
+    public RandomLayout(int width, int height) {
         super(width, height);
     }
 
