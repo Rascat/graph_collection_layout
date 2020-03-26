@@ -46,6 +46,7 @@ public class SuperVertexLayout extends AbstractGraphCollectionLayout {
   private double k;
   private double superK;
   private double superKFactor;
+  private int numVertices;
   private int iterations;
   private int centerLayoutIterations;
   private StandardRepulsionFunction repulsionFunction;
@@ -63,6 +64,7 @@ public class SuperVertexLayout extends AbstractGraphCollectionLayout {
     this.k = builder.k;
     this.superK = builder.superK;
     this.superKFactor = builder.superKFactor;
+    this.numVertices = builder.numVertices;
   }
 
   /**
@@ -82,9 +84,12 @@ public class SuperVertexLayout extends AbstractGraphCollectionLayout {
     DataSet<EPGMVertex> vertices = collection.getVertices();
     DataSet<EPGMGraphHead> graphHeads = collection.getGraphHeads();
 
+    if (this.numVertices == 0) {
+      this.numVertices = (int) vertices.count();
+    }
     // compute k if not explicitly set to certain value
     if (this.k == -1) {
-      this.k = computeK((int) vertices.count());
+      this.k = computeK(this.numVertices);
     }
 
     // init repulsion/attraction function
@@ -205,6 +210,7 @@ public class SuperVertexLayout extends AbstractGraphCollectionLayout {
     private double k = -1;
     private double superK = -1;
     private int iterations = 1;
+    private int numVertices = 0;
     private int preLayoutIterations = 1;
     private double superKFactor = 1;
 
@@ -232,6 +238,15 @@ public class SuperVertexLayout extends AbstractGraphCollectionLayout {
 
       this.k = k;
       return this;
+    }
+
+    public Builder vertices(int vertices) {
+      if (vertices <= 0) {
+        throw new IllegalArgumentException("Number of vertices must be > 0.");
+      }
+
+      this.numVertices = vertices;
+      return  this;
     }
 
     /**

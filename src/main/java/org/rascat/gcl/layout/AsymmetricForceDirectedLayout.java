@@ -74,13 +74,12 @@ public class AsymmetricForceDirectedLayout extends AbstractGraphCollectionLayout
     DataSet<EPGMVertex> vertices = collection.getVertices();
     DataSet<EPGMGraphHead> graphHeads = collection.getGraphHeads();
 
-    if (this.numVertices != 0) {
-      this.k = Math.sqrt(area() / (double) numVertices) * 3;
+    if (this.numVertices == 0) {
+      this.numVertices = (int) vertices.count();
     }
 
     if (this.k == -1) {
-      long numVertices = vertices.count();
-      this.k = Math.sqrt(area() / (double) numVertices) * 3;
+      this.k = Math.sqrt(area() / (double) this.numVertices) * 3;
     }
 
     if (!isIntermediaryLayout) {
