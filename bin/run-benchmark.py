@@ -19,7 +19,7 @@ def main():
 
     repeat = config.getint('SYSTEM', 'repeat')
     for i in range(repeat):
-        print('\n+++ REPEAT: ' + str(i + 1) + '/' + str(repeat) + '+++')
+        print('\n+++ REPEAT: ' + str(i + 1) + '/' + str(repeat) + ' +++')
         subprocess.check_call(params)
 
 
