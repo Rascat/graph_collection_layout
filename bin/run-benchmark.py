@@ -4,6 +4,22 @@ import configparser
 import subprocess
 
 
+FLINK = ""
+CLASS= ""
+JAR = ""
+PARALLELISM_VALUES = []
+INPUT = ""
+OUTPUT = ""
+STATISTICS = ""
+WIDTH = ""
+HEIGHT = ""
+VERTICES = ""
+ITERATIONS = ""
+SGF = None
+DGF = None
+PRE_LAYOUT_ITERATIONS = None
+
+
 def main():
     parser = argparse.ArgumentParser(description='Run layout benchmark')
     parser.add_argument('config', type=str, help='path to config')
@@ -14,31 +30,43 @@ def main():
     config = configparser.ConfigParser()
     config.read(config_path)
 
-    params = build_params(config)
-    print('Running command:\n================\n\n' + ' '.join(params))
+    build_params(config)
 
-    repeat = config.getint('SYSTEM', 'repeat')
-    for i in range(repeat):
-        print('\n+++ REPEAT: ' + str(i + 1) + '/' + str(repeat) + ' +++')
-        subprocess.check_call(params)
+    for parallelism in PARALLELISM_VALUES:
+        # build cmd string
+        cmd = "{} run -p {} -c {} {} ".format(FLINK, parallelism, CLASS, JAR)
+        cmd += "-input {} -output {} -statistics {} ".format(INPUT, OUTPUT, STATISTICS)
+        cmd += "-width {} -height {} -vertices {} ".format(WIDTH, HEIGHT, VERTICES)
+        cmd += "-iterations {} ".format(ITERATIONS)
+        if SGF is not None:
+            cmd += "-sgf {} ".format(SGF)
+        if DGF is not None:
+            cmd += "-dgf {} ".format(DGF)
+        if PRE_LAYOUT_ITERATIONS is not None:
+            cmd += "-prelayoutiterations {}".format(PRE_LAYOUT_ITERATIONS)
+
+        print('Running command:\n================\n\n' + ' ' + cmd)
+
+        repeat = config.getint('SYSTEM', 'repeat')
+        for i in range(repeat):
+            print('\n+++ REPEAT {}/{} +++'.format(str(i + 1), str(repeat)))
+            subprocess.check_call(cmd.split(' '))
 
 
-def check_section(config, section_name):
+def check_section(config, section_name) -> None:
     if config.has_section(section_name) is False:
         raise RuntimeError('Error while reading config: section "' + section_name + '" not found.')
 
 
-def build_params(config):
-    params = []
-
+def build_params(config) -> None:
     # read system config
     system_section_name = 'SYSTEM'
     check_section(config, system_section_name)
 
     if config.has_option(system_section_name, 'flink'):
+        global FLINK
         flink = config.get(system_section_name, 'flink')
-        params.append(flink + "/bin/flink")
-        params.append("run")
+        FLINK = flink + "/bin/flink"
     else:
         raise RuntimeError("Error while reading config: missing flink executable.")
 
@@ -50,80 +78,81 @@ def build_params(config):
     check_section(config, flink_section_name)
 
     if config.has_option(flink_section_name, 'parallelism'):
+        global PARALLELISM_VALUES
         parallelism = config.get(flink_section_name, 'parallelism')
-        params.append("-p")
-        params.append(parallelism)
+        PARALLELISM_VALUES = parallelism.split(',')
     else:
         raise RuntimeError("Error while reading config: missing parallelism.")
 
     if config.has_option(flink_section_name, 'class'):
-        clazz = config.get(flink_section_name, 'class')
-        params.append("-c")
-        params.append(clazz)
+        global CLASS
+        CLASS = config.get(flink_section_name, 'class')
     else:
         raise RuntimeError("Error while reading config: missing benchmark class.")
 
     if config.has_option(flink_section_name, 'jar'):
-        jar = config.get(flink_section_name, 'jar')
-        params.append(jar)
+        global JAR
+        JAR = config.get(flink_section_name, 'jar')
     else:
-        raise RuntimeError("Error while reading config: missing jar.")
+        raise RuntimeError('Error while reading config: missing jar.')
 
     # read benchmark config
     benchmark_section_name = 'BENCHMARK'
     check_section(config, benchmark_section_name)
 
     if config.has_option(benchmark_section_name, 'inputpath'):
-        input_path = config.get(benchmark_section_name, 'inputpath')
-        params.append('-input')
-        params.append(input_path)
+        global INPUT
+        INPUT = config.get(benchmark_section_name, 'inputpath')
+    else:
+        raise RuntimeError('Error while reading config: missing input path.')
 
     if config.has_option(benchmark_section_name, 'outputpath'):
-        output_path = config.get(benchmark_section_name, 'outputpath')
-        params.append('-output')
-        params.append(output_path)
+        global OUTPUT
+        OUTPUT = config.get(benchmark_section_name, 'outputpath')
+    else:
+        raise RuntimeError('Error while reading config: missing output path.')
 
     if config.has_option(benchmark_section_name, 'statisticspath'):
-        statistics_path = config.get(benchmark_section_name, 'statisticspath')
-        params.append('-statistics')
-        params.append(statistics_path)
+        global STATISTICS
+        STATISTICS = config.get(benchmark_section_name, 'statisticspath')
+    else:
+        raise RuntimeError('Error while reading config: missing statistics path.')
 
     if config.has_option(benchmark_section_name, 'width'):
-        width = config.get(benchmark_section_name, 'width')
-        params.append('-width')
-        params.append(width)
+        global WIDTH
+        WIDTH = config.get(benchmark_section_name, 'width')
+    else:
+        raise RuntimeError('Error while reading config: missing width.')
 
     if config.has_option(benchmark_section_name, 'height'):
-        height = config.get(benchmark_section_name, 'height')
-        params.append('-height')
-        params.append(height)
+        global HEIGHT
+        HEIGHT = config.get(benchmark_section_name, 'height')
+    else:
+        raise RuntimeError('Error while reading config: missing height.')
 
     if config.has_option(benchmark_section_name, 'vertices'):
-        vertices = config.get(benchmark_section_name, 'vertices')
-        params.append('-vertices')
-        params.append(vertices)
-
-    if config.has_option(benchmark_section_name, 'sgf'):
-        sgf = config.get(benchmark_section_name, 'sgf')
-        params.append('-sgf')
-        params.append(sgf)
-
-    if config.has_option(benchmark_section_name, 'dgf'):
-        dgf = config.get(benchmark_section_name, 'dgf')
-        params.append('-dgf')
-        params.append(dgf)
+        global VERTICES
+        VERTICES = config.get(benchmark_section_name, 'vertices')
+    else:
+        raise RuntimeError('Error while reading config: missing number of vertices.')
 
     if config.has_option(benchmark_section_name, 'iterations'):
-        iterations = config.get(benchmark_section_name, 'iterations')
-        params.append('-iterations')
-        params.append(iterations)
+        global ITERATIONS
+        ITERATIONS = config.get(benchmark_section_name, 'iterations')
+    else:
+        raise RuntimeError('Error while reading config: missing number of iterations.')
+
+    if config.has_option(benchmark_section_name, 'sgf'):
+        global SGF
+        SGF = config.get(benchmark_section_name, 'sgf')
+
+    if config.has_option(benchmark_section_name, 'dgf'):
+        global DGF
+        DGF = config.get(benchmark_section_name, 'dgf')
 
     if config.has_option(benchmark_section_name, 'prelayoutiterations'):
-        pre_layout_iterations = config.get(benchmark_section_name, 'prelayoutiterations')
-        params.append('-prelayoutiterations')
-        params.append(pre_layout_iterations)
-
-    return params
+        global PRE_LAYOUT_ITERATIONS
+        PRE_LAYOUT_ITERATIONS = config.get(benchmark_section_name, 'prelayoutiterations')
 
 
 if __name__ == "__main__":
