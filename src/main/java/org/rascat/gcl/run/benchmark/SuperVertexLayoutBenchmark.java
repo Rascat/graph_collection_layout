@@ -3,19 +3,18 @@ package org.rascat.gcl.run.benchmark;
 import org.apache.commons.io.FileUtils;
 import org.apache.flink.api.java.ExecutionEnvironment;
 import org.gradoop.flink.io.api.DataSink;
+import org.gradoop.flink.io.api.DataSource;
 import org.gradoop.flink.io.impl.csv.CSVDataSink;
+import org.gradoop.flink.io.impl.csv.CSVDataSource;
 import org.gradoop.flink.model.impl.epgm.GraphCollection;
 import org.gradoop.flink.util.GradoopFlinkConfig;
 import org.rascat.gcl.layout.SuperVertexLayout;
-import org.rascat.gcl.util.GraphCollectionLoader;
 import org.rascat.gcl.util.LayoutParameters;
 
 import java.io.File;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.concurrent.TimeUnit;
-
-import static org.rascat.gcl.util.GraphCollectionLoader.*;
 
 public class SuperVertexLayoutBenchmark {
   private static String INPUT_PATH;
@@ -37,13 +36,12 @@ public class SuperVertexLayoutBenchmark {
     VERTICES = params.vertices(100);
     PRE_LAYOUT_ITERATIONS = params.preLayoutIterations(1);
     ITERATIONS = params.iterations(1);
-    InputFormat inputFormat = params.inputFormat(InputFormat.CSV);
 
     ExecutionEnvironment env = ExecutionEnvironment.getExecutionEnvironment();
     GradoopFlinkConfig cfg = GradoopFlinkConfig.createConfig(env);
 
-    GraphCollectionLoader loader = new GraphCollectionLoader(cfg);
-    GraphCollection collection = loader.load(INPUT_PATH, inputFormat);
+    DataSource source = new CSVDataSource(INPUT_PATH, cfg);
+    GraphCollection collection = source.getGraphCollection();
 
     SuperVertexLayout layout = SuperVertexLayout.builder(WIDTH, HEIGHT)
       .preLayoutIterations(PRE_LAYOUT_ITERATIONS)
@@ -57,7 +55,7 @@ public class SuperVertexLayoutBenchmark {
     collection.writeTo(sink, true);
 
     env.execute();
-    writeMetaData(env);
+    writeStatistics(env);
   }
 
   /**
@@ -66,7 +64,7 @@ public class SuperVertexLayoutBenchmark {
    * @param env given ExecutionEnvironment
    * @throws IOException exception during file writing
    */
-  private static void writeMetaData(ExecutionEnvironment env) throws IOException {
+  private static void writeStatistics(ExecutionEnvironment env) throws IOException {
 
     String template = "%s | %s | %s | %s | %s | %s | %s | %s%n";
 

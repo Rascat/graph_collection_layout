@@ -13,15 +13,12 @@ import org.rascat.gcl.layout.functions.forces.attractive.WeightedAttractiveForce
 import org.rascat.gcl.layout.functions.forces.repulsive.GridRepulsiveForces;
 import org.rascat.gcl.layout.functions.forces.repulsive.WeightedRepulsionFunction;
 import org.rascat.gcl.layout.functions.prepare.RandomPlacement;
-import org.rascat.gcl.util.GraphCollectionLoader;
 import org.rascat.gcl.util.LayoutParameters;
 
 import java.io.File;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.concurrent.TimeUnit;
-
-import static org.rascat.gcl.util.GraphCollectionLoader.*;
 
 public class AsymmetricForceDirectedLayoutBenchmark {
 
@@ -46,13 +43,10 @@ public class AsymmetricForceDirectedLayoutBenchmark {
     SGF = params.sameGraphFactor(1);
     DGF = params.differentGraphFactor(1);
     ITERATIONS = params.iterations(1);
-    InputFormat inputFormat = params.inputFormat(InputFormat.CSV);
 
     ExecutionEnvironment env = ExecutionEnvironment.getExecutionEnvironment();
     GradoopFlinkConfig cfg = GradoopFlinkConfig.createConfig(env);
 
-//    GraphCollectionLoader loader = new GraphCollectionLoader(cfg);
-//    GraphCollection collection = loader.load(INPUT_PATH, inputFormat);
     DataSource source = new CSVDataSource(INPUT_PATH, cfg);
     GraphCollection collection = source.getGraphCollection();
 
@@ -70,7 +64,7 @@ public class AsymmetricForceDirectedLayoutBenchmark {
     collection.writeTo(sink, true);
 
     env.execute();
-    writeMetaData(env);
+    writeStatistics(env);
   }
 
   /**
@@ -79,7 +73,7 @@ public class AsymmetricForceDirectedLayoutBenchmark {
    * @param env given ExecutionEnvironment
    * @throws IOException exception during file writing
    */
-  private static void writeMetaData(ExecutionEnvironment env) throws IOException {
+  private static void writeStatistics(ExecutionEnvironment env) throws IOException {
 
     String template = "%s | %s | %s | %s | %s | %s | %s | %s | %s%n";
 
