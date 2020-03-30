@@ -51,8 +51,7 @@ def main():
             repeat = config.getint('SYSTEM', 'repeat')
             for i in range(repeat):
                 print('\n+++ REPEAT {}/{} +++'.format(str(i + 1), str(repeat)))
-                #subprocess.check_call(cmd.split(' '))
-                print('HIT')
+                subprocess.check_call(cmd.split(' '))
 
 
 def check_section(config, section_name) -> None:
