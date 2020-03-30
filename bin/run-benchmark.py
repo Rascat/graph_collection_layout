@@ -8,7 +8,7 @@ FLINK = ""
 CLASS= ""
 JAR = ""
 PARALLELISM_VALUES = []
-INPUT = ""
+INPUT_VALUES = []
 OUTPUT = ""
 STATISTICS = ""
 WIDTH = ""
@@ -33,24 +33,26 @@ def main():
     build_params(config)
 
     for parallelism in PARALLELISM_VALUES:
-        # build cmd string
-        cmd = "{} run -p {} -c {} {} ".format(FLINK, parallelism, CLASS, JAR)
-        cmd += "-input {} -output {} -statistics {} ".format(INPUT, OUTPUT, STATISTICS)
-        cmd += "-width {} -height {} -vertices {} ".format(WIDTH, HEIGHT, VERTICES)
-        cmd += "-iterations {} ".format(ITERATIONS)
-        if SGF is not None:
-            cmd += "-sgf {} ".format(SGF)
-        if DGF is not None:
-            cmd += "-dgf {} ".format(DGF)
-        if PRE_LAYOUT_ITERATIONS is not None:
-            cmd += "-prelayoutiterations {}".format(PRE_LAYOUT_ITERATIONS)
+        for inputpath in INPUT_VALUES:
+            # build cmd string
+            cmd = "{} run -p {} -c {} {} ".format(FLINK, parallelism, CLASS, JAR)
+            cmd += "-input {} -output {} -statistics {} ".format(inputpath, OUTPUT, STATISTICS)
+            cmd += "-width {} -height {} -vertices {} ".format(WIDTH, HEIGHT, VERTICES)
+            cmd += "-iterations {} ".format(ITERATIONS)
+            if SGF is not None:
+                cmd += "-sgf {} ".format(SGF)
+            if DGF is not None:
+                cmd += "-dgf {} ".format(DGF)
+            if PRE_LAYOUT_ITERATIONS is not None:
+                cmd += "-prelayoutiterations {}".format(PRE_LAYOUT_ITERATIONS)
 
-        print('Running command:\n================\n\n' + ' ' + cmd)
+            print('Running command:\n================\n\n' + ' ' + cmd)
 
-        repeat = config.getint('SYSTEM', 'repeat')
-        for i in range(repeat):
-            print('\n+++ REPEAT {}/{} +++'.format(str(i + 1), str(repeat)))
-            subprocess.check_call(cmd.split(' '))
+            repeat = config.getint('SYSTEM', 'repeat')
+            for i in range(repeat):
+                print('\n+++ REPEAT {}/{} +++'.format(str(i + 1), str(repeat)))
+                #subprocess.check_call(cmd.split(' '))
+                print('HIT')
 
 
 def check_section(config, section_name) -> None:
@@ -101,8 +103,9 @@ def build_params(config) -> None:
     check_section(config, benchmark_section_name)
 
     if config.has_option(benchmark_section_name, 'inputpath'):
-        global INPUT
-        INPUT = config.get(benchmark_section_name, 'inputpath')
+        global INPUT_VALUES
+        inputpaths = config.get(benchmark_section_name, 'inputpath')
+        INPUT_VALUES = inputpaths.split(',')
     else:
         raise RuntimeError('Error while reading config: missing input path.')
 
