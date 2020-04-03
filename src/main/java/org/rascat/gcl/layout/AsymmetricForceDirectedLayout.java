@@ -68,6 +68,10 @@ public class AsymmetricForceDirectedLayout extends AbstractGraphCollectionLayout
     return new Builder(width, height);
   }
 
+  public static Builder builder(int numVertices) {
+    return new Builder(numVertices);
+  }
+
   @Override
   public GraphCollection execute(GraphCollection collection) throws Exception {
     DataSet<EPGMEdge> edges = collection.getEdges();
@@ -171,7 +175,7 @@ public class AsymmetricForceDirectedLayout extends AbstractGraphCollectionLayout
     private final int height;
 
     // optional
-    private double k = -1;
+    private double k = 100;
     private int iterations = 1;
     private boolean isIntermediary = false;
     private MapFunction<EPGMVertex, EPGMVertex> initialLayout; // we initialize this during build()
@@ -188,6 +192,13 @@ public class AsymmetricForceDirectedLayout extends AbstractGraphCollectionLayout
     private Builder(int width, int height) {
       this.width = width;
       this.height = height;
+    }
+
+    private Builder(int numVertices) {
+      int a = (int) Math.sqrt((k * k) * numVertices);
+      this.numVertices = numVertices;
+      this.width = a;
+      this.height = a;
     }
 
     /**

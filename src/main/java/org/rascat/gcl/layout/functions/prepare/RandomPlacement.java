@@ -16,6 +16,8 @@ public class RandomPlacement<T extends Element> implements MapFunction<T, T> {
     private int upperBoundX;
     private int upperBoundY;
 
+    public RandomPlacement() {}
+
     public RandomPlacement(int upperBoundX, int upperBoundY) {
         this.upperBoundX = upperBoundX;
         this.upperBoundY = upperBoundY;
@@ -25,6 +27,38 @@ public class RandomPlacement<T extends Element> implements MapFunction<T, T> {
         this(upperBoundX, upperBoundY);
         this.lowerBoundX = lowerBoundX;
         this.lowerBoundY = lowerBoundY;
+    }
+
+    public int getLowerBoundX() {
+        return lowerBoundX;
+    }
+
+    public void setLowerBoundX(int lowerBoundX) {
+        this.lowerBoundX = lowerBoundX;
+    }
+
+    public int getLowerBoundY() {
+        return lowerBoundY;
+    }
+
+    public void setLowerBoundY(int lowerBoundY) {
+        this.lowerBoundY = lowerBoundY;
+    }
+
+    public int getUpperBoundX() {
+        return upperBoundX;
+    }
+
+    public void setUpperBoundX(int upperBoundX) {
+        this.upperBoundX = upperBoundX;
+    }
+
+    public int getUpperBoundY() {
+        return upperBoundY;
+    }
+
+    public void setUpperBoundY(int upperBoundY) {
+        this.upperBoundY = upperBoundY;
     }
 
     @Override

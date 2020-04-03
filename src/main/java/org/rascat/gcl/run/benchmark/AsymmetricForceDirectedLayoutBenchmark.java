@@ -37,8 +37,6 @@ public class AsymmetricForceDirectedLayoutBenchmark {
     INPUT_PATH = params.inputPath();
     OUTPUT_PATH = params.outputPath();
     STATISTICS_PATH = params.statistics("out/statistics.csv");
-    WIDTH = params.width(1000);
-    HEIGHT = params.height(1000);
     VERTICES = params.vertices(0);
     SGF = params.sameGraphFactor(1);
     DGF = params.differentGraphFactor(1);
@@ -50,15 +48,16 @@ public class AsymmetricForceDirectedLayoutBenchmark {
     DataSource source = new CSVDataSource(INPUT_PATH, cfg);
     GraphCollection collection = source.getGraphCollection();
 
-    AsymmetricForceDirectedLayout layout = AsymmetricForceDirectedLayout.builder(WIDTH, HEIGHT)
-      .initialLayout(new RandomPlacement<>(WIDTH / 10, HEIGHT / 10, WIDTH - (WIDTH / 10), HEIGHT - (HEIGHT / 10)))
+    AsymmetricForceDirectedLayout layout = AsymmetricForceDirectedLayout.builder(VERTICES)
+      .initialLayout(new RandomPlacement<>())
       .attractiveForces(new WeightedAttractiveForces(SGF, 1))
       .repulsiveForces(new GridRepulsiveForces(new WeightedRepulsionFunction(1, DGF)))
       .iterations(ITERATIONS)
-      .numVertices(VERTICES)
       .build();
 
     collection = layout.execute(collection);
+    WIDTH = layout.getWidth();
+    HEIGHT = layout.getHeight();
 
     DataSink sink = new CSVDataSink(OUTPUT_PATH, cfg);
     collection.writeTo(sink, true);
@@ -75,10 +74,11 @@ public class AsymmetricForceDirectedLayoutBenchmark {
    */
   private static void writeStatistics(ExecutionEnvironment env) throws IOException {
 
-    String template = "%s|%s|%s|%s|%s|%s|%s|%s|%s%n";
+    String template = "|%s|%s|%s|%s|%s|%s|%s|%s|%s|%s%n";
 
     String head = String.format(
       template,
+      "Class",
       "Parallelism",
       "Dataset",
       "Runtime",
@@ -92,6 +92,7 @@ public class AsymmetricForceDirectedLayoutBenchmark {
 
     String tail = String.format(
       template,
+      "AsymmetricForceDirectedLayout",
       env.getParallelism(),
       INPUT_PATH,
       env.getLastJobExecutionResult().getNetRuntime(TimeUnit.SECONDS),

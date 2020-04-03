@@ -31,8 +31,6 @@ public class SuperVertexLayoutBenchmark {
     INPUT_PATH = params.inputPath();
     OUTPUT_PATH = params.outputPath();
     STATISTICS_PATH = params.statistics("out/statistics.csv");
-    WIDTH = params.width(1000);
-    HEIGHT = params.height(1000);
     VERTICES = params.vertices(100);
     PRE_LAYOUT_ITERATIONS = params.preLayoutIterations(1);
     ITERATIONS = params.iterations(1);
@@ -43,13 +41,15 @@ public class SuperVertexLayoutBenchmark {
     DataSource source = new CSVDataSource(INPUT_PATH, cfg);
     GraphCollection collection = source.getGraphCollection();
 
-    SuperVertexLayout layout = SuperVertexLayout.builder(WIDTH, HEIGHT)
+    SuperVertexLayout layout = SuperVertexLayout.builder(VERTICES)
       .preLayoutIterations(PRE_LAYOUT_ITERATIONS)
       .iterations(ITERATIONS)
       .superKFactor(3D)
       .build();
 
     collection = layout.execute(collection);
+    WIDTH = layout.getWidth();
+    HEIGHT = layout.getHeight();
 
     DataSink sink = new CSVDataSink(OUTPUT_PATH, cfg);
     collection.writeTo(sink, true);
@@ -66,10 +66,11 @@ public class SuperVertexLayoutBenchmark {
    */
   private static void writeStatistics(ExecutionEnvironment env) throws IOException {
 
-    String template = "%s|%s|%s|%s|%s|%s|%s|%s%n";
+    String template = "%s|%s|%s|%s|%s|%s|%s|%s|%s%n";
 
     String head = String.format(
       template,
+      "Class",
       "Parallelism",
       "Dataset",
       "Runtime",
@@ -82,6 +83,7 @@ public class SuperVertexLayoutBenchmark {
 
     String tail = String.format(
       template,
+      "SuperVertexLayout",
       env.getParallelism(),
       INPUT_PATH,
       env.getLastJobExecutionResult().getNetRuntime(TimeUnit.SECONDS),

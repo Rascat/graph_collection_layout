@@ -23,9 +23,8 @@ import static org.rascat.gcl.util.GraphCollectionLoader.*;
 public class Workbench {
     public static void main(@NotNull String[] args) throws Exception {
         LayoutParameters params = new LayoutParameters(args);
-        int height = params.height(1000);
-        int width = params.width(1000);
         int iterations = params.iterations(10);
+        int numVertices = params.vertices(20);
         double  sameGraphFactor = params.sameGraphFactor(1);
         double differentGraphFactor = params.differentGraphFactor(1);
         boolean isIntermediary = params.isIntermediary();
@@ -33,14 +32,13 @@ public class Workbench {
         String inputPath = params.inputPath();
         InputFormat inputFormat = params.inputFormat(InputFormat.GDL);
 
-        ExecutionEnvironment env = ExecutionEnvironment.createLocalEnvironment();
+        ExecutionEnvironment env = ExecutionEnvironment.getExecutionEnvironment();
         GradoopFlinkConfig cfg = GradoopFlinkConfig.createConfig(env);
         GraphCollectionLoader loader = new GraphCollectionLoader(cfg);
 
         GraphCollection collection = loader.load(inputPath, inputFormat);
 
-        AsymmetricForceDirectedLayout layout = AsymmetricForceDirectedLayout.builder(width, height)
-          .initialLayout(new RandomPlacement<>(width / 10, height / 10, width - (width / 10), height - (height / 10)))
+        AsymmetricForceDirectedLayout layout = AsymmetricForceDirectedLayout.builder(numVertices)
           .attractiveForces(new WeightedAttractiveForces(sameGraphFactor, 1))
           .repulsiveForces(new GridRepulsiveForces(new WeightedRepulsionFunction(1, differentGraphFactor)))
           .isIntermediary(isIntermediary)
@@ -64,7 +62,7 @@ public class Workbench {
         String pngFileName = String.format("%s%c%d-%.0f-%.0f.png",
           outputPath, File.separatorChar, iterations, sameGraphFactor, differentGraphFactor);
 
-        Render render = new Render(height, width, pngFileName);
+        Render render = new Render(layout.getHeight(), layout.getWidth(), pngFileName);
         render.renderGraphCollection(layoutCollection, env);
     }
 }

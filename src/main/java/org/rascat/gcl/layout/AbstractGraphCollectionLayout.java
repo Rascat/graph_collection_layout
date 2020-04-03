@@ -22,6 +22,14 @@ public abstract class AbstractGraphCollectionLayout {
     return this.width * this.height;
   }
 
+  public int getHeight() {
+    return this.height;
+  }
+
+  public int getWidth() {
+    return this.width;
+  }
+
   /**
    * Compute 2D-embedding for the given graph collection. The resulting position of each vertex from the input graph
    * collection is annotated as properties with the keys 'X' and 'Y'.

@@ -17,13 +17,12 @@ public class SuperVertexLayoutWorkbench {
     LayoutParameters params = new LayoutParameters(args);
     String outputPath = params.outputPath();
     String inputPath = params.inputPath();
-    int height = params.height(1000);
-    int width = params.width(1000);
     int iterations = params.iterations(10);
-    int preLayoutIterations = params.preLayoutIterations(5);
+    int preLayoutIterations = params.preLayoutIterations(7);
+    int numVertices = params.vertices(20);
     GraphCollectionLoader.InputFormat inputFormat = params.inputFormat(GraphCollectionLoader.InputFormat.GDL);
 
-    ExecutionEnvironment env = ExecutionEnvironment.createLocalEnvironment();
+    ExecutionEnvironment env = ExecutionEnvironment.getExecutionEnvironment();
     GradoopFlinkConfig cfg = GradoopFlinkConfig.createConfig(env);
     GraphCollectionLoader loader = new GraphCollectionLoader(cfg);
 
@@ -31,7 +30,7 @@ public class SuperVertexLayoutWorkbench {
 
     double superKFactor = 4D;
 
-    SuperVertexLayout layout = SuperVertexLayout.builder(width, height)
+    SuperVertexLayout layout = SuperVertexLayout.builder(numVertices)
       .iterations(iterations)
       .preLayoutIterations(preLayoutIterations)
       .superKFactor(superKFactor)
@@ -50,7 +49,7 @@ public class SuperVertexLayoutWorkbench {
     DOTDataSink sink = new DOTDataSink(filename + ".dot", true, DOTDataSink.DotFormat.SIMPLE);
     collection.writeTo(sink, true);
 
-    Render render = new Render(height, width, filename + ".png");
+    Render render = new Render(layout.getHeight(), layout.getWidth(), filename + ".png");
     render.renderGraphCollection(collection, env);
   }
 }
