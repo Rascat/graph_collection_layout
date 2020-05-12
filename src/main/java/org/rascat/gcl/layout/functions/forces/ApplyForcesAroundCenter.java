@@ -48,14 +48,14 @@ public class ApplyForcesAroundCenter extends RichJoinFunction<EPGMVertex, Force,
       newPosition = vPosition.add(Vector2D.ZERO);
     }
 
+    // Restrict position to super vertex layout space
+    Double distance = newPosition.distance(vCenter);
+    if (distance > radius) {
+      newPosition = newPosition.normalize().scalarMultiply(radius);
+    }
+
     double newX = newPosition.getX();
     double newY = newPosition.getY();
-    double centerX = vCenter.getX();
-    double centerY = vCenter.getY();
-
-    // Restrict position to super vertex layout space
-    newX = Math.min(centerX + radius, Math.max(centerX - radius, newX));
-    newY = Math.min(centerY + radius, Math.max(centerY - radius, newY));
 
     // Restrict position to total layout space
     newX = Math.min(width, Math.max(0, newX));
