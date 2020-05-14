@@ -48,10 +48,14 @@ public class ApplyForcesAroundCenter extends RichJoinFunction<EPGMVertex, Force,
       newPosition = vPosition.add(Vector2D.ZERO);
     }
 
-    // Restrict position to super vertex layout space
+    // Restrict position to super vertex layout space by computing the difference vector
+    // between the graph center and the vertex. The vector is then scaled to length of the
+    // radius and added to the graph center to yield the new position.
     Double distance = newPosition.distance(vCenter);
     if (distance > radius) {
-      newPosition = newPosition.normalize().scalarMultiply(radius);
+      newPosition = newPosition.subtract(vCenter);
+      newPosition.normalize().scalarMultiply(radius);
+      newPosition = vCenter.add(newPosition);
     }
 
     double newX = newPosition.getX();
