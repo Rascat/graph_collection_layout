@@ -53,9 +53,9 @@ public class ApplyForcesAroundCenter extends RichJoinFunction<EPGMVertex, Force,
     // radius and added to the graph center to yield the new position.
     Double distance = newPosition.distance(vCenter);
     if (distance > radius) {
-      newPosition = newPosition.subtract(vCenter);
-      newPosition.normalize().scalarMultiply(radius);
-      newPosition = vCenter.add(newPosition);
+      Vector2D difference  = newPosition.subtract(vCenter);
+      difference = difference.normalize().scalarMultiply(radius);
+      newPosition = vCenter.add(difference);
     }
 
     double newX = newPosition.getX();

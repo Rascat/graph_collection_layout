@@ -63,14 +63,14 @@ public class ApplyForcesAroundCenterTest {
   public void testJoinOffCenterArea() {
     ApplyForcesAroundCenter function = new ApplyForcesAroundCenter(10, 10, 3D, this.scheduleMock);
 
-    EPGMVertex vertex = createVertexWithCenter(2, 4, 5 , 5);
+    EPGMVertex vertex = createVertexWithCenter(5, 1, 5 , 5);
 
-    Force force = new Force(vertex.getId(), new Vector2D(-2, 0));
+    Force force = new Force(vertex.getId(), new Vector2D(0, -1));
 
     EPGMVertex actualVertex = function.join(vertex, force);
     Point actualPoint = Point.fromEPGMElement(actualVertex);
 
-    assertEquals(actualPoint, new Point(2,4));
+    assertEquals(actualPoint, new Point(5,2));
   }
 
   private EPGMVertex createVertexWithCenter(double x, double y, double cx, double cy) {

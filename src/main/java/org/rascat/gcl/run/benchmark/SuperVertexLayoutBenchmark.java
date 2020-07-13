@@ -14,6 +14,7 @@ import org.rascat.gcl.util.LayoutParameters;
 import java.io.File;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.time.Instant;
 import java.util.concurrent.TimeUnit;
 
 public class SuperVertexLayoutBenchmark {
@@ -30,7 +31,7 @@ public class SuperVertexLayoutBenchmark {
     LayoutParameters params = new LayoutParameters(args);
     INPUT_PATH = params.inputPath();
     OUTPUT_PATH = params.outputPath();
-    STATISTICS_PATH = params.statistics("out/statistics.csv");
+    STATISTICS_PATH = params.statistics("out/svl_statistics.csv");
     VERTICES = params.vertices(100);
     PRE_LAYOUT_ITERATIONS = params.preLayoutIterations(1);
     ITERATIONS = params.iterations(1);
@@ -66,7 +67,7 @@ public class SuperVertexLayoutBenchmark {
    */
   private static void writeStatistics(ExecutionEnvironment env) throws IOException {
 
-    String template = "%s|%s|%s|%s|%s|%s|%s|%s|%s%n";
+    String template = "%s|%s|%s|%s|%s|%s|%s|%s|%s|%s%n";
 
     String head = String.format(
       template,
@@ -78,7 +79,8 @@ public class SuperVertexLayoutBenchmark {
       "Height",
       "Vertices",
       "Iterations",
-      "Pre-Layout-Iterations"
+      "Pre-Layout-Iterations",
+      "Timestamp"
     );
 
     String tail = String.format(
@@ -91,7 +93,8 @@ public class SuperVertexLayoutBenchmark {
       HEIGHT,
       VERTICES,
       ITERATIONS,
-      PRE_LAYOUT_ITERATIONS
+      PRE_LAYOUT_ITERATIONS,
+      Instant.now().toString()
     );
 
     File f = new File(STATISTICS_PATH);
