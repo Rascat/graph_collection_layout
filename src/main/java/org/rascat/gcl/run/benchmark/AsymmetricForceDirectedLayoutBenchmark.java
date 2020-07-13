@@ -18,6 +18,7 @@ import org.rascat.gcl.util.LayoutParameters;
 import java.io.File;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.time.Instant;
 import java.util.concurrent.TimeUnit;
 
 public class AsymmetricForceDirectedLayoutBenchmark {
@@ -74,7 +75,7 @@ public class AsymmetricForceDirectedLayoutBenchmark {
    */
   private static void writeStatistics(ExecutionEnvironment env) throws IOException {
 
-    String template = "|%s|%s|%s|%s|%s|%s|%s|%s|%s|%s%n";
+    String template = "|%s|%s|%s|%s|%s|%s|%s|%s|%s|%s|%s%n";
 
     String head = String.format(
       template,
@@ -87,7 +88,8 @@ public class AsymmetricForceDirectedLayoutBenchmark {
       "Vertices",
       "Iterations",
       "SGF",
-      "DGF"
+      "DGF",
+      "Timestamp"
     );
 
     String tail = String.format(
@@ -101,7 +103,8 @@ public class AsymmetricForceDirectedLayoutBenchmark {
       VERTICES,
       ITERATIONS,
       SGF,
-      DGF
+      DGF,
+      Instant.now().toString()
     );
 
     File f = new File(STATISTICS_PATH);
