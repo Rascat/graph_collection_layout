@@ -10,14 +10,13 @@ import org.gradoop.flink.model.impl.epgm.LogicalGraph;
 import org.gradoop.flink.model.impl.operators.sampling.RandomVertexEdgeSampling;
 import org.gradoop.flink.model.impl.operators.sampling.SamplingAlgorithm;
 import org.gradoop.flink.util.GradoopFlinkConfig;
-import org.jetbrains.annotations.NotNull;
 import org.rascat.gcl.util.Logger;
 
 import java.util.Objects;
 
 public class Main {
 
-    public static void main(@NotNull String[] args) throws Exception {
+    public static void main(String[] args) throws Exception {
         String pathToCsv = Objects.requireNonNull(args[0]);
         String pathToOutput = Objects.requireNonNull(args[1]);
 

@@ -4,11 +4,9 @@ import org.apache.flink.api.java.ExecutionEnvironment;
 import org.gradoop.flink.io.impl.dot.DOTDataSink;
 import org.gradoop.flink.model.impl.epgm.GraphCollection;
 import org.gradoop.flink.util.GradoopFlinkConfig;
-import org.jetbrains.annotations.NotNull;
 import org.rascat.gcl.layout.functions.forces.repulsive.GridRepulsiveForces;
 import org.rascat.gcl.layout.functions.forces.attractive.WeightedAttractiveForces;
 import org.rascat.gcl.layout.functions.forces.repulsive.WeightedRepulsionFunction;
-import org.rascat.gcl.layout.functions.prepare.RandomPlacement;
 import org.rascat.gcl.layout.functions.prepare.SetGraphIdsProperty;
 import org.rascat.gcl.layout.functions.prepare.SetPosProperty;
 import org.rascat.gcl.layout.AsymmetricForceDirectedLayout;
@@ -21,7 +19,7 @@ import java.io.File;
 import static org.rascat.gcl.util.GraphCollectionLoader.*;
 
 public class Workbench {
-    public static void main(@NotNull String[] args) throws Exception {
+    public static void main(String[] args) throws Exception {
         LayoutParameters params = new LayoutParameters(args);
         int iterations = params.iterations(10);
         int numVertices = params.vertices(20);

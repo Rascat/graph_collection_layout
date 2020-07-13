@@ -3,7 +3,6 @@ package org.rascat.gcl.layout.functions.forces.repulsive;
 import org.apache.commons.math3.exception.MathArithmeticException;
 import org.apache.commons.math3.geometry.euclidean.twod.Vector2D;
 import org.gradoop.common.model.impl.pojo.EPGMVertex;
-import org.jetbrains.annotations.NotNull;
 import org.rascat.gcl.layout.model.Force;
 
 public class WeightedRepulsionFunction extends RepulsionFunction {
@@ -47,7 +46,6 @@ public class WeightedRepulsionFunction extends RepulsionFunction {
     return getWeightedForce(v, u);
   }
 
-  @NotNull
   private Force getWeightedForce(EPGMVertex v, EPGMVertex u) {
     boolean sameGraph = u.getGraphIds().containsAny(v.getGraphIds());
 

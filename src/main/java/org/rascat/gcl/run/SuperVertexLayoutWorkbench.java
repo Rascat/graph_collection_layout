@@ -4,7 +4,6 @@ import org.apache.flink.api.java.ExecutionEnvironment;
 import org.gradoop.flink.io.impl.dot.DOTDataSink;
 import org.gradoop.flink.model.impl.epgm.GraphCollection;
 import org.gradoop.flink.util.GradoopFlinkConfig;
-import org.jetbrains.annotations.NotNull;
 import org.rascat.gcl.io.Render;
 import org.rascat.gcl.layout.SuperVertexLayout;
 import org.rascat.gcl.layout.functions.prepare.SetGraphIdsProperty;
@@ -13,7 +12,7 @@ import org.rascat.gcl.util.GraphCollectionLoader;
 import org.rascat.gcl.util.LayoutParameters;
 
 public class SuperVertexLayoutWorkbench {
-  public static void main(@NotNull String[] args) throws Exception {
+  public static void main(String[] args) throws Exception {
     LayoutParameters params = new LayoutParameters(args);
     String outputPath = params.outputPath();
     String inputPath = params.inputPath();
