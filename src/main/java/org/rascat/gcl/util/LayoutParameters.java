@@ -16,6 +16,7 @@ public class LayoutParameters {
   private final String PARAM_WIDTH = "width";
   private final String PARAM_HEIGHT = "height";
   private final String PARAM_VERTICES = "vertices";
+  private final String PARAM_GRAPHS = "graphs";
   private final String PARAM_INTERMEDIARY = "intermediary";
   private final String PARAM_COMBI_LAYOUT_QUALITY = "quality";
   private final String PARAM_FUSING_LAYOUT_THRESHOLD = "threshold";
@@ -60,6 +61,11 @@ public class LayoutParameters {
   public int vertices(int defaultValue) {
     return cmd.getOptionValue(PARAM_VERTICES) == null ? defaultValue
       : Integer.parseInt(cmd.getOptionValue(PARAM_VERTICES));
+  }
+
+  public int graphs(int defaultValue) {
+    return cmd.getOptionValue(PARAM_GRAPHS) == null ? defaultValue
+      : Integer.parseInt(cmd.getOptionValue(PARAM_GRAPHS));
   }
 
   public boolean isIntermediary() {
@@ -148,6 +154,12 @@ public class LayoutParameters {
       .desc("Number of vertices in the input graph.")
       .build();
 
+    Option graphs = Option.builder(PARAM_GRAPHS)
+      .required(false)
+      .hasArg(true)
+      .desc("Number of graphs in the input graph collection.")
+      .build();
+
     Option quality = Option.builder(PARAM_COMBI_LAYOUT_QUALITY)
       .required(false)
       .hasArg(true)
@@ -205,7 +217,8 @@ public class LayoutParameters {
       .addOption(differentGraphFactor)
       .addOption(inputFormat)
       .addOption(preLayoutIterations)
-      .addOption(statistics);
+      .addOption(statistics)
+      .addOption(graphs);
   }
 
 }

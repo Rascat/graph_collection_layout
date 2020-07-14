@@ -24,6 +24,7 @@ public class SuperVertexLayoutBenchmark {
   private static int WIDTH;
   private static int HEIGHT;
   private static int VERTICES;
+  private static int GRAPHS;
   private static int PRE_LAYOUT_ITERATIONS;
   private static int ITERATIONS;
 
@@ -33,6 +34,7 @@ public class SuperVertexLayoutBenchmark {
     OUTPUT_PATH = params.outputPath();
     STATISTICS_PATH = params.statistics("out/svl_statistics.csv");
     VERTICES = params.vertices(100);
+    GRAPHS = params.graphs(1000);
     PRE_LAYOUT_ITERATIONS = params.preLayoutIterations(1);
     ITERATIONS = params.iterations(1);
 
@@ -42,7 +44,7 @@ public class SuperVertexLayoutBenchmark {
     DataSource source = new CSVDataSource(INPUT_PATH, cfg);
     GraphCollection collection = source.getGraphCollection();
 
-    SuperVertexLayout layout = SuperVertexLayout.builder(VERTICES)
+    SuperVertexLayout layout = SuperVertexLayout.builder(VERTICES, GRAPHS)
       .preLayoutIterations(PRE_LAYOUT_ITERATIONS)
       .iterations(ITERATIONS)
       .superKFactor(3D)

@@ -47,6 +47,7 @@ public class SuperVertexLayout extends AbstractGraphCollectionLayout {
   private double superK;
   private double superKFactor;
   private int numVertices;
+  private int numGraphs;
   private int iterations;
   private int centerLayoutIterations;
   private StandardRepulsionFunction repulsionFunction;
@@ -65,21 +66,11 @@ public class SuperVertexLayout extends AbstractGraphCollectionLayout {
     this.superK = builder.superK;
     this.superKFactor = builder.superKFactor;
     this.numVertices = builder.numVertices;
+    this.numGraphs = builder.numGraphs;
   }
 
-  /**
-   * Static method used to retrieve a {@link Builder} object.
-   *
-   * @param width  the total width of the layout space in px
-   * @param height the total height of the layout space in px
-   * @return a new instance of Builder.
-   */
-  public static Builder builder(int width, int height) {
-    return new Builder(width, height);
-  }
-
-  public static Builder builder(int numVertices) {
-    return new Builder(numVertices);
+  public static Builder builder(int numVertices, int numGraphs) {
+    return new Builder(numVertices, numGraphs);
   }
 
   @Override
@@ -106,7 +97,7 @@ public class SuperVertexLayout extends AbstractGraphCollectionLayout {
     LogicalGraph superGraph = reduce.transform(collection);
 
     // create layout for super graph
-    initSuperGraphLayout(superGraph);
+    initSuperGraphLayout(superGraph, numGraphs);
     superGraph = superGraphLayout.execute(superGraph);
 
     DataSet<EPGMVertex> centeredVertices =
@@ -164,20 +155,22 @@ public class SuperVertexLayout extends AbstractGraphCollectionLayout {
     return positionedEdges.flatMap(this.attractionFunction);
   }
 
+
   /**
    * Initialize the FRLayouter object responsible for the computation of the center graph layout.
    *
    * @param graph the center graph
+   * @param superGraphVertexCount number of vertices in the center graph
+   *
    * @throws Exception if something goes wrong
    */
-  private void initSuperGraphLayout(LogicalGraph graph) throws Exception {
-    long superGraphVertexCount = graph.getVertices().count();
+  private void initSuperGraphLayout(LogicalGraph graph, int superGraphVertexCount) throws Exception {
     // compute superK if not set to certain value
     if (Double.compare(superK, -1) == 0) {
-      this.superK = computeK((int) superGraphVertexCount) * superKFactor;
+      this.superK = computeK(superGraphVertexCount) * superKFactor;
     }
 
-    this.superGraphLayout = new FRLayouter(centerLayoutIterations, (int) superGraphVertexCount);
+    this.superGraphLayout = new FRLayouter(centerLayoutIterations, superGraphVertexCount);
     this.superGraphLayout.k(superK);
     this.superGraphLayout.area(width, height);
   }
@@ -215,23 +208,21 @@ public class SuperVertexLayout extends AbstractGraphCollectionLayout {
     private double superK = -1;
     private int iterations = 1;
     private int numVertices = 0;
+    private int numGraphs = 0;
     private int preLayoutIterations = 1;
     private double superKFactor = 1;
-
-    /**
-     * Private constructor used by {@link SuperVertexLayout#builder(int, int)}.
-     *
-     * @param width  the width of the total layout space
-     * @param height the height of the total layout space
-     */
-    private Builder(int width, int height) {
-      this.width = width;
-      this.height = height;
-    }
 
     private Builder(int numVertices) {
       int a = (int) Math.sqrt((k * k) * numVertices);
       this.numVertices = numVertices;
+      this.width = a;
+      this.height = a;
+    }
+
+    private Builder(int numVertices, int numGraphs) {
+      int a = (int) Math.sqrt((k * k) * numVertices);
+      this.numVertices = numVertices;
+      this.numGraphs = numGraphs;
       this.width = a;
       this.height = a;
     }
@@ -258,6 +249,15 @@ public class SuperVertexLayout extends AbstractGraphCollectionLayout {
 
       this.numVertices = vertices;
       return  this;
+    }
+
+    public Builder graphs(int numGraphs) {
+      if (numGraphs <= 0) {
+        throw new IllegalArgumentException("Number of graphs must be > 0");
+      }
+
+      this.numGraphs = numGraphs;
+      return this;
     }
 
     /**

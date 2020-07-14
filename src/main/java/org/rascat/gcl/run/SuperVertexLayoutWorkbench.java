@@ -19,6 +19,7 @@ public class SuperVertexLayoutWorkbench {
     int iterations = params.iterations(10);
     int preLayoutIterations = params.preLayoutIterations(7);
     int numVertices = params.vertices(20);
+    int numGraphs = params.graphs(5);
     GraphCollectionLoader.InputFormat inputFormat = params.inputFormat(GraphCollectionLoader.InputFormat.GDL);
 
     ExecutionEnvironment env = ExecutionEnvironment.getExecutionEnvironment();
@@ -27,9 +28,9 @@ public class SuperVertexLayoutWorkbench {
 
     GraphCollection collection = loader.load(inputPath, inputFormat);
 
-    double superKFactor = 4D;
+    double superKFactor = 3D;
 
-    SuperVertexLayout layout = SuperVertexLayout.builder(numVertices)
+    SuperVertexLayout layout = SuperVertexLayout.builder(numVertices, numGraphs)
       .iterations(iterations)
       .preLayoutIterations(preLayoutIterations)
       .superKFactor(superKFactor)
