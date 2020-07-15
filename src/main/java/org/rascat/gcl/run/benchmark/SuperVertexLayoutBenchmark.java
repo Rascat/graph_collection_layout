@@ -69,7 +69,7 @@ public class SuperVertexLayoutBenchmark {
    */
   private static void writeStatistics(ExecutionEnvironment env) throws IOException {
 
-    String template = "%s|%s|%s|%s|%s|%s|%s|%s|%s|%s%n";
+    String template = "%s|%s|%s|%s|%s|%s|%s|%s|%s|%s|%s%n";
 
     String head = String.format(
       template,
@@ -80,6 +80,7 @@ public class SuperVertexLayoutBenchmark {
       "Width",
       "Height",
       "Vertices",
+      "Graphs",
       "Iterations",
       "Pre-Layout-Iterations",
       "Timestamp"
@@ -94,6 +95,7 @@ public class SuperVertexLayoutBenchmark {
       WIDTH,
       HEIGHT,
       VERTICES,
+      GRAPHS,
       ITERATIONS,
       PRE_LAYOUT_ITERATIONS,
       Instant.now().toString()
