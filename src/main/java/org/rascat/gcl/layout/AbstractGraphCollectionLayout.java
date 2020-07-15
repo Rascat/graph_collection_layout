@@ -18,8 +18,9 @@ public abstract class AbstractGraphCollectionLayout {
    *
    * @return the area
    */
-  public int area() {
-    return this.width * this.height;
+  public long area() {
+    // cast to long to prevent int overflow
+    return (long) this.width * this.height;
   }
 
   public int getHeight() {
