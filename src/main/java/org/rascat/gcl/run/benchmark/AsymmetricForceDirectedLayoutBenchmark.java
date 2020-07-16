@@ -50,7 +50,6 @@ public class AsymmetricForceDirectedLayoutBenchmark {
     GraphCollection collection = source.getGraphCollection();
 
     AsymmetricForceDirectedLayout layout = AsymmetricForceDirectedLayout.builder(VERTICES)
-      .initialLayout(new RandomPlacement<>())
       .attractiveForces(new WeightedAttractiveForces(SGF, 1))
       .repulsiveForces(new GridRepulsiveForces(new WeightedRepulsionFunction(1, DGF)))
       .iterations(ITERATIONS)
