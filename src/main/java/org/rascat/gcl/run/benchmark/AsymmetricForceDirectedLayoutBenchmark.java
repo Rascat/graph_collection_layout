@@ -62,7 +62,8 @@ public class AsymmetricForceDirectedLayoutBenchmark {
     DataSink sink = new CSVDataSink(OUTPUT_PATH, cfg);
     collection.writeTo(sink, true);
 
-    env.execute();
+    env.execute("AsymmetricForceDirectedBenchmark (" +
+      "v=" + VERTICES + ",i=" + ITERATIONS + ",sgf=" + SGF + ",dgf=" + DGF + ")");
     writeStatistics(env);
   }
 
@@ -74,7 +75,7 @@ public class AsymmetricForceDirectedLayoutBenchmark {
    */
   private static void writeStatistics(ExecutionEnvironment env) throws IOException {
 
-    String template = "|%s|%s|%s|%s|%s|%s|%s|%s|%s|%s|%s%n";
+    String template = "%s|%s|%s|%s|%s|%s|%s|%s|%s|%s|%s%n";
 
     String head = String.format(
       template,

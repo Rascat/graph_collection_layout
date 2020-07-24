@@ -57,7 +57,8 @@ public class SuperVertexLayoutBenchmark {
     DataSink sink = new CSVDataSink(OUTPUT_PATH, cfg);
     collection.writeTo(sink, true);
 
-    env.execute();
+    env.execute("SuperVertexLayoutBenchmark (" +
+      "v=" + VERTICES + ",g=" + GRAPHS + ",pi=" + PRE_LAYOUT_ITERATIONS + ",i=" + ITERATIONS + ")");
     writeStatistics(env);
   }
 
