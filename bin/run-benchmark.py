@@ -11,9 +11,8 @@ PARALLELISM_VALUES = []
 INPUT_VALUES = []
 OUTPUT = ""
 STATISTICS = ""
-WIDTH = ""
-HEIGHT = ""
 VERTICES = ""
+GRAPHS = None
 ITERATIONS = ""
 SGF = None
 DGF = None
@@ -37,14 +36,20 @@ def main():
             # build cmd string
             cmd = "{} run -p {} -c {} {} ".format(FLINK, parallelism, CLASS, JAR)
             cmd += "-input {} -output {} -statistics {} ".format(inputpath, OUTPUT, STATISTICS)
-            cmd += "-width {} -height {} -vertices {} ".format(WIDTH, HEIGHT, VERTICES)
+            cmd += "-vertices {} ".format(VERTICES)
             cmd += "-iterations {} ".format(ITERATIONS)
+
             if SGF is not None:
                 cmd += "-sgf {} ".format(SGF)
+
             if DGF is not None:
                 cmd += "-dgf {} ".format(DGF)
+
             if PRE_LAYOUT_ITERATIONS is not None:
-                cmd += "-prelayoutiterations {}".format(PRE_LAYOUT_ITERATIONS)
+                cmd += "-prelayoutiterations {} ".format(PRE_LAYOUT_ITERATIONS)
+
+            if GRAPHS is not None:
+                cmd += "-graphs {} ".format(GRAPHS)
 
             print('Running command:\n================\n\n' + ' ' + cmd)
 
@@ -120,18 +125,6 @@ def build_params(config) -> None:
     else:
         raise RuntimeError('Error while reading config: missing statistics path.')
 
-    if config.has_option(benchmark_section_name, 'width'):
-        global WIDTH
-        WIDTH = config.get(benchmark_section_name, 'width')
-    else:
-        raise RuntimeError('Error while reading config: missing width.')
-
-    if config.has_option(benchmark_section_name, 'height'):
-        global HEIGHT
-        HEIGHT = config.get(benchmark_section_name, 'height')
-    else:
-        raise RuntimeError('Error while reading config: missing height.')
-
     if config.has_option(benchmark_section_name, 'vertices'):
         global VERTICES
         VERTICES = config.get(benchmark_section_name, 'vertices')
@@ -155,6 +148,10 @@ def build_params(config) -> None:
     if config.has_option(benchmark_section_name, 'prelayoutiterations'):
         global PRE_LAYOUT_ITERATIONS
         PRE_LAYOUT_ITERATIONS = config.get(benchmark_section_name, 'prelayoutiterations')
+
+    if config.has_option(benchmark_section_name, 'graphs'):
+        global GRAPHS
+        GRAPHS = config.get(benchmark_section_name, 'graphs')
 
 
 if __name__ == "__main__":
