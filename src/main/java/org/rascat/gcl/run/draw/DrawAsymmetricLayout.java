@@ -1,17 +1,16 @@
 package org.rascat.gcl.run.draw;
 
 import org.apache.flink.api.java.ExecutionEnvironment;
-import org.gradoop.flink.io.api.DataSink;
 import org.gradoop.flink.io.api.DataSource;
-import org.gradoop.flink.io.impl.csv.CSVDataSink;
 import org.gradoop.flink.io.impl.csv.CSVDataSource;
+import org.gradoop.flink.io.impl.image.ImageDataSink;
 import org.gradoop.flink.model.impl.epgm.GraphCollection;
 import org.gradoop.flink.util.GradoopFlinkConfig;
-import org.rascat.gcl.io.Render;
 import org.rascat.gcl.layout.AsymmetricForceDirectedLayout;
 import org.rascat.gcl.layout.functions.forces.attractive.WeightedAttractiveForces;
 import org.rascat.gcl.layout.functions.forces.repulsive.GridRepulsiveForces;
 import org.rascat.gcl.layout.functions.forces.repulsive.WeightedRepulsionFunction;
+import org.rascat.gcl.layout.functions.prepare.CastDoubleCoordToInt;
 import org.rascat.gcl.util.LayoutParameters;
 
 import java.io.File;
@@ -49,16 +48,19 @@ public class DrawAsymmetricLayout {
       .build();
 
     collection = layout.execute(collection);
+
+    // convert coordinate data type from double to int
+    collection = collection.callForCollection(new CastDoubleCoordToInt());
+
     WIDTH = layout.getWidth();
     HEIGHT = layout.getHeight();
 
-    DataSink sink = new CSVDataSink(OUTPUT_PATH, cfg);
-    collection.writeTo(sink, true);
-
-    String fileName = String.format("%s%cafdl-v=%d-i=%d-sgf=%f-dgf=%f-a=%dx%d.png",
+    String fileName = String.format("%s%cafdl-v=%d-i=%d-sgf=%.0f-dgf=%.0f-a=%dx%d.png",
       OUTPUT_PATH, File.separatorChar, VERTICES, ITERATIONS, SGF, DGF, WIDTH, HEIGHT);
 
-    Render render = new Render(layout.getHeight(), layout.getWidth(), fileName);
-    render.renderGraphCollection(collection, env);
+    ImageDataSink sink = new ImageDataSink(fileName, WIDTH, HEIGHT, WIDTH, HEIGHT);
+    sink.write(collection);
+
+    env.execute("DrawAsymmetricLayout with " + INPUT_PATH);
   }
 }
