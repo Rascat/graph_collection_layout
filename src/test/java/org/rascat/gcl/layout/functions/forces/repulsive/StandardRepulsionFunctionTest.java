@@ -5,6 +5,7 @@ import org.apache.flink.api.common.functions.util.ListCollector;
 import org.apache.flink.util.Collector;
 import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.common.model.impl.pojo.EPGMVertex;
+import org.rascat.gcl.layout.TestBase;
 import org.rascat.gcl.layout.model.Force;
 import org.rascat.gcl.layout.model.Point;
 import org.testng.annotations.BeforeMethod;
@@ -18,19 +19,14 @@ import java.util.List;
 import static org.rascat.gcl.layout.AbstractGraphCollectionLayout.*;
 import static org.testng.Assert.*;
 
-public class StandardRepulsionFunctionTest {
+public class StandardRepulsionFunctionTest extends TestBase {
 
   private StandardRepulsionFunction function;
   private List<Force> resultList;
   private Collector<Force> collector;
-  private final GradoopId vId = GradoopId.fromString("912345678910111213141516");
-  private final GradoopId uId = GradoopId.fromString("1AB363914FD1325CC43790AB");
-
-  public StandardRepulsionFunctionTest() {
-  }
 
   @BeforeTest
-  public void setUp() {
+  public void setUpRepulsionFunction() {
     this.function = new StandardRepulsionFunction();
     this.function.setK(7.5D);
   }
@@ -51,7 +47,7 @@ public class StandardRepulsionFunctionTest {
   @DataProvider
   public Object[][] testCrossProvider() {
     EPGMVertex v = createVertex(vId, 0, 0);
-    Force zeroForce = new Force(vId, new Vector2D(0, 0));
+    Force zeroForce = new Force(vId, Vector2D.ZERO);
 
     return new Object[][] {
       {v, v, zeroForce}
@@ -134,14 +130,5 @@ public class StandardRepulsionFunctionTest {
 
     assertNotEquals(vPos, uPos);
     assertTrue(resultList.get(0).getVector().getNorm() > 0);
-  }
-
-  private EPGMVertex createVertex(GradoopId id, double x, double y) {
-    EPGMVertex vertex = new EPGMVertex();
-    vertex.setId(id);
-    vertex.setProperty(KEY_X_COORD, x);
-    vertex.setProperty(KEY_Y_COORD, y);
-
-    return vertex;
   }
 }

@@ -186,7 +186,7 @@ public class SquareIdSelectorTest extends TestBase {
   }
 
   private EPGMVertex createVertexWithGridId(int gridId) {
-    EPGMVertex vertex = vertexFactory.createVertex();
+    EPGMVertex vertex = createVertex(0, 0);
     vertex.setProperty(SquareIdMapper.KEY_SQUARE_ID, gridId);
 
     return  vertex;
