@@ -34,6 +34,7 @@ import java.util.StringJoiner;
 public class AsymmetricForceDirectedLayout extends AbstractGraphCollectionLayout {
 
   private double k;
+  private double c = 3;
   private int numVertices;
   private final int iterations;
   private final boolean isIntermediaryLayout;
@@ -83,7 +84,7 @@ public class AsymmetricForceDirectedLayout extends AbstractGraphCollectionLayout
     }
 
     if (this.k == -1) {
-      this.k = Math.sqrt(area() / (double) this.numVertices) * 3;
+      this.k = Math.sqrt(area() / (double) this.numVertices) * c;
     }
 
     if (!isIntermediaryLayout) {
