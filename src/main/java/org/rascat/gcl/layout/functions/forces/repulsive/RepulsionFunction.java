@@ -2,6 +2,7 @@ package org.rascat.gcl.layout.functions.forces.repulsive;
 
 import org.apache.commons.math3.geometry.euclidean.twod.Vector2D;
 import org.apache.flink.api.common.functions.CrossFunction;
+import org.apache.flink.api.common.functions.FlatJoinFunction;
 import org.apache.flink.api.common.functions.JoinFunction;
 import org.gradoop.common.model.impl.pojo.EPGMVertex;
 import org.rascat.gcl.layout.model.Force;
@@ -14,7 +15,7 @@ import static org.rascat.gcl.layout.AbstractGraphCollectionLayout.KEY_Y_COORD;
 
 
 public abstract class RepulsionFunction implements JoinFunction<EPGMVertex, EPGMVertex, Force>,
-  CrossFunction<EPGMVertex, EPGMVertex, Force> {
+  FlatJoinFunction<EPGMVertex, EPGMVertex, Force>, CrossFunction<EPGMVertex, EPGMVertex, Force> {
 
   protected double k;
   protected Vector2D delta;

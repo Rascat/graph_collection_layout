@@ -31,10 +31,6 @@ public class WeightedAttractiveForces implements AttractiveForces {
       .join(vertices).where("sourceId").equalTo("id").with(new TransferPosition(TAIL))
       .join(vertices).where("targetId").equalTo("id").with(new TransferPosition(HEAD));
 
-    positionedEdges = positionedEdges
-      .join(vertices).where("sourceId").equalTo("id").with(new TransferGraphIds(TAIL))
-      .join(vertices).where("targetId").equalTo("id").with(new TransferGraphIds(HEAD));
-
     return positionedEdges.flatMap(new WeightedAttractionFunction(k, sameGraphFactor, differentGraphFactor));
   }
 

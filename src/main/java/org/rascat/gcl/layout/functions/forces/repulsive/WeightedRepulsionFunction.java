@@ -2,6 +2,7 @@ package org.rascat.gcl.layout.functions.forces.repulsive;
 
 import org.apache.commons.math3.exception.MathArithmeticException;
 import org.apache.commons.math3.geometry.euclidean.twod.Vector2D;
+import org.apache.flink.util.Collector;
 import org.gradoop.common.model.impl.pojo.EPGMVertex;
 import org.rascat.gcl.layout.model.Force;
 
@@ -46,6 +47,25 @@ public class WeightedRepulsionFunction extends RepulsionFunction {
     }
 
     return getWeightedForce(v, u);
+  }
+
+  @Override
+  public void join(EPGMVertex v, EPGMVertex u, Collector<Force> out) {
+    setPositionalValues(v, u);
+
+    if (v.equals(u) || distance > maxDistance()) {
+      return;
+    }
+
+    if (distance == 0) {
+      relocate(v);
+      setPositionalValues(v, u);
+    }
+
+    Force force = getWeightedForce(v, u);
+    out.collect(force);
+    Vector2D reverseVector = force.getVector().scalarMultiply(-1);
+    out.collect(new Force(u.getId(), reverseVector));
   }
 
   private Force getWeightedForce(EPGMVertex v, EPGMVertex u) {

@@ -1,5 +1,6 @@
 package org.rascat.gcl.layout.functions.forces.repulsive;
 
+import org.apache.flink.api.common.functions.FlatJoinFunction;
 import org.apache.flink.api.java.DataSet;
 import org.apache.flink.api.java.functions.KeySelector;
 import org.gradoop.common.model.impl.pojo.EPGMVertex;
@@ -31,23 +32,23 @@ public class GridRepulsiveForces implements RepulsiveForces {
 
     DataSet<Force> directNeighbors = vertices.join(vertices)
       .where(selfSelector).equalTo(selfSelector)
-      .with(repulsionFunction);
+      .with((FlatJoinFunction<EPGMVertex, EPGMVertex, Force>) repulsionFunction);
 
     DataSet<Force> upNeighbors = vertices.join(vertices)
       .where(upSelector).equalTo(selfSelector)
-      .with(repulsionFunction);
+      .with((FlatJoinFunction<EPGMVertex, EPGMVertex, Force>) repulsionFunction);
 
     DataSet<Force> upRightNeighbors = vertices.join(vertices)
       .where(upRightSelector).equalTo(selfSelector)
-      .with(repulsionFunction);
+      .with((FlatJoinFunction<EPGMVertex, EPGMVertex, Force>) repulsionFunction);
 
     DataSet<Force> upLeftNeighbors = vertices.join(vertices)
       .where(upLeftSelector).equalTo(selfSelector)
-      .with(repulsionFunction);
+      .with((FlatJoinFunction<EPGMVertex, EPGMVertex, Force>) repulsionFunction);
 
     DataSet<Force> leftNeighbors = vertices.join(vertices)
       .where(leftSelector).equalTo(selfSelector)
-      .with(repulsionFunction);
+      .with((FlatJoinFunction<EPGMVertex, EPGMVertex, Force>) repulsionFunction);
 
     return directNeighbors
       .union(upNeighbors)

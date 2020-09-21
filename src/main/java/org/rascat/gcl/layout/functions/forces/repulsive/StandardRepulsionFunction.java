@@ -8,7 +8,7 @@ import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.common.model.impl.pojo.EPGMVertex;
 import org.rascat.gcl.layout.model.Force;
 
-public class StandardRepulsionFunction extends RepulsionFunction implements FlatJoinFunction<EPGMVertex, EPGMVertex, Force> {
+public class StandardRepulsionFunction extends RepulsionFunction {
 
   @Override
   public Force cross(EPGMVertex v, EPGMVertex u) {
